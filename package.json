@@ -1,0 +1,56 @@
+{
+  "name": "@oremis/prisme",
+  "version": "0.1.0",
+  "description": "Design system Vue 3 officiel des applications web OREMIS.",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/prisme.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "types": "./dist/index.d.ts",
+  "style": "./dist/styles.css",
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "type-check": "vue-tsc -p tsconfig.build.json --noEmit",
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "latest",
+    "@storybook/addon-a11y": "^10.5.9",
+    "@storybook/addon-docs": "^10.5.9",
+    "@storybook/addon-vitest": "^10.5.9",
+    "@storybook/vue3-vite": "^10.5.9",
+    "@types/node": "^24.13.3",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitest/browser-playwright": "latest",
+    "@vitest/coverage-v8": "latest",
+    "@vue/tsconfig": "^0.9.1",
+    "playwright": "latest",
+    "storybook": "^10.5.9",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0",
+    "vitest": "latest",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.8"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.33.0",
+    "reka-ui": "^2.10.3"
+  }
+}

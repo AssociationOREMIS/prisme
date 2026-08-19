@@ -1,0 +1,22 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Prisme/Introduction" />
+
+# Prisme
+
+Prisme est la bibliothèque UI Vue 3 des applications web OREMIS.
+
+La première version fournit une fondation compacte pour les interfaces métier :
+tokens CSS, thème clair, composants accessibles et API publique préfixée `Pr`.
+
+```ts
+import { PrButton, PrCard, PrInput } from '@oremis/prisme'
+import '@oremis/prisme/styles.css'
+```
+
+```vue
+<PrCard>
+  <PrInput v-model="name" label="Nom" />
+  <PrButton>Enregistrer</PrButton>
+</PrCard>
+```

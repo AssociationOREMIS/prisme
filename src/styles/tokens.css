@@ -1,0 +1,104 @@
+:root {
+  --pr-blue-50: #eff8ff;
+  --pr-blue-100: #dff0ff;
+  --pr-blue-200: #b8e1ff;
+  --pr-blue-300: #78caff;
+  --pr-blue-400: #32aeea;
+  --pr-blue-500: #0077b6;
+  --pr-blue-600: #08619f;
+  --pr-blue-700: #0d4d86;
+  --pr-blue-800: #103f6f;
+  --pr-blue-900: #0d2c99;
+
+  --pr-green-50: #ecfdf6;
+  --pr-green-100: #d2f9e9;
+  --pr-green-200: #a8f0d4;
+  --pr-green-300: #6edfb9;
+  --pr-green-400: #31c48d;
+  --pr-green-500: #16a978;
+  --pr-green-600: #0f8661;
+  --pr-green-700: #106b50;
+  --pr-green-800: #105540;
+  --pr-green-900: #0f4636;
+
+  --pr-yellow-50: #fffbeb;
+  --pr-yellow-100: #fff2c6;
+  --pr-yellow-200: #ffe38a;
+  --pr-yellow-300: #ffd24d;
+  --pr-yellow-400: #ebb223;
+  --pr-yellow-500: #d49712;
+  --pr-yellow-600: #b8750d;
+  --pr-yellow-700: #94570f;
+  --pr-yellow-800: #794614;
+  --pr-yellow-900: #663a16;
+
+  --pr-red-50: #fef2f2;
+  --pr-red-100: #fee2e2;
+  --pr-red-200: #fecaca;
+  --pr-red-300: #fca5a5;
+  --pr-red-400: #f87171;
+  --pr-red-500: #ef4444;
+  --pr-red-600: #dc2626;
+  --pr-red-700: #b91c1c;
+  --pr-red-800: #991b1b;
+  --pr-red-900: #7f1d1d;
+
+  --pr-neutral-0: #ffffff;
+  --pr-neutral-50: #f8fafc;
+  --pr-neutral-100: #f1f5f9;
+  --pr-neutral-200: #e2e8f0;
+  --pr-neutral-300: #cbd5e1;
+  --pr-neutral-400: #94a3b8;
+  --pr-neutral-500: #64748b;
+  --pr-neutral-600: #475569;
+  --pr-neutral-700: #334155;
+  --pr-neutral-800: #1e293b;
+  --pr-neutral-900: #0f172a;
+  --pr-neutral-950: #020617;
+
+  --pr-space-0: 0;
+  --pr-space-1: 0.25rem;
+  --pr-space-2: 0.5rem;
+  --pr-space-3: 0.75rem;
+  --pr-space-4: 1rem;
+  --pr-space-5: 1.25rem;
+  --pr-space-6: 1.5rem;
+  --pr-space-8: 2rem;
+  --pr-space-10: 2.5rem;
+  --pr-space-12: 3rem;
+
+  --pr-radius-xs: 0.1875rem;
+  --pr-radius-sm: 0.25rem;
+  --pr-radius-md: 0.375rem;
+  --pr-radius-lg: 0.5rem;
+  --pr-radius-full: 999px;
+
+  --pr-navbar-height: 3.75rem;
+  --pr-sidebar-width: 17.5rem;
+  --pr-sidebar-collapsed-width: 4.375rem;
+  --pr-breakpoint-mobile: 48.75rem;
+  --pr-breakpoint-tablet: 64rem;
+  --pr-breakpoint-desktop: 80rem;
+
+  --pr-shadow-xs: 0 1px 2px rgb(15 23 42 / 6%);
+  --pr-shadow-sm: 0 1px 3px rgb(15 23 42 / 9%), 0 1px 2px rgb(15 23 42 / 5%);
+  --pr-shadow-md: 0 8px 20px rgb(15 23 42 / 10%);
+
+  --pr-font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --pr-font-mono:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  --pr-font-size-xs: 0.75rem;
+  --pr-font-size-sm: 0.875rem;
+  --pr-font-size-md: 0.9375rem;
+  --pr-font-size-lg: 1rem;
+  --pr-font-size-xl: 1.25rem;
+
+  --pr-line-height-tight: 1.25;
+  --pr-line-height-normal: 1.5;
+
+  --pr-duration-fast: 120ms;
+  --pr-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}

@@ -1,0 +1,97 @@
+@import "./styles/prisme.css";
+
+#app {
+  min-height: 100svh;
+}
+
+.playground {
+  width: min(100%, 72rem);
+}
+
+.playground__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pr-space-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--pr-space-6);
+}
+
+.playground__eyebrow {
+  margin: 0;
+  color: var(--pr-color-primary);
+  font-size: var(--pr-font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.playground__title {
+  margin: 0;
+  color: var(--pr-color-text);
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+.playground__description {
+  max-width: 680px;
+  margin: 0;
+  color: var(--pr-color-text-muted);
+}
+
+.playground__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--pr-space-5);
+  align-items: start;
+}
+
+.playground__form {
+  display: grid;
+  gap: var(--pr-space-4);
+}
+
+.playground__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pr-space-3);
+  align-items: center;
+}
+
+.playground__card-title {
+  margin: 0 0 var(--pr-space-3);
+  font-size: var(--pr-font-size-lg);
+  line-height: var(--pr-line-height-tight);
+}
+
+.playground__brand-mark,
+.playground__avatar {
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--pr-radius-md);
+  font-weight: 800;
+}
+
+.playground__brand-mark {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--pr-color-navbar-border);
+  background: var(--pr-color-navbar-muted);
+}
+
+.playground__brand-text {
+  font-weight: 750;
+}
+
+.playground__avatar {
+  width: 2rem;
+  height: 2rem;
+  background: var(--pr-color-navbar-muted);
+  color: var(--pr-color-navbar-text);
+  font-size: var(--pr-font-size-xs);
+}
+
+@media (max-width: 760px) {
+  .playground__grid {
+    grid-template-columns: 1fr;
+  }
+}
