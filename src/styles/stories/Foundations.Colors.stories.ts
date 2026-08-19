@@ -26,7 +26,7 @@ const semanticTokens = [
 ]
 
 const meta = {
-  title: 'Prisme/Foundations/Colors',
+  title: 'Foundations/Colors',
   tags: ['autodocs'],
   render: () => ({
     setup() {

@@ -11,7 +11,7 @@ const spaces = [
 ]
 
 const meta = {
-  title: 'Prisme/Foundations/Spacing',
+  title: 'Foundations/Spacing',
   tags: ['autodocs'],
   render: () => ({
     setup() {

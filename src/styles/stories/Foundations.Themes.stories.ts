@@ -24,7 +24,7 @@ const themeTokens = [
 ]
 
 const meta = {
-  title: 'Prisme/Foundations/Themes',
+  title: 'Foundations/Themes',
   tags: ['autodocs'],
   render: () => ({
     components: {

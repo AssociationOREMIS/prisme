@@ -3,7 +3,7 @@ import { PrSpinner } from './'
 import '../../stories.css'
 
 const meta = {
-  title: 'Prisme/Components/Spinner',
+  title: 'Feedback/Spinner',
   component: PrSpinner,
   tags: ['autodocs'],
   argTypes: {

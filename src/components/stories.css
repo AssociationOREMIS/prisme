@@ -42,3 +42,16 @@
   align-items: center;
   min-height: 4rem;
 }
+
+.story-toast-demo {
+  position: relative;
+  min-height: 8rem;
+  overflow: hidden;
+}
+
+.story-toast-demo .pr-toast__viewport {
+  position: absolute;
+  right: var(--pr-space-4);
+  bottom: var(--pr-space-4);
+  width: min(24rem, calc(100% - var(--pr-space-8)));
+}

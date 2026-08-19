@@ -5,7 +5,7 @@ import { PrCard } from './'
 import '../../stories.css'
 
 const meta = {
-  title: 'Prisme/Components/Card',
+  title: 'Data Display/Card',
   component: PrCard,
   tags: ['autodocs'],
   argTypes: {

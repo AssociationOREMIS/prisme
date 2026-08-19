@@ -26,9 +26,12 @@ import {
 import '../navigation.stories.css'
 
 const meta = {
-  title: 'Prisme/Navigation/Sidebar',
+  title: 'Navigation/Sidebar',
   component: PrSidebar,
   tags: ['autodocs'],
+  parameters: {
+    prLayout: 'fullscreen',
+  },
 } satisfies Meta<typeof PrSidebar>
 
 export default meta

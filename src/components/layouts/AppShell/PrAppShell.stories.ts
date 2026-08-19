@@ -25,9 +25,12 @@ import {
 import '../navigation.stories.css'
 
 const meta = {
-  title: 'Prisme/Navigation/AppShell',
+  title: 'Layout/AppShell',
   component: PrAppShell,
   tags: ['autodocs'],
+  parameters: {
+    prLayout: 'fullscreen',
+  },
 } satisfies Meta<typeof PrAppShell>
 
 export default meta
@@ -48,7 +51,7 @@ export const Default: Story = {
       PrThemeToggle,
     },
     setup() {
-      const activePath = ref('/settings/security')
+      const activePath = ref('/')
 
       function isActive(path: string) {
         return activePath.value === path

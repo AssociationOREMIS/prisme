@@ -1,48 +1,75 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { Bell } from '@lucide/vue'
-import { PrButton, PrNavbar, PrThemeToggle } from '../../../index'
+import { PrButton, PrNavbar } from '../../../index'
 import '../navigation.stories.css'
 
 const meta = {
-  title: 'Prisme/Navigation/Navbar',
+  title: 'Navigation/Navbar',
   component: PrNavbar,
   tags: ['autodocs'],
-  args: {
-    brandLabel: 'OREMIS',
+  parameters: {
+    prLayout: 'fullscreen',
   },
+  args: {
+    title: 'Navbar Title',
+  },
+  render: (args) => ({
+    components: { PrNavbar },
+    setup() {
+      return { args }
+    },
+    template: '<div class="nav-story-navbar-frame"><PrNavbar v-bind="args" /></div>',
+  }),
 } satisfies Meta<typeof PrNavbar>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  render: (args) => ({
-    components: { PrNavbar },
-    setup() {
-      return { args }
-    },
-    template: '<div style="height: var(--pr-navbar-height)"><PrNavbar v-bind="args" /></div>',
+  args: {},
+}
+
+export const WithChildren: Story = {
+  render: () => ({
+    components: { PrButton, PrNavbar },
+    template: `
+      <div class="nav-story-navbar-frame">
+        <PrNavbar title="Navbar Title">
+          <PrButton>Button</PrButton>
+        </PrNavbar>
+      </div>
+    `,
   }),
 }
 
-export const WithSlots: Story = {
+export const IconOnly: Story = {
+  args: {
+    title: 'Navbar Title',
+    logoVariant: 'icon-only',
+  },
+}
+
+export const WithDiagonalDivider: Story = {
+  args: {
+    title: 'Navbar Title',
+    diagonalDivider: true,
+  },
+}
+
+export const IconOnlyWithDiagonalDivider: Story = {
+  args: {
+    title: 'Navbar Title',
+    logoVariant: 'icon-only',
+    diagonalDivider: true,
+  },
+}
+
+export const WithChildrenAndDiagonalDivider: Story = {
   render: () => ({
-    components: { Bell, PrButton, PrNavbar, PrThemeToggle },
+    components: { PrButton, PrNavbar },
     template: `
-      <div style="height: var(--pr-navbar-height)">
-        <PrNavbar>
-          <template #brand>
-            <span class="nav-story-brand" aria-hidden="true">O</span>
-            <span class="nav-story-brand-text">OREMIS Admin</span>
-          </template>
-          <template #actions>
-            <PrButton variant="ghost" size="sm"><Bell :size="16" aria-hidden="true" /> Alertes</PrButton>
-            <PrButton variant="secondary" size="sm">Créer</PrButton>
-            <PrThemeToggle />
-          </template>
-          <template #user>
-            <span class="nav-story-avatar" aria-hidden="true">LM</span>
-          </template>
+      <div class="nav-story-navbar-frame">
+        <PrNavbar title="Navbar Title" diagonal-divider>
+          <PrButton>Button</PrButton>
         </PrNavbar>
       </div>
     `,

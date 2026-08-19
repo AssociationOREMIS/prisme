@@ -3,7 +3,7 @@ import { PrDivider } from './'
 import '../../stories.css'
 
 const meta = {
-  title: 'Prisme/Components/Divider',
+  title: 'Layout/Divider',
   component: PrDivider,
   tags: ['autodocs'],
   argTypes: {

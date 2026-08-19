@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import './foundations.css'
 
 const meta = {
-  title: 'Prisme/Foundations/Typography',
+  title: 'Foundations/Typography',
   tags: ['autodocs'],
   render: () => ({
     template: `

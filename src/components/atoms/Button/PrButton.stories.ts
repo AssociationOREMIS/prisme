@@ -3,7 +3,7 @@ import { PrButton } from './'
 import '../../stories.css'
 
 const meta = {
-  title: 'Prisme/Components/Button',
+  title: 'Actions/Button',
   component: PrButton,
   tags: ['autodocs'],
   argTypes: {

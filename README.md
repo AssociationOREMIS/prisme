@@ -28,9 +28,36 @@ npm pack --dry-run
 ## Usage
 
 ```ts
-import { PrButton, PrCard, PrInput } from '@oremis/prisme'
+import {
+  PrButton,
+  PrDialog,
+  PrSelect,
+  PrTooltip,
+  PrDataTable,
+} from '@oremis/prisme'
 import '@oremis/prisme/styles.css'
 ```
+
+## Couverture composants
+
+Prisme couvre progressivement les composants generiques d'IVAO Atmosphere avec
+des implementations natives Vue 3, TypeScript, tokens Prisme et primitives Reka
+UI lorsque le comportement clavier/focus le justifie.
+
+Les composants publics utilisent tous le prefixe `Pr` et sont exportes depuis
+`@oremis/prisme`. L'inventaire de parite est maintenu dans
+[`docs/atmosphere-parity.md`](docs/atmosphere-parity.md).
+
+Lots actuellement couverts :
+
+- Forms : `PrLabel`, `PrTextarea`, `PrCheckbox`, `PrRadioGroup`, `PrSwitch`, `PrSelect`, `PrSlider`
+- Feedback : `PrAlert`, `PrAlertDialog`, `PrProgress`, `PrSkeleton`, `PrToast`
+- Overlays : `PrDialog`, `PrPopover`, `PrDropdownMenu`, `PrHoverCard`, `PrTooltip`, `PrSheet`
+- Navigation / interaction : `PrAccordion`, `PrCollapsible`, `PrNavigationMenu`, `PrPagination`, `PrToggle`, `PrToggleGroup`, `PrCommand`
+- Data / content : `PrTable`, `PrDataTable`, `PrCalendar`, `PrDatePicker`, `PrCarousel`, `PrScrollArea`, `PrTypography`, `PrListItem`
+
+Les tables et `PrDataTable` utilisent un conteneur horizontal interne pour les
+petits ecrans afin d'eviter un overflow global de page.
 
 ## Themes
 

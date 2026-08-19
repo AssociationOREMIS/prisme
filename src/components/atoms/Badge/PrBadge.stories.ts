@@ -3,7 +3,7 @@ import { PrBadge } from './'
 import '../../stories.css'
 
 const meta = {
-  title: 'Prisme/Components/Badge',
+  title: 'Data Display/Badge',
   component: PrBadge,
   tags: ['autodocs'],
   argTypes: {

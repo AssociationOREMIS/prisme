@@ -8,7 +8,7 @@ const shadows = [
 ]
 
 const meta = {
-  title: 'Prisme/Foundations/Shadows',
+  title: 'Foundations/Shadows',
   tags: ['autodocs'],
   render: () => ({
     setup() {

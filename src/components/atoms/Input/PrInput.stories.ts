@@ -4,7 +4,7 @@ import { PrInput } from './'
 import '../../stories.css'
 
 const meta = {
-  title: 'Prisme/Components/Input',
+  title: 'Forms/Input',
   component: PrInput,
   tags: ['autodocs'],
   argTypes: {

@@ -1,22 +1,29 @@
 .nav-story-shell {
-  min-height: 34rem;
+  min-height: 40rem;
   overflow: hidden;
   border: 1px solid var(--pr-color-border);
   border-radius: var(--pr-radius-lg);
 }
 
-.nav-story-shell .pr-navbar,
-.nav-story-shell .pr-sidebar {
-  position: absolute;
+.nav-story-navbar-frame {
+  height: var(--pr-navbar-height);
+}
+
+.nav-story-navbar-frame .pr-navbar {
+  position: static;
+  inset: auto;
 }
 
 .nav-story-shell .pr-app-shell {
-  position: relative;
-  min-height: 34rem;
+  min-height: 40rem;
 }
 
 .nav-story-shell .pr-app-shell__content {
-  min-height: calc(34rem - var(--pr-navbar-height));
+  min-height: calc(40rem - var(--pr-navbar-height));
+}
+
+.nav-story-shell .pr-sidebar {
+  height: calc(40rem - var(--pr-navbar-height));
 }
 
 .nav-story-content {

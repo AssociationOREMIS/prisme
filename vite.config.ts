@@ -32,14 +32,14 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['aria-query', 'lz-string', 'pretty-format'],
+    include: ['aria-query', 'lz-string', 'pretty-format', 'reka-ui'],
     exclude: ['@lucide/vue'],
   },
   test: {
     deps: {
       optimizer: {
         web: {
-          include: ['aria-query', 'lz-string', 'pretty-format'],
+          include: ['aria-query', 'lz-string', 'pretty-format', 'reka-ui'],
           exclude: ['@lucide/vue'],
         },
       },

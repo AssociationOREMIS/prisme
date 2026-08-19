@@ -9,7 +9,7 @@ const radii = [
 ]
 
 const meta = {
-  title: 'Prisme/Foundations/Radius',
+  title: 'Foundations/Radius',
   tags: ['autodocs'],
   render: () => ({
     setup() {
