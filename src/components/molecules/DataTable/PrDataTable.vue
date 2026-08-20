@@ -52,13 +52,16 @@ const slots = defineSlots<{
 }>()
 
 const isLoading = computed(() => props.loading || props.isLoading)
+const columns = computed(() => props.columns)
 const sourceRows = computed(() => props.data ?? props.rows)
 const emptyMessage = computed(() => props.noResultsMessage ?? props.emptyText)
-const filterColumnKey = computed(() => props.filterKey ?? props.columns.find((column) => column.filterable !== false)?.key ?? '')
+const filterColumnKey = computed(() => props.filterKey ?? columns.value.find((column) => column.filterable !== false)?.key ?? '')
+const pageSizeOptions = computed(() => props.pageSizeOptions)
 const hasRowActions = computed(() => Boolean(props.rowActions.length || 'row-actions' in slots))
+const hideSelectedRowsCount = computed(() => props.hideSelectedRowsCount)
 
 const visibleColumns = computed(() =>
-  props.columns.filter((column) => !hiddenColumnKeys.value.has(column.key)),
+  columns.value.filter((column) => !hiddenColumnKeys.value.has(column.key)),
 )
 
 const filteredRows = computed(() => {
@@ -195,7 +198,7 @@ function goToPage(nextPage: number) {
             v-if="filterColumnKey"
             v-model="filterValue"
             class="pr-data-table__filter h-8 w-[min(100%,16rem)]"
-            :placeholder="filterPlaceholder ?? `Filtrer ${props.columns.find((column) => column.key === filterColumnKey)?.label.toLocaleLowerCase() ?? 'les lignes'}...`"
+            :placeholder="filterPlaceholder ?? `Filtrer ${columns.find((column) => column.key === filterColumnKey)?.label.toLocaleLowerCase() ?? 'les lignes'}...`"
           />
         </slot>
       </div>

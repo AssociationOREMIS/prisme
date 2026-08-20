@@ -27,11 +27,13 @@ export const Default: Story = {
 
       const addToast = () => {
         id += 1
+        const title = args.title ?? 'Dossier mis a jour'
+        const description = args.description ?? 'Les changements ont ete sauvegardes.'
         toasts.value.push({
           id,
           open: true,
-          title: args.title,
-          description: id === 1 ? args.description : `${args.description} #${id}`,
+          title,
+          description: id === 1 ? description : `${description} #${id}`,
         })
       }
 
