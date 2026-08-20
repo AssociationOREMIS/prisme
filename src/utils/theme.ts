@@ -5,5 +5,5 @@ export {
   setPrTheme,
   togglePrTheme,
   usePrTheme,
-}
+} from '../composables/usePrTheme'
 export type { PrResolvedTheme, PrTheme } from '../composables/usePrTheme'
