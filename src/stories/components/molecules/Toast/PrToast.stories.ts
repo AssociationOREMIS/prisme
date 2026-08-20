@@ -15,9 +15,12 @@ const meta = {
   },
 } satisfies Meta<typeof PrToast>
 
-export default meta
 type Story = StoryObj<typeof meta>
 
+// noinspection JSUnusedGlobalSymbols
+export default meta
+
+// noinspection JSUnusedGlobalSymbols
 export const Default: Story = {
   render: (args) => ({
     components: { PrButton, PrToast, PrToastProvider },
@@ -67,6 +70,7 @@ export const Default: Story = {
   }),
 }
 
+// noinspection JSUnusedGlobalSymbols
 export const WithAction: Story = {
   render: () => ({
     components: { PrButton, PrToast, PrToastProvider },
@@ -98,7 +102,7 @@ export const WithAction: Story = {
             v-for="toast in toasts"
             :key="toast.id"
             :open="toast.open"
-            title="Controle requis"
+            title="Validation requise"
             description="Une verification manuelle est necessaire."
             action-label="Voir"
             @update:open="onOpenChange(toast, $event)"
