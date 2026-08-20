@@ -49,21 +49,41 @@ const describedBy = computed(() => {
   return ids.length > 0 ? ids.join(' ') : undefined
 })
 
+const inputClass = computed(() => [
+  'pr-input grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]',
+])
+
+const inputControlClass = computed(() => [
+  'pr-input__control min-h-[2.375rem] w-full rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] text-[length:var(--pr-font-size-md)] text-[color:var(--pr-color-text)] transition-[background-color,border-color,box-shadow] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] placeholder:text-[color:var(--pr-color-text-subtle)] hover:not-disabled:border-[var(--pr-neutral-400)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] disabled:cursor-not-allowed disabled:bg-[var(--pr-color-surface-subtle)] disabled:text-[color:var(--pr-color-text-muted)]',
+  props.error ? 'border-[var(--pr-color-danger)]' : '',
+])
+
+const inputMessageClass = computed(() => [
+  'pr-input__message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)]',
+  props.error
+    ? 'pr-input__message--error text-[color:var(--pr-color-danger)]'
+    : 'text-[color:var(--pr-color-text-muted)]',
+])
+
 function updateValue(event: Event) {
   emit('update:modelValue', (event.target as HTMLInputElement).value)
 }
 </script>
 
 <template>
-  <div class="pr-input" :class="{ 'pr-input--invalid': Boolean(error) }">
-    <label v-if="label" class="pr-input__label" :for="inputId">
+  <div :class="inputClass">
+    <label
+      v-if="label"
+      class="pr-input__label inline-flex w-fit items-baseline gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)]"
+      :for="inputId"
+    >
       <span>{{ label }}</span>
-      <span v-if="required" class="pr-input__required" aria-hidden="true">*</span>
+      <span v-if="required" class="pr-input__required text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
     </label>
 
     <input
       :id="inputId"
-      class="pr-input__control"
+      :class="inputControlClass"
       :name="name"
       :value="modelValue"
       :type="type"
@@ -75,10 +95,10 @@ function updateValue(event: Event) {
       @input="updateValue"
     >
 
-    <p v-if="error" :id="errorId" class="pr-input__message pr-input__message--error">
+    <p v-if="error" :id="errorId" :class="inputMessageClass">
       {{ error }}
     </p>
-    <p v-else-if="hint" :id="hintId" class="pr-input__message">
+    <p v-else-if="hint" :id="hintId" :class="inputMessageClass">
       {{ hint }}
     </p>
   </div>

@@ -3,14 +3,3 @@ export type { PrAppShellProps } from './AppShell'
 
 export { PrNavbar } from './Navbar'
 export type { PrNavbarProps } from './Navbar'
-
-export {
-  PrSidebar,
-  PrSidebarItem,
-  PrSidebarSubItem,
-} from './Sidebar'
-export type {
-  PrSidebarItemProps,
-  PrSidebarProps,
-  PrSidebarSubItemProps,
-} from './Sidebar'

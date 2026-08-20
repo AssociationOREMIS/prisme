@@ -25,9 +25,6 @@ export type { PrLabelProps } from './Label'
 export { PrProgress } from './Progress'
 export type { PrProgressProps } from './Progress'
 
-export { PrSidebarIcon } from './SidebarIcon'
-export type { PrSidebarIconProps } from './SidebarIcon'
-
 export { PrSkeleton } from './Skeleton'
 export type { PrSkeletonProps } from './Skeleton'
 

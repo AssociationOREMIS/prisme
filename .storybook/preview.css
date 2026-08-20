@@ -62,11 +62,12 @@ body {
   color: var(--pr-color-text);
 }
 
-.pr-storybook-canvas[data-pr-layout="centered"] .pr-storybook-surface,
-.pr-storybook-canvas[data-pr-layout="padded"] .pr-storybook-surface {
-  width: min(100%, 34rem);
+.pr-storybook-canvas[data-pr-layout="centered"] .pr-storybook-surface {
+  width: fit-content;
+  max-width: 100%;
 }
 
+.pr-storybook-canvas[data-pr-layout="padded"] .pr-storybook-surface,
 .pr-storybook-canvas[data-pr-layout="fullscreen"] .pr-storybook-surface {
   width: 100%;
 }

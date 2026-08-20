@@ -39,13 +39,13 @@ function updateValue(value: number[] | undefined) {
 </script>
 
 <template>
-  <div class="pr-slider" :class="{ 'pr-slider--disabled': disabled }">
-    <div v-if="label || showValue" class="pr-slider__header">
+  <div class="pr-slider grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
+    <div v-if="label || showValue" class="pr-slider__header flex items-center justify-between gap-[var(--pr-space-3)]">
       <PrLabel v-if="label" :disabled="disabled">{{ label }}</PrLabel>
-      <output v-if="showValue" class="pr-slider__value">{{ sliderValue[0] }}</output>
+      <output v-if="showValue" class="pr-slider__value text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)] tabular-nums">{{ sliderValue[0] }}</output>
     </div>
     <SliderRoot
-      class="pr-slider__root"
+      class="pr-slider__root relative flex h-5 touch-none select-none items-center data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"
       :model-value="sliderValue"
       :min="min"
       :max="max"
@@ -54,10 +54,10 @@ function updateValue(value: number[] | undefined) {
       :name="name"
       @update:model-value="updateValue"
     >
-      <SliderTrack class="pr-slider__track">
-        <SliderRange class="pr-slider__range" />
+      <SliderTrack class="pr-slider__track relative h-1.5 flex-auto overflow-hidden rounded-[var(--pr-radius-full)] bg-[var(--pr-color-surface-subtle)]">
+        <SliderRange class="pr-slider__range absolute h-full rounded-[var(--pr-radius-full)] bg-[var(--pr-color-primary)]" />
       </SliderTrack>
-      <SliderThumb class="pr-slider__thumb" aria-label="Valeur" />
+      <SliderThumb class="pr-slider__thumb block size-4 cursor-grab rounded-[var(--pr-radius-full)] border-2 border-[var(--pr-color-primary)] bg-[var(--pr-color-surface)] shadow-[var(--pr-shadow-sm)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] active:cursor-grabbing" aria-label="Valeur" />
     </SliderRoot>
   </div>
 </template>

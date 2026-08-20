@@ -24,7 +24,7 @@
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "test": "vitest run",
     "preview": "vite preview",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build"
   },
   "peerDependencies": {
@@ -36,6 +36,7 @@
     "@storybook/addon-docs": "^10.5.9",
     "@storybook/addon-vitest": "^10.5.9",
     "@storybook/vue3-vite": "^10.5.9",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/browser-playwright": "latest",
@@ -43,6 +44,7 @@
     "@vue/tsconfig": "^0.9.1",
     "playwright": "latest",
     "storybook": "^10.5.9",
+    "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.2.0",
     "vitest": "latest",

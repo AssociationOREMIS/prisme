@@ -97,12 +97,12 @@ export {
   PrSidebar,
   PrSidebarItem,
   PrSidebarSubItem,
-} from './components/layouts/Sidebar'
+} from './components/molecules/Sidebar'
 export type {
   PrSidebarItemProps,
   PrSidebarProps,
   PrSidebarSubItemProps,
-} from './components/layouts/Sidebar'
+} from './components/molecules/Sidebar'
 
 export { PrThemeToggle } from './components/molecules/ThemeToggle'
 export type { PrThemeToggleProps } from './components/molecules/ThemeToggle'
@@ -122,8 +122,8 @@ export type { PrTableProps } from './components/atoms/Table'
 export { PrTextarea } from './components/atoms/Textarea'
 export type { PrTextareaProps } from './components/atoms/Textarea'
 
-export { PrToast } from './components/molecules/Toast'
-export type { PrToastProps } from './components/molecules/Toast'
+export { PrToast, PrToastProvider } from './components/molecules/Toast'
+export type { PrToastProps, PrToastProviderProps } from './components/molecules/Toast'
 
 export { PrToggle } from './components/atoms/Toggle'
 export type { PrToggleProps } from './components/atoms/Toggle'

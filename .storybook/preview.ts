@@ -24,7 +24,7 @@ function resolveStoryTheme(value: PrTheme): PrResolvedTheme {
 function resolveStoryLayout(value: unknown): StoryLayout {
   return typeof value === 'string' && layoutValues.includes(value as StoryLayout)
     ? (value as StoryLayout)
-    : 'centered'
+    : 'padded'
 }
 
 const preview: Preview = {

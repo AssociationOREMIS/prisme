@@ -47,19 +47,37 @@ const describedBy = computed(() => {
   return ids.length > 0 ? ids.join(' ') : undefined
 })
 
+const textareaClass = computed(() => [
+  'pr-textarea grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]',
+])
+
+const textareaResizeClass: Record<NonNullable<PrTextareaProps['resize']>, string> = {
+  none: 'resize-none',
+  vertical: 'resize-y',
+  horizontal: 'resize-x',
+  both: 'resize',
+}
+
+const textareaControlClass = computed(() => [
+  'pr-textarea__control min-h-24 w-full rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] p-[var(--pr-space-3)] font-[inherit] text-[length:var(--pr-font-size-md)] leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text)] transition-[background-color,border-color,box-shadow] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] placeholder:text-[color:var(--pr-color-text-subtle)] hover:not-disabled:border-[var(--pr-neutral-400)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] disabled:cursor-not-allowed disabled:bg-[var(--pr-color-surface-subtle)] disabled:text-[color:var(--pr-color-text-muted)]',
+  props.error ? 'border-[var(--pr-color-danger)]' : '',
+  textareaResizeClass[props.resize],
+])
+
+const fieldMessageClass = computed(() => [
+  'pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)]',
+  props.error
+    ? 'pr-field-message--error text-[color:var(--pr-color-danger)]'
+    : 'text-[color:var(--pr-color-text-muted)]',
+])
+
 function updateValue(event: Event) {
   emit('update:modelValue', (event.target as HTMLTextAreaElement).value)
 }
 </script>
 
 <template>
-  <div
-    class="pr-textarea"
-    :class="[
-      `pr-textarea--resize-${resize}`,
-      { 'pr-textarea--invalid': Boolean(error) },
-    ]"
-  >
+  <div :class="textareaClass">
     <PrLabel
       v-if="label"
       :for="textareaId"
@@ -70,7 +88,7 @@ function updateValue(event: Event) {
     </PrLabel>
     <textarea
       :id="textareaId"
-      class="pr-textarea__control"
+      :class="textareaControlClass"
       :name="name"
       :value="modelValue"
       :placeholder="placeholder"
@@ -81,10 +99,10 @@ function updateValue(event: Event) {
       :aria-describedby="describedBy"
       @input="updateValue"
     />
-    <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error">
+    <p v-if="error" :id="errorId" :class="fieldMessageClass">
       {{ error }}
     </p>
-    <p v-else-if="hint" :id="hintId" class="pr-field-message">
+    <p v-else-if="hint" :id="hintId" :class="fieldMessageClass">
       {{ hint }}
     </p>
   </div>

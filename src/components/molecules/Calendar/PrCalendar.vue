@@ -44,22 +44,22 @@ function select(day: string) {
 </script>
 
 <template>
-  <div class="pr-calendar">
-    <div class="pr-calendar__header">
-      <button type="button" class="pr-calendar__nav" aria-label="Mois precedent" @click="move(-1)">
+  <div class="pr-calendar grid w-[min(21rem,100%)] gap-[var(--pr-space-3)] rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-4)]">
+    <div class="pr-calendar__header flex items-center justify-between gap-[var(--pr-space-3)]">
+      <button type="button" class="pr-calendar__nav inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" aria-label="Mois precedent" @click="move(-1)">
         <ChevronLeft :size="16" />
       </button>
-      <strong class="pr-calendar__label">{{ label }}</strong>
-      <button type="button" class="pr-calendar__nav" aria-label="Mois suivant" @click="move(1)">
+      <strong class="pr-calendar__label capitalize">{{ label }}</strong>
+      <button type="button" class="pr-calendar__nav inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" aria-label="Mois suivant" @click="move(1)">
         <ChevronRight :size="16" />
       </button>
     </div>
-    <div class="pr-calendar__grid">
-      <span v-for="weekday in weekdays" :key="weekday" class="pr-calendar__weekday">{{ weekday }}</span>
+    <div class="pr-calendar__grid grid grid-cols-7 gap-[var(--pr-space-1)]">
+      <span v-for="weekday in weekdays" :key="weekday" class="pr-calendar__weekday text-center text-[length:var(--pr-font-size-xs)] font-[750] text-[color:var(--pr-color-text-muted)]">{{ weekday }}</span>
       <button
         v-for="(day, index) in days"
         :key="`${day}-${index}`"
-        class="pr-calendar__day"
+        class="pr-calendar__day inline-grid aspect-square min-w-0 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text)] hover:not-disabled:bg-[var(--pr-color-surface-subtle)] disabled:invisible"
         type="button"
         :disabled="!day"
         @click="select(day)"

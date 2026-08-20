@@ -21,6 +21,7 @@ const emit = defineEmits<{
 
 const internalCollapsed = ref(props.defaultCollapsed)
 const internalMobileOpen = ref(false)
+const previousBodyOverflow = ref('')
 
 const collapsed = computed({
   get: () => props.collapsed ?? internalCollapsed.value,
@@ -65,7 +66,13 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 watch(mobileOpen, (isOpen) => {
-  document.body.classList.toggle('pr-app-shell-mobile-open', isOpen)
+  if (isOpen) {
+    previousBodyOverflow.value = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return
+  }
+
+  document.body.style.overflow = previousBodyOverflow.value
 })
 
 onMounted(() => {
@@ -74,7 +81,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown)
-  document.body.classList.remove('pr-app-shell-mobile-open')
+  document.body.style.overflow = previousBodyOverflow.value
 })
 
 provide(prAppShellContextKey, {
@@ -90,7 +97,7 @@ provide(prAppShellContextKey, {
 
 <template>
   <div
-    class="pr-app-shell"
+    class="pr-app-shell group/app-shell grid min-h-[100svh] grid-cols-[var(--pr-sidebar-width)_minmax(0,1fr)] grid-rows-[var(--pr-navbar-height)_minmax(0,1fr)] bg-[var(--pr-color-background)] text-[color:var(--pr-color-text)] transition-[grid-template-columns] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] data-[sidebar-collapsed=true]:grid-cols-[var(--pr-sidebar-collapsed-width)_minmax(0,1fr)] max-[780px]:grid-cols-[minmax(0,1fr)] max-[780px]:data-[sidebar-collapsed=true]:grid-cols-[minmax(0,1fr)]"
     :data-sidebar-collapsed="collapsed ? 'true' : 'false'"
     :data-mobile-open="mobileOpen ? 'true' : 'false'"
   >
@@ -98,7 +105,7 @@ provide(prAppShellContextKey, {
 
     <button
       v-if="mobileOpen"
-      class="pr-app-shell__backdrop"
+      class="pr-app-shell__backdrop fixed inset-[var(--pr-navbar-height)_0_0] z-[30] cursor-pointer bg-[var(--pr-color-overlay)]"
       type="button"
       aria-label="Fermer la navigation"
       @click="closeMobile"
@@ -106,7 +113,7 @@ provide(prAppShellContextKey, {
 
     <slot name="sidebar" />
 
-    <main class="pr-app-shell__content">
+    <main class="pr-app-shell__content col-[2] row-[2] min-h-[calc(100svh-var(--pr-navbar-height))] min-w-0 p-[var(--pr-space-6)] lg:p-[var(--pr-space-8)] max-[780px]:col-[1] max-[780px]:p-[var(--pr-space-4)]">
       <slot />
     </main>
   </div>

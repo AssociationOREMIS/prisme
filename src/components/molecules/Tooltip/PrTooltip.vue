@@ -33,7 +33,7 @@ withDefaults(defineProps<PrTooltipProps>(), {
       </TooltipTrigger>
       <TooltipPortal>
         <TooltipContent
-          class="pr-tooltip"
+          class="pr-tooltip z-[70] rounded-[var(--pr-radius-md)] bg-[var(--pr-neutral-900)] px-[var(--pr-space-2)] py-[var(--pr-space-1)] text-[length:var(--pr-font-size-xs)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-neutral-0)] shadow-[var(--pr-shadow-sm)] data-[state=delayed-open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[state=instant-open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[side=top]:origin-bottom data-[side=right]:origin-left data-[side=bottom]:origin-top data-[side=left]:origin-right"
           :side="side"
           :align="align"
           :side-offset="8"
@@ -41,7 +41,7 @@ withDefaults(defineProps<PrTooltipProps>(), {
           <slot name="content">
             {{ content }}
           </slot>
-          <TooltipArrow class="pr-tooltip__arrow" :width="10" :height="5" />
+          <TooltipArrow class="pr-tooltip__arrow fill-current" :width="10" :height="5" />
         </TooltipContent>
       </TooltipPortal>
     </TooltipRoot>

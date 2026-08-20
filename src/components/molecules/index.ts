@@ -55,20 +55,24 @@ export type { PrScrollAreaProps } from './ScrollArea'
 export { PrSheet } from './Sheet'
 export type { PrSheetProps } from './Sheet'
 
-export { PrSidebarCollapseButton } from './SidebarCollapseButton'
-export type { PrSidebarCollapseButtonProps } from './SidebarCollapseButton'
-
-export { PrSidebarItem } from './SidebarItem'
-export type { PrSidebarItemProps } from './SidebarItem'
-
-export { PrSidebarSubItem } from './SidebarSubItem'
-export type { PrSidebarSubItemProps } from './SidebarSubItem'
+export {
+  PrSidebar,
+  PrSidebarItem,
+  PrSidebarSubItem,
+} from './Sidebar'
+export type {
+  PrSidebarCollapseButtonProps,
+  PrSidebarIconProps,
+  PrSidebarItemProps,
+  PrSidebarProps,
+  PrSidebarSubItemProps,
+} from './Sidebar'
 
 export { PrThemeToggle } from './ThemeToggle'
 export type { PrThemeToggleProps } from './ThemeToggle'
 
-export { PrToast } from './Toast'
-export type { PrToastProps } from './Toast'
+export { PrToast, PrToastProvider } from './Toast'
+export type { PrToastProps, PrToastProviderProps } from './Toast'
 
 export { PrToggleGroup } from './ToggleGroup'
 export type { PrToggleGroupItem, PrToggleGroupProps } from './ToggleGroup'
