@@ -2,6 +2,7 @@
   "name": "@oremis/prisme",
   "version": "0.1.0",
   "description": "Design system Vue 3 officiel des applications web OREMIS.",
+  "license": "MIT",
   "type": "module",
   "files": [
     "dist"

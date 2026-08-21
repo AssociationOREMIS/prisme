@@ -1,99 +1,127 @@
 # Prisme
 
 Prisme est la bibliotheque UI Vue 3 officielle des applications web OREMIS.
-Elle fournit des composants reutilisables, des tokens de design et des layouts
-pour construire des interfaces coherentes dans l'ecosysteme OREMIS.
 
-## Installation
+Elle fournit des composants, des styles et des tokens de design pour construire des interfaces coherentes dans l'ecosysteme OREMIS.
+
+## Requirements
+
+1. Node 24 ou plus recent.
+2. Vue 3.5 ou plus recent.
+3. Un navigateur moderne compatible avec Tailwind CSS v4.
+
+## Usage
+
+1. Installez le package.
 
 ```bash
 npm install @oremis/prisme
 ```
 
+2. Importez les styles.
+
 ```ts
-import { PrButton, PrCard, PrInput } from '@oremis/prisme'
 import '@oremis/prisme/styles.css'
 ```
 
-## Developpement local
+3. Utilisez les composants.
 
-Installer les dependances :
+```vue
+<script setup lang="ts">
+import { PrButton } from '@oremis/prisme'
+</script>
+
+<template>
+  <PrButton>Continuer</PrButton>
+</template>
+```
+
+4. Consultez la documentation Storybook.
+
+```text
+https://associationoremis.github.io/prisme/
+```
+
+## Laravel Blade
+
+Dans une application Laravel avec Vite, Prisme peut etre monte dans une vue Blade via une petite application Vue.
+
+1. Installez le package dans l'application Laravel.
+
+```bash
+npm install @oremis/prisme
+```
+
+2. Importez les styles et montez Vue dans `resources/js/app.ts`.
+
+```ts
+import { createApp } from 'vue'
+import { PrButton } from '@oremis/prisme'
+import '@oremis/prisme/styles.css'
+
+const element = document.getElementById('prisme-app')
+
+if (element) {
+  createApp({
+    components: { PrButton },
+    template: '<PrButton>{{ label }}</PrButton>',
+    data: () => ({
+      label: element.dataset.label ?? 'Continuer',
+    }),
+  }).mount(element)
+}
+```
+
+3. Ajoutez le point de montage dans une vue Blade.
+
+```blade
+@vite('resources/js/app.ts')
+
+<div id="prisme-app" data-label="Enregistrer"></div>
+```
+
+Pour plusieurs composants ou des ecrans plus complets, creez un composant Vue dedie puis montez-le depuis `app.ts`.
+
+Vous pouvez aussi ecrire les composants directement dans le Blade, tant qu'ils sont dans le noeud monte par Vue. En HTML, utilisez le format kebab-case :
+
+```ts
+import { createApp } from 'vue'
+import { PrButton } from '@oremis/prisme'
+import '@oremis/prisme/styles.css'
+
+const app = createApp({})
+
+app.component('PrButton', PrButton)
+app.mount('#prisme-app')
+```
+
+```blade
+@vite('resources/js/app.ts')
+
+<div id="prisme-app">
+    <pr-button>Enregistrer</pr-button>
+</div>
+```
+
+## Development
 
 ```bash
 npm install
-```
-
-Lancer l'application de developpement :
-
-```bash
-npm run dev
-```
-
-Lancer Storybook :
-
-```bash
 npm run storybook
 ```
 
-## Validation
-
-Avant de publier ou de pousser une modification importante :
+Build de la librairie :
 
 ```bash
-npm run type-check
-npm run test
 npm run build
+```
+
+Build du Storybook statique :
+
+```bash
 npm run build-storybook
-npm pack --dry-run
 ```
 
-## Composants
+## License
 
-Les composants publics utilisent le prefixe `Pr` et sont exportes depuis
-`@oremis/prisme`.
-
-Principales familles disponibles :
-
-- Actions : `PrButton`, `PrToggle`, `PrToggleGroup`, `PrCommand`
-- Formulaires : `PrLabel`, `PrInput`, `PrTextarea`, `PrCheckbox`, `PrRadioGroup`, `PrSwitch`, `PrSelect`, `PrSlider`
-- Feedback : `PrAlert`, `PrAlertDialog`, `PrProgress`, `PrSkeleton`, `PrSpinner`, `PrToast`
-- Navigation : `PrAppShell`, `PrNavbar`, `PrSidebar`, `PrSidebarItem`, `PrSidebarSubItem`, `PrNavigationMenu`, `PrPagination`
-- Donnees et contenu : `PrTable`, `PrDataTable`, `PrCard`, `PrListItem`, `PrTypography`
-- Overlays : `PrDialog`, `PrSheet`, `PrPopover`, `PrDropdownMenu`, `PrHoverCard`, `PrTooltip`
-- Date et affichage : `PrCalendar`, `PrDatePicker`, `PrCarousel`, `PrScrollArea`
-
-Les composants sont documentes dans Storybook avec leurs etats principaux et
-leurs variantes.
-
-## Themes
-
-Prisme gere nativement les themes `light`, `dark` et `system`. Sans choix
-enregistre, `system` est utilise et suit la preference du navigateur via
-`prefers-color-scheme`.
-
-Le choix explicite de l'utilisateur est stocke dans `oremis-prisme-theme`.
-
-```ts
-import { usePrTheme } from '@oremis/prisme'
-
-const { theme, resolvedTheme, setTheme, toggleTheme } = usePrTheme()
-
-setTheme('system')
-```
-
-Pour eviter un flash de theme au chargement, injecter le script d'initialisation
-avant le montage Vue :
-
-```ts
-import { getPrThemeInitScript } from '@oremis/prisme'
-```
-
-## Publication
-
-Le package expose uniquement le dossier `dist` lors de la publication npm.
-Construire la bibliotheque avant publication :
-
-```bash
-npm run build
-npm pack --dry-run
-```
+Prisme est distribue sous licence MIT. Voir [LICENSE](./LICENSE).
