@@ -3,6 +3,10 @@
   "version": "0.1.2",
   "description": "Design system Vue 3 officiel des applications web OREMIS.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AssociationOREMIS/prisme"
+  },
   "type": "module",
   "files": [
     "dist"
