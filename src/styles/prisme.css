@@ -4,5 +4,6 @@
 @import "./themes.css";
 @import "./reset.css";
 @import "./animations.css";
+@import "./rtl.css";
 
 @source "../components";

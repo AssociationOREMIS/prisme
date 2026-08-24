@@ -2,7 +2,8 @@ import type { Preview } from '@storybook/vue3-vite'
 import { themes } from 'storybook/theming'
 import '../src/styles/prisme.css'
 import './preview.css'
-import type { PrResolvedTheme, PrTheme } from '../src/composables/usePrTheme'
+import type { PrTheme } from '../src/composables/usePrTheme'
+import { usePrTheme } from '../src/composables/usePrTheme'
 
 const themeValues = ['light', 'dark', 'system']
 const layoutValues = ['centered', 'fullscreen', 'padded'] as const
@@ -11,14 +12,6 @@ type StoryLayout = (typeof layoutValues)[number]
 
 function isPrTheme(value: unknown): value is PrTheme {
   return typeof value === 'string' && themeValues.includes(value)
-}
-
-function resolveStoryTheme(value: PrTheme): PrResolvedTheme {
-  if (value !== 'system') {
-    return value
-  }
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
 function resolveStoryLayout(value: unknown): StoryLayout {
@@ -47,16 +40,21 @@ const preview: Preview = {
   decorators: [
     (_story, context) => {
       const selectedTheme = context.globals.prTheme
-      const prStorybookTheme = resolveStoryTheme(isPrTheme(selectedTheme) ? selectedTheme : 'system')
       const prStorybookLayout = resolveStoryLayout(context.parameters.prLayout)
 
       return {
         setup() {
-          return { prStorybookLayout, prStorybookTheme }
+          // Drive the wrapper's theme from usePrTheme()'s own reactive state
+          // (the same module-level singleton every PrThemeToggle/story uses),
+          // instead of a static snapshot — so a story-side toggle click and
+          // the toolbar's Theme control both update the same visible state.
+          const { resolvedTheme, setTheme } = usePrTheme()
+          if (isPrTheme(selectedTheme)) setTheme(selectedTheme)
+          return { prStorybookLayout, resolvedTheme }
         },
         template: `
-          <div class="pr-storybook-canvas" :data-pr-layout="prStorybookLayout" :data-pr-theme="prStorybookTheme">
-            <div class="pr-storybook-surface" :data-pr-theme="prStorybookTheme">
+          <div class="pr-storybook-canvas" :data-pr-layout="prStorybookLayout" :data-pr-theme="resolvedTheme">
+            <div class="pr-storybook-surface" :data-pr-theme="resolvedTheme">
               <story />
             </div>
           </div>

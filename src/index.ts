@@ -137,6 +137,18 @@ export type { PrTypographyProps } from './components/atoms/Typography'
 export { PrTooltip } from './components/molecules/Tooltip'
 export type { PrTooltipProps } from './components/molecules/Tooltip'
 
+export { PrTabs } from './components/molecules/Tabs'
+export type { PrTab, PrTabsProps } from './components/molecules/Tabs'
+
+export { PrStepper } from './components/molecules/Stepper'
+export type { PrStep, PrStepperProps } from './components/molecules/Stepper'
+
+export { PrCombobox } from './components/molecules/Combobox'
+export type { PrComboboxOption, PrComboboxProps } from './components/molecules/Combobox'
+
+export { PrFileUpload } from './components/molecules/FileUpload'
+export type { PrFileUploadProps, PrRejectedFile } from './components/molecules/FileUpload'
+
 export {
   applyPrThemePreference,
   getPrThemeInitScript,
@@ -146,3 +158,22 @@ export {
   usePrTheme,
 } from './composables/usePrTheme'
 export type { PrResolvedTheme, PrTheme } from './composables/usePrTheme'
+
+export {
+  email,
+  fromLaravelErrors,
+  max,
+  maxLength,
+  min,
+  minLength,
+  pattern,
+  required,
+  usePrForm,
+} from './composables/usePrForm'
+export type {
+  LaravelValidationErrors,
+  PrFieldConfig,
+  PrFormReturn,
+  PrFormSchema,
+  PrValidationRule,
+} from './composables/usePrForm'

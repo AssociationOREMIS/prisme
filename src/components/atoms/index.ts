@@ -48,3 +48,9 @@ export type { PrToggleProps } from './Toggle'
 
 export { PrTypography } from './Typography'
 export type { PrTypographyProps } from './Typography'
+
+export { PrNumberInput } from './NumberInput'
+export type { PrNumberInputProps } from './NumberInput'
+
+export { PrTagInput } from './TagInput'
+export type { PrTagInputProps } from './TagInput'

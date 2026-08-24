@@ -79,3 +79,15 @@ export type { PrToggleGroupItem, PrToggleGroupProps } from './ToggleGroup'
 
 export { PrTooltip } from './Tooltip'
 export type { PrTooltipProps } from './Tooltip'
+
+export { PrTabs } from './Tabs'
+export type { PrTab, PrTabsProps } from './Tabs'
+
+export { PrStepper } from './Stepper'
+export type { PrStep, PrStepperProps } from './Stepper'
+
+export { PrCombobox } from './Combobox'
+export type { PrComboboxOption, PrComboboxProps } from './Combobox'
+
+export { PrFileUpload } from './FileUpload'
+export type { PrFileUploadProps, PrRejectedFile } from './FileUpload'

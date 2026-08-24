@@ -16,6 +16,8 @@ export interface PrRadioGroupProps {
   defaultValue?: string
   options?: PrRadioOption[]
   label?: string
+  hint?: string
+  error?: string
   name?: string
   orientation?: 'horizontal' | 'vertical'
   disabled?: boolean
@@ -27,6 +29,8 @@ const props = withDefaults(defineProps<PrRadioGroupProps>(), {
   defaultValue: undefined,
   options: () => [],
   label: undefined,
+  hint: undefined,
+  error: undefined,
   name: undefined,
   orientation: 'vertical',
   disabled: false,
@@ -39,6 +43,14 @@ const emit = defineEmits<{
 
 const generatedId = useId()
 const rootValue = computed(() => props.modelValue ?? props.defaultValue)
+const hintId = computed(() => `pr-radio-group-${generatedId}-hint`)
+const errorId = computed(() => `pr-radio-group-${generatedId}-error`)
+const describedBy = computed(() => {
+  const ids: string[] = []
+  if (props.hint) ids.push(hintId.value)
+  if (props.error) ids.push(errorId.value)
+  return ids.length > 0 ? ids.join(' ') : undefined
+})
 
 const radioRootClass = computed(() => [
   'pr-radio-group__root',
@@ -64,6 +76,8 @@ function updateValue(value: unknown) {
       :disabled="disabled"
       :required="required"
       :name="name"
+      :aria-invalid="error ? 'true' : undefined"
+      :aria-describedby="describedBy"
       @update:model-value="updateValue"
     >
       <label
@@ -90,5 +104,7 @@ function updateValue(value: unknown) {
         </span>
       </label>
     </RadioGroupRoot>
+    <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+    <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

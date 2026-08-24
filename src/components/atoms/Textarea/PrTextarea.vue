@@ -65,9 +65,9 @@ const textareaControlClass = computed(() => [
 ])
 
 const fieldMessageClass = computed(() => [
-  'pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)]',
+  'pr-textarea__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)]',
   props.error
-    ? 'pr-field-message--error text-[color:var(--pr-color-danger)]'
+    ? 'pr-textarea__message--error pr-field-message--error text-[color:var(--pr-color-danger)]'
     : 'text-[color:var(--pr-color-text-muted)]',
 ])
 

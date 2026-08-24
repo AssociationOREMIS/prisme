@@ -1,0 +1,47 @@
+/* RTL (right-to-left) directional overrides */
+
+/* Flip chevron icons in directional components */
+[dir="rtl"] .pr-select__icon,
+[dir="rtl"] .pr-combobox__icon,
+[dir="rtl"] .pr-accordion__trigger > svg:last-child,
+[dir="rtl"] .pr-collapsible__trigger > svg:last-child {
+  transform: scaleX(-1);
+}
+
+/* Pagination navigation arrows */
+[dir="rtl"] .pr-pagination__prev svg,
+[dir="rtl"] .pr-pagination__next svg {
+  transform: scaleX(-1);
+}
+
+/* Sheet: swap side positioning */
+[dir="rtl"] .pr-sheet[data-side="left"] {
+  right: 0;
+  left: auto;
+  border-right: none;
+  border-left: 1px solid var(--pr-color-border);
+}
+
+[dir="rtl"] .pr-sheet[data-side="right"] {
+  left: 0;
+  right: auto;
+  border-left: none;
+  border-right: 1px solid var(--pr-color-border);
+}
+
+/* Sidebar navigation */
+[dir="rtl"] .pr-sidebar {
+  border-right: none;
+  border-left: 1px solid var(--pr-color-border);
+}
+
+/* Form field messages and labels align start */
+[dir="rtl"] .pr-field-message,
+[dir="rtl"] .pr-label {
+  text-align: right;
+}
+
+/* Stepper separator direction */
+[dir="rtl"] .pr-stepper__separator {
+  transform: scaleX(-1);
+}

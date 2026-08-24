@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 import { ToggleGroupItem, ToggleGroupRoot } from 'reka-ui'
 
 export interface PrToggleGroupItem {
@@ -13,6 +13,8 @@ export interface PrToggleGroupProps {
   items?: PrToggleGroupItem[]
   type?: 'single' | 'multiple'
   disabled?: boolean
+  hint?: string
+  error?: string
   ariaLabel?: string
 }
 
@@ -21,12 +23,28 @@ const props = withDefaults(defineProps<PrToggleGroupProps>(), {
   items: () => [],
   type: 'single',
   disabled: false,
+  hint: undefined,
+  error: undefined,
   ariaLabel: undefined,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | string[]]
 }>()
+
+// Multi-root template (root + error/hint message) disables Vue's automatic
+// attrs fallthrough, so extraneous attributes must be forwarded explicitly.
+defineOptions({ inheritAttrs: false })
+
+const generatedId = useId()
+const hintId = computed(() => `pr-toggle-group-${generatedId}-hint`)
+const errorId = computed(() => `pr-toggle-group-${generatedId}-error`)
+const describedBy = computed(() => {
+  const ids: string[] = []
+  if (props.hint) ids.push(hintId.value)
+  if (props.error) ids.push(errorId.value)
+  return ids.length > 0 ? ids.join(' ') : undefined
+})
 
 function updateValue(value: unknown) {
   if (typeof value === 'string' || Array.isArray(value)) {
@@ -65,12 +83,15 @@ const toggleGroupItemClass = [
 
 <template>
   <ToggleGroupRoot
+    v-bind="$attrs"
     :class="toggleGroupClass"
     :style="toggleGroupStyle"
     :type="type"
     :model-value="modelValue"
     :disabled="disabled"
     :aria-label="ariaLabel"
+    :aria-invalid="error ? 'true' : undefined"
+    :aria-describedby="describedBy"
     @update:model-value="updateValue"
   >
     <ToggleGroupItem
@@ -83,4 +104,6 @@ const toggleGroupItemClass = [
       {{ item.label }}
     </ToggleGroupItem>
   </ToggleGroupRoot>
+  <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+  <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 mt-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>

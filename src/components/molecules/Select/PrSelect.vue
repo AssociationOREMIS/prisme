@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Check, ChevronDown, ChevronUp } from '@lucide/vue'
+import { computed, useId } from 'vue'
 import {
   SelectContent,
   SelectIcon,
@@ -33,9 +34,10 @@ export interface PrSelectProps {
   disabled?: boolean
   required?: boolean
   name?: string
+  id?: string
 }
 
-withDefaults(defineProps<PrSelectProps>(), {
+const props = withDefaults(defineProps<PrSelectProps>(), {
   modelValue: undefined,
   defaultValue: undefined,
   options: () => [],
@@ -46,16 +48,28 @@ withDefaults(defineProps<PrSelectProps>(), {
   disabled: false,
   required: false,
   name: undefined,
+  id: undefined,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
+
+const generatedId = useId()
+const triggerId = computed(() => props.id ?? `pr-select-${generatedId}`)
+const hintId = computed(() => `${triggerId.value}-hint`)
+const errorId = computed(() => `${triggerId.value}-error`)
+const describedBy = computed(() => {
+  const ids: string[] = []
+  if (props.hint) ids.push(hintId.value)
+  if (props.error) ids.push(errorId.value)
+  return ids.length > 0 ? ids.join(' ') : undefined
+})
 </script>
 
 <template>
   <div class="pr-select grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
-    <PrLabel v-if="label" :required="required" :disabled="disabled">{{ label }}</PrLabel>
+    <PrLabel v-if="label" :for="triggerId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <SelectRoot
       :model-value="modelValue"
       :default-value="defaultValue"
@@ -65,9 +79,11 @@ const emit = defineEmits<{
       @update:model-value="emit('update:modelValue', $event)"
     >
       <SelectTrigger
+        :id="triggerId"
         class="pr-select__trigger inline-flex min-h-[2.375rem] w-full cursor-pointer items-center justify-between gap-[var(--pr-space-3)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] text-[length:var(--pr-font-size-md)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] data-[placeholder]:text-[color:var(--pr-color-text-subtle)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"
         :class="{ 'border-[var(--pr-color-danger)]': Boolean(error) }"
         :aria-invalid="error ? 'true' : undefined"
+        :aria-describedby="describedBy"
       >
         <SelectValue :placeholder="placeholder" />
         <SelectIcon class="pr-select__icon inline-flex shrink-0 text-[color:var(--pr-color-text-muted)]">
@@ -103,7 +119,7 @@ const emit = defineEmits<{
         </SelectContent>
       </SelectPortal>
     </SelectRoot>
-    <p v-if="error" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
-    <p v-else-if="hint" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
+    <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+    <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

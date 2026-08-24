@@ -59,9 +59,9 @@ const inputControlClass = computed(() => [
 ])
 
 const inputMessageClass = computed(() => [
-  'pr-input__message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)]',
+  'pr-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)]',
   props.error
-    ? 'pr-input__message--error text-[color:var(--pr-color-danger)]'
+    ? 'pr-input__message--error pr-field-message--error text-[color:var(--pr-color-danger)]'
     : 'text-[color:var(--pr-color-text-muted)]',
 ])
 
