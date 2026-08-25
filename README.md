@@ -82,16 +82,19 @@ if (element) {
 
 Pour plusieurs composants ou des ecrans plus complets, creez un composant Vue dedie puis montez-le depuis `app.ts`.
 
-Vous pouvez aussi ecrire les composants directement dans le Blade, tant qu'ils sont dans le noeud monte par Vue. En HTML, utilisez le format kebab-case :
+### Enregistrement global avec `app.use(Prisme)`
+
+Vous pouvez aussi ecrire les composants Prisme directement dans le Blade, tant qu'ils sont dans le noeud monte par Vue. Dans ce cas, installez le plugin Prisme avec `app.use(Prisme)` : il enregistre globalement tous les composants publics de la bibliotheque, utilisables ensuite en HTML/Blade sous leur forme kebab-case.
 
 ```ts
 import { createApp } from 'vue'
-import { PrButton } from '@oremis/prisme'
+import Prisme from '@oremis/prisme'
 import '@oremis/prisme/styles.css'
 
 const app = createApp({})
 
-app.component('PrButton', PrButton)
+app.use(Prisme)
+
 app.mount('#prisme-app')
 ```
 
@@ -100,8 +103,18 @@ app.mount('#prisme-app')
 
 <div id="prisme-app">
     <pr-button>Enregistrer</pr-button>
+    <pr-badge>Actif</pr-badge>
+    <pr-input placeholder="Nom"></pr-input>
+    <pr-data-table></pr-data-table>
 </div>
 ```
+
+### `app.use(Prisme)` ou imports nommes ?
+
+- `app.use(Prisme)` enregistre en une seule fois tous les composants Prisme comme composants globaux de l'application. C'est le plus adapte quand les composants sont utilises directement dans du HTML/Blade (pas de `<script setup>` pour les declarer), au prix d'inclure l'integralite de la bibliotheque dans le bundle.
+- `import { PrButton } from '@oremis/prisme'` importe uniquement les composants reellement utilises et beneficie du tree-shaking. C'est le choix recommande dans des composants Vue (SFC) ou seule une partie de Prisme est necessaire.
+
+Les deux approches sont interchangeables et peuvent cohabiter dans la meme application.
 
 ## Development
 
