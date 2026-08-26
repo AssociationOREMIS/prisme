@@ -63,6 +63,14 @@ export const IconOnlyWithDiagonalDivider: Story = {
   },
 }
 
+export const WithMobileLogo: Story = {
+  args: {
+    title: 'Navbar Title',
+    logoSrc: '/oremis-logo.svg',
+    mobileLogoSrc: '/oremis-icon.svg',
+  },
+}
+
 export const WithChildrenAndDiagonalDivider: Story = {
   render: () => ({
     components: { PrButton, PrNavbar },

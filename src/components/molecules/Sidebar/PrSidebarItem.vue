@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ChevronDown } from '@lucide/vue'
 import { computed, inject, ref, useSlots, watch } from 'vue'
-import { prAppShellContextKey } from '../../layouts/AppShell/appShellContext'
 import PrSidebarIcon from './PrSidebarIcon.vue'
 import PrSidebarItemBody from './PrSidebarItemBody.vue'
 import PrSidebarItemSubItems from './PrSidebarItemSubItems.vue'
+import { prSidebarContextKey } from './sidebarContext'
 import {
   sidebarItemClass,
   sidebarItemLinkBaseClass,
@@ -27,7 +27,7 @@ const emit = defineEmits<{
 }>()
 
 const slots = useSlots()
-const shell = inject(prAppShellContextKey, null)
+const sidebar = inject(prSidebarContextKey, null)
 const hasSubItems = computed(() => Boolean(slots.default))
 const componentTag = computed(() => props.as ?? (props.href ? 'a' : 'button'))
 const resolvedActive = computed(() => {
@@ -94,7 +94,7 @@ function handleClick() {
     return
   }
 
-  shell?.closeMobile()
+  sidebar?.closeMobileFlyout()
 }
 </script>
 
@@ -109,7 +109,7 @@ function handleClick() {
       v-bind="componentAttrs"
       :aria-current="resolvedActive ? 'page' : undefined"
       :aria-expanded="hasSubItems ? isExpanded : undefined"
-      :title="shell?.collapsed.value && itemLabel ? itemLabel : undefined"
+      :title="sidebar?.isNarrow.value && itemLabel ? itemLabel : undefined"
       @click="handleClick"
     >
       <PrSidebarIcon :icon="icon" :active="resolvedActive" />

@@ -1,0 +1,53 @@
+/*
+ * Reusable navbar/sidebar/content grid, extracted from PrAppShell so it can be
+ * composed manually by consumers that don't want to go through PrAppShell at
+ * all — PrNavbar and PrSidebar are fully self-sufficient components, each
+ * owning their own state via props/emits.
+ *
+ * Usage:
+ *   <div class="pr-shell-grid">
+ *     <PrNavbar />
+ *     <PrSidebar />
+ *     <main class="pr-shell-grid__content">...</main>
+ *   </div>
+ *
+ * PrNavbar and PrSidebar already place themselves in this grid (navbar spans
+ * row 1, sidebar sits at column 1 / row 2) via their own component classes.
+ *
+ * Column 1 is intentionally sized with `minmax(--pr-sidebar-collapsed-width,
+ * auto)` rather than a value driven by a "collapsed" data attribute: PrSidebar
+ * sets its own `width` (rail vs. full) directly, so the grid track just
+ * follows whatever width the sidebar is actually rendering at — no shared
+ * state between PrAppShell and PrSidebar is required for the layout to stay
+ * correct. The `--pr-sidebar-collapsed-width` floor keeps column 1 from
+ * collapsing to 0 when the sidebar becomes a `position: fixed` overlay below
+ * the mobile breakpoint (out-of-flow elements don't contribute to track
+ * sizing).
+ */
+
+.pr-shell-grid {
+  display: grid;
+  min-height: 100svh;
+  grid-template-columns: minmax(var(--pr-sidebar-collapsed-width), auto) minmax(0, 1fr);
+  grid-template-rows: var(--pr-navbar-height) minmax(0, 1fr);
+}
+
+.pr-shell-grid__content {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: calc(100svh - var(--pr-navbar-height));
+  padding: var(--pr-space-6);
+}
+
+@media (min-width: 1024px) {
+  .pr-shell-grid__content {
+    padding: var(--pr-space-8);
+  }
+}
+
+@media (max-width: 780px) {
+  .pr-shell-grid__content {
+    padding: var(--pr-space-4);
+  }
+}

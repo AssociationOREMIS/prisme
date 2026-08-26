@@ -238,6 +238,35 @@ export const Collapsed: Story = {
   }),
 }
 
+export const Standalone: Story = {
+  name: 'Standalone (no PrAppShell)',
+  render: () => ({
+    components: {
+      PrSidebar,
+      PrSidebarItem,
+    },
+    setup() {
+      const collapsed = ref(false)
+      return { collapsed, ...createNavigationStorySetup('/') }
+    },
+    template: `
+      <div class="nav-story-shell" style="grid-template-rows: minmax(0, 1fr);" @click.capture="handleStoryNavigation">
+        <div style="display: grid; grid-template-columns: minmax(var(--pr-sidebar-collapsed-width), auto) minmax(0, 1fr); min-height: 100%;">
+          <PrSidebar v-model:collapsed="collapsed">
+            <PrSidebarItem :icon="House" label="Tableau de bord" href="/" :active="isActive('/')" />
+            <PrSidebarItem :icon="Users" label="Membres" href="/members" :active="isActive('/members')" />
+            <PrSidebarItem :icon="CalendarDays" label="Evénements" href="/events" :active="isActive('/events')" />
+          </PrSidebar>
+          <div class="nav-story-content">
+            <h1 class="nav-story-title">Composition libre</h1>
+            <p class="nav-story-muted">PrSidebar gère ici son propre état de collapse (v-model:collapsed), sans PrAppShell.</p>
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
 export const CompleteExample: Story = {
   name: 'Complete example',
   render: () => shellStory(`

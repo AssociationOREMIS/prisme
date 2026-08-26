@@ -1,50 +1,56 @@
 <script setup lang="ts">
-import { Menu } from '@lucide/vue'
-import { computed, inject } from 'vue'
-import { prAppShellContextKey } from '../AppShell/appShellContext'
+import { computed } from 'vue'
 
 export interface PrNavbarProps {
   title?: string
   brandLabel?: string
   logoVariant?: 'icon-only'
+  /** Overrides the default brand logo `<img>` source. Ignored if the `#brand` slot is used. */
+  logoSrc?: string
+  /** Overrides the default brand icon `<img>` source when `logoVariant` is `'icon-only'`. Ignored if the `#brand` slot is used. */
+  iconSrc?: string
+  /** Swaps in a reduced logo below the mobile breakpoint (780px), e.g. an icon-only mark. Ignored if the `#brand` slot is used. */
+  mobileLogoSrc?: string
   diagonalDivider?: boolean
-  mobileMenuLabel?: string
 }
 
 const props = withDefaults(defineProps<PrNavbarProps>(), {
   title: undefined,
   brandLabel: 'OREMIS',
   logoVariant: undefined,
+  logoSrc: undefined,
+  iconSrc: undefined,
+  mobileLogoSrc: undefined,
   diagonalDivider: false,
-  mobileMenuLabel: 'Ouvrir la navigation',
 })
 
-const shell = inject(prAppShellContextKey, null)
 const navbarTitle = computed(() => props.title ?? props.brandLabel)
-const logoSrc = computed(() =>
-  props.logoVariant === 'icon-only' ? '/oremis-icon.svg' : '/oremis-logo.svg',
-)
+const resolvedLogoSrc = computed(() => {
+  if (props.logoVariant === 'icon-only') {
+    return props.iconSrc ?? '/oremis-icon.svg'
+  }
+  return props.logoSrc ?? '/oremis-logo.svg'
+})
+const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
 </script>
 
 <template>
   <nav class="pr-navbar sticky top-0 col-[1/-1] row-[1] z-[50] flex h-[var(--pr-navbar-height)] w-full items-center justify-between bg-[#0d2c99] px-[var(--pr-space-4)] py-[var(--pr-space-3)] text-white [[data-pr-theme=dark]_&]:bg-[#21212e] max-[780px]:px-[var(--pr-space-3)]" aria-label="Navigation principale">
     <div class="pr-navbar__brand inline-flex min-w-0 items-center gap-[var(--pr-space-3)]">
-      <button
-        v-if="shell"
-        class="pr-navbar__menu-button hidden size-9 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] bg-transparent text-white transition-[background-color,color,border-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:bg-white/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] max-[780px]:inline-grid"
-        type="button"
-        :aria-label="mobileMenuLabel"
-        :aria-expanded="shell.mobileOpen.value"
-        @click="shell.toggleMobile"
-      >
-        <Menu aria-hidden="true" :size="20" />
-      </button>
-
       <slot name="brand">
         <img
           class="pr-navbar__logo block h-9 w-auto shrink-0 object-contain object-center"
-          :class="{ 'pr-navbar__logo--icon w-9': logoVariant === 'icon-only' }"
-          :src="logoSrc"
+          :class="[
+            { 'pr-navbar__logo--icon w-9': logoVariant === 'icon-only' },
+            { 'max-[780px]:hidden': hasMobileLogo },
+          ]"
+          :src="resolvedLogoSrc"
+          alt="OREMIS"
+        />
+        <img
+          v-if="hasMobileLogo"
+          class="pr-navbar__logo pr-navbar__logo--mobile hidden h-9 w-9 shrink-0 object-contain object-center max-[780px]:block"
+          :src="mobileLogoSrc"
           alt="OREMIS"
         />
         <span
