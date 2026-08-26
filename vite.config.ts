@@ -17,10 +17,13 @@ export default defineConfig({
   build: {
     copyPublicDir: false,
     lib: {
-      entry: path.resolve(dirname, 'src/index.ts'),
+      entry: {
+        prisme: path.resolve(dirname, 'src/index.ts'),
+        registry: path.resolve(dirname, 'src/registry.ts'),
+      },
       name: 'Prisme',
       formats: ['es'],
-      fileName: () => 'prisme.js',
+      fileName: (_format, entryName) => `${entryName}.js`,
       cssFileName: 'styles',
     },
     rollupOptions: {

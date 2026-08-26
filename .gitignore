@@ -15,6 +15,9 @@ coverage/
 .turbo/
 .eslintcache
 
+# Generated at build time — see scripts/generate-component-paths.mjs
+src/components/paths.generated.ts
+
 # Logs
 logs/
 *.log
