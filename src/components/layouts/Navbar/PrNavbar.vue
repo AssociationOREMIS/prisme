@@ -12,6 +12,8 @@ export interface PrNavbarProps {
   /** Swaps in a reduced logo below the mobile breakpoint (780px), e.g. an icon-only mark. Ignored if the `#brand` slot is used. */
   mobileLogoSrc?: string
   diagonalDivider?: boolean
+  /** Hides the default/`#actions` slot content below the mobile breakpoint (780px). Off by default. */
+  hideActionsOnMobile?: boolean
 }
 
 const props = withDefaults(defineProps<PrNavbarProps>(), {
@@ -22,6 +24,7 @@ const props = withDefaults(defineProps<PrNavbarProps>(), {
   iconSrc: undefined,
   mobileLogoSrc: undefined,
   diagonalDivider: false,
+  hideActionsOnMobile: false,
 })
 
 const navbarTitle = computed(() => props.title ?? props.brandLabel)
@@ -61,16 +64,20 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
           ]"
           aria-hidden="true"
         />
-        <h1 class="pr-navbar__title m-0 whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-white">{{ navbarTitle }}</h1>
+        <h1 class="pr-navbar__title m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-white">{{ navbarTitle }}</h1>
       </slot>
     </div>
 
-    <div v-if="$slots.default || $slots.actions" class="pr-navbar__actions ml-auto inline-flex items-center gap-[var(--pr-space-1)] max-[780px]:hidden">
+    <div
+      v-if="$slots.default || $slots.actions"
+      class="pr-navbar__actions ml-auto inline-flex shrink-0 items-center gap-[var(--pr-space-1)]"
+      :class="{ 'max-[780px]:hidden': hideActionsOnMobile }"
+    >
       <slot />
       <slot name="actions" />
     </div>
 
-    <div v-if="$slots.user" class="pr-navbar__user ml-[var(--pr-space-3)] inline-flex items-center gap-[var(--pr-space-1)] border-l border-[var(--pr-color-navbar-border)] pl-[var(--pr-space-3)] max-[780px]:ml-[var(--pr-space-2)] max-[780px]:pl-[var(--pr-space-2)]">
+    <div v-if="$slots.user" class="pr-navbar__user ml-[var(--pr-space-3)] inline-flex shrink-0 items-center gap-[var(--pr-space-1)] border-l border-[var(--pr-color-navbar-border)] pl-[var(--pr-space-3)] max-[780px]:ml-[var(--pr-space-2)] max-[780px]:pl-[var(--pr-space-2)]">
       <slot name="user" />
     </div>
   </nav>

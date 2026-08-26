@@ -71,6 +71,42 @@ export const WithMobileLogo: Story = {
   },
 }
 
+export const ActionsVisibleOnMobile: Story = {
+  render: () => ({
+    components: { PrButton, PrNavbar },
+    template: `
+      <div class="nav-story-navbar-frame" style="width: 390px;">
+        <PrNavbar title="Navbar Title">
+          <PrButton size="sm">Action</PrButton>
+          <template #user>
+            <span class="nav-story-avatar" aria-hidden="true">AD</span>
+          </template>
+        </PrNavbar>
+      </div>
+    `,
+  }),
+}
+
+export const HideActionsOnMobile: Story = {
+  args: {
+    title: 'Navbar Title',
+    hideActionsOnMobile: true,
+  },
+  render: (args) => ({
+    components: { PrButton, PrNavbar },
+    setup() {
+      return { args }
+    },
+    template: `
+      <div class="nav-story-navbar-frame" style="width: 390px;">
+        <PrNavbar v-bind="args">
+          <PrButton size="sm">Action</PrButton>
+        </PrNavbar>
+      </div>
+    `,
+  }),
+}
+
 export const WithChildrenAndDiagonalDivider: Story = {
   render: () => ({
     components: { PrButton, PrNavbar },
