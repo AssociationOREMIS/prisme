@@ -19,6 +19,10 @@ const icon = computed(() => ({
   danger: AlertCircle,
 })[props.variant])
 
+// Danger/warning need to interrupt and be announced immediately (role="alert"
+// implies aria-live="assertive"); info/success are non-urgent (role="status").
+const alertRole = computed(() => (props.variant === 'danger' || props.variant === 'warning' ? 'alert' : 'status'))
+
 const alertVariantClass = computed(() => ({
   info: 'border-[var(--pr-color-info-border)] bg-[var(--pr-color-info-soft)] text-[color:var(--pr-color-info)]',
   success: 'border-[var(--pr-color-success-border)] bg-[var(--pr-color-success-soft)] text-[color:var(--pr-color-success)]',
@@ -31,7 +35,7 @@ const alertVariantClass = computed(() => ({
   <div
     class="pr-alert flex items-start gap-[var(--pr-space-3)] rounded-[var(--pr-radius-lg)] border p-[var(--pr-space-4)]"
     :class="alertVariantClass"
-    role="status"
+    :role="alertRole"
   >
     <component :is="icon" class="pr-alert__icon mt-[0.0625rem] shrink-0" :size="18" aria-hidden="true" />
     <div class="pr-alert__content grid min-w-0 gap-[var(--pr-space-1)]">

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { reactive } from 'vue'
 import {
   ArrowDown,
   ArrowRight,
@@ -119,4 +120,75 @@ export const Empty: Story = {
     data: [],
   },
   render: Default.render,
+}
+
+export const ServerSide: Story = {
+  args: {
+    serverSide: true,
+  },
+  render: (args) => ({
+    components: { PrDataTable },
+    setup() {
+      // Simulates a Laravel `Model::paginate()` endpoint: sorting, filtering
+      // and pagination all happen "server-side" instead of in the browser.
+      const state = reactive({
+        rows: [] as typeof data,
+        page: 1,
+        pageSize: args.pageSize ?? 10,
+        totalRows: 0,
+        sort: null as { key: string, direction: 'asc' | 'desc' } | null,
+        filter: '',
+        isLoading: false,
+      })
+
+      async function fetchPage() {
+        state.isLoading = true
+        await new Promise((resolve) => setTimeout(resolve, 300))
+
+        let rows = args.filterKey && state.filter
+          ? data.filter((row) => String(row[args.filterKey as keyof typeof row]).toLocaleLowerCase().includes(state.filter.toLocaleLowerCase()))
+          : [...data]
+
+        if (state.sort) {
+          const { key, direction } = state.sort
+          rows = rows.sort((a, b) => {
+            const result = String(a[key as keyof typeof a]).localeCompare(String(b[key as keyof typeof b]))
+            return direction === 'asc' ? result : -result
+          })
+        }
+
+        state.totalRows = rows.length
+        const start = (state.page - 1) * state.pageSize
+        state.rows = rows.slice(start, start + state.pageSize)
+        state.isLoading = false
+      }
+
+      fetchPage()
+
+      return {
+        args,
+        state,
+        onPage: (page: number) => { state.page = page; fetchPage() },
+        onPageSize: (pageSize: number) => { state.pageSize = pageSize; fetchPage() },
+        onSort: (sort: typeof state.sort) => { state.sort = sort; fetchPage() },
+        onFilter: (filter: string) => { state.filter = filter; fetchPage() },
+      }
+    },
+    template: `
+      <PrDataTable
+        v-bind="args"
+        :rows="state.rows"
+        :total-rows="state.totalRows"
+        :page="state.page"
+        :page-size="state.pageSize"
+        :sort="state.sort"
+        :filter="state.filter"
+        :is-loading="state.isLoading"
+        @update:page="onPage"
+        @update:page-size="onPageSize"
+        @update:sort="onSort"
+        @update:filter="onFilter"
+      />
+    `,
+  }),
 }

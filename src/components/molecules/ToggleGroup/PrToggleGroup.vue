@@ -16,6 +16,7 @@ export interface PrToggleGroupProps {
   hint?: string
   error?: string
   ariaLabel?: string
+  name?: string
 }
 
 const props = withDefaults(defineProps<PrToggleGroupProps>(), {
@@ -26,6 +27,7 @@ const props = withDefaults(defineProps<PrToggleGroupProps>(), {
   hint: undefined,
   error: undefined,
   ariaLabel: undefined,
+  name: undefined,
 })
 
 const emit = defineEmits<{
@@ -89,6 +91,7 @@ const toggleGroupItemClass = [
     :type="type"
     :model-value="modelValue"
     :disabled="disabled"
+    :name="name"
     :aria-label="ariaLabel"
     :aria-invalid="error ? 'true' : undefined"
     :aria-describedby="describedBy"

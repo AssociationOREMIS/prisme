@@ -75,6 +75,7 @@ export type {
   PrCommandProps,
   PrDataTableColumn,
   PrDataTableProps,
+  PrDataTableSort,
   PrDatePickerProps,
   PrDialogProps,
   PrDividerProps,
@@ -118,6 +119,15 @@ export type {
   PrToggleProps,
   PrTooltipProps,
   PrTypographyProps,
+} from './components/registry'
+
+export { fromLaravelPaginator } from './components/registry'
+export type {
+  LaravelFlatPaginatorResponse,
+  LaravelPaginatorMeta,
+  LaravelPaginatorResponse,
+  LaravelWrappedPaginatorResponse,
+  PrServerTableState,
 } from './components/registry'
 
 export { default, Prisme } from './plugin'

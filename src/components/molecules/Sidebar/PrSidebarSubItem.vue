@@ -6,7 +6,7 @@ withDefaults(defineProps<PrSidebarSubItemProps>(), {
   as: undefined,
   href: undefined,
   description: undefined,
-  active: false,
+  active: undefined,
   disabled: false,
 })
 </script>

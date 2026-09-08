@@ -68,6 +68,10 @@ const inputMessageClass = computed(() => [
 function updateValue(event: Event) {
   emit('update:modelValue', (event.target as HTMLInputElement).value)
 }
+
+// The template root is a wrapper <div>, not the <input> — forward fallthrough
+// attrs (autocomplete, pattern, inputmode, data-*, ...) to the actual control.
+defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
@@ -83,6 +87,7 @@ function updateValue(event: Event) {
 
     <input
       :id="inputId"
+      v-bind="$attrs"
       :class="inputControlClass"
       :name="name"
       :value="modelValue"

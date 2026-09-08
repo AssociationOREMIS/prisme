@@ -74,6 +74,10 @@ const fieldMessageClass = computed(() => [
 function updateValue(event: Event) {
   emit('update:modelValue', (event.target as HTMLTextAreaElement).value)
 }
+
+// The template root is a wrapper <div>, not the <textarea> — forward
+// fallthrough attrs (autocomplete, maxlength, data-*, ...) to the control.
+defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
@@ -88,6 +92,7 @@ function updateValue(event: Event) {
     </PrLabel>
     <textarea
       :id="textareaId"
+      v-bind="$attrs"
       :class="textareaControlClass"
       :name="name"
       :value="modelValue"

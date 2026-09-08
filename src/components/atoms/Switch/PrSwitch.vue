@@ -13,6 +13,8 @@ export interface PrSwitchProps {
   required?: boolean
   id?: string
   name?: string
+  /** Value submitted with `name` in a native form when on (defaults to `"on"`) — set it to distinguish switches sharing the same `name="options[]"`. */
+  value?: string
 }
 
 const props = withDefaults(defineProps<PrSwitchProps>(), {
@@ -26,6 +28,7 @@ const props = withDefaults(defineProps<PrSwitchProps>(), {
   required: false,
   id: undefined,
   name: undefined,
+  value: undefined,
 })
 
 const emit = defineEmits<{
@@ -70,6 +73,7 @@ const switchClass = computed(() => [
       :required="required"
       :id="id"
       :name="name"
+      :value="value"
       :aria-invalid="error ? 'true' : undefined"
       :aria-describedby="describedBy"
       @update:checked="emit('update:checked', $event)"

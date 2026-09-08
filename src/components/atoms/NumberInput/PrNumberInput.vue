@@ -112,6 +112,10 @@ function onBlur() {
   inputValue.value = String(clamped)
   if (clamped !== props.modelValue) emit('update:modelValue', clamped)
 }
+
+// The template root is a wrapper <div>, not the <input> — forward fallthrough
+// attrs (inputmode, autofocus, data-*, ...) to the actual control.
+defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
@@ -140,6 +144,7 @@ function onBlur() {
       </button>
       <input
         :id="inputId"
+        v-bind="$attrs"
         class="pr-number-input__field min-w-0 grow bg-transparent px-[var(--pr-space-3)] text-center text-[length:var(--pr-font-size-md)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed disabled:text-[color:var(--pr-color-text-muted)] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         type="number"
         :value="inputValue"

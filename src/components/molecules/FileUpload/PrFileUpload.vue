@@ -93,7 +93,7 @@ function validateFiles(files: File[]): { accepted: File[]; rejected: PrRejectedF
   }
 
   if (props.maxFiles) {
-    const available = props.maxFiles - currentCount
+    const available = Math.max(props.maxFiles - currentCount, 0)
     const overflow = accepted.splice(available)
     for (const file of overflow) {
       rejected.push({ file, reason: `Nombre maximum de fichiers atteint (${props.maxFiles})` })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
+import { parseIsoDate, toIsoDate } from './utils'
 
 export interface PrCalendarProps {
   modelValue?: string
@@ -14,7 +15,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const cursor = ref(props.modelValue ? new Date(props.modelValue) : new Date())
+const cursor = ref(props.modelValue ? parseIsoDate(props.modelValue) : new Date())
 const formatter = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' })
 const weekdays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
@@ -39,7 +40,7 @@ function move(delta: number) {
 function select(day: string) {
   if (!day) return
   const date = new Date(cursor.value.getFullYear(), cursor.value.getMonth(), Number(day))
-  emit('update:modelValue', date.toISOString().slice(0, 10))
+  emit('update:modelValue', toIsoDate(date))
 }
 </script>
 

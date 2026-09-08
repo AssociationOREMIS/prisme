@@ -14,6 +14,8 @@ type InferValue<C> = C extends PrFieldConfig<infer T> ? T : never
 export interface PrFormReturn<S extends PrFormSchema> {
   fields: { [K in keyof S]: Ref<InferValue<S[K]>> }
   errors: { [K in keyof S]: Ref<string | null> }
+  /** Messages from a 422 response that didn't match any field in the schema (e.g. array-item errors like `items.0.name` with no `items.name` field declared). */
+  generalErrors: Ref<string[]>
   validate: () => boolean
   validateField: (field: keyof S) => boolean
   reset: () => void
@@ -22,14 +24,39 @@ export interface PrFormReturn<S extends PrFormSchema> {
   isDirty: ComputedRef<boolean>
 }
 
+/** Deep-clones a field value so mutating a form field never mutates the schema's initial value (or a previous snapshot of it). */
+function cloneFieldValue<T>(value: T): T {
+  return value === null || typeof value !== 'object' ? value : structuredClone(value)
+}
+
+function isFieldValueEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  if (a instanceof Date || b instanceof Date) {
+    return a instanceof Date && b instanceof Date && a.getTime() === b.getTime()
+  }
+  if (Array.isArray(a) || Array.isArray(b)) {
+    return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((item, index) => isFieldValueEqual(item, b[index]))
+  }
+  if (typeof a === 'object' && a !== null && typeof b === 'object' && b !== null) {
+    const aKeys = Object.keys(a)
+    const bKeys = Object.keys(b)
+    return aKeys.length === bKeys.length && aKeys.every((key) => isFieldValueEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key]))
+  }
+  return false
+}
+
 export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
   type Keys = keyof S
 
   const fields = {} as { [K in Keys]: Ref<InferValue<S[K]>> }
   const errors = {} as { [K in Keys]: Ref<string | null> }
+  const initialValues = {} as { [K in Keys]: InferValue<S[K]> }
+  const generalErrors = ref<string[]>([])
 
   for (const key in schema) {
-    fields[key as Keys] = ref(schema[key].initialValue) as Ref<InferValue<S[typeof key]>>
+    const initialValue = cloneFieldValue(schema[key].initialValue) as InferValue<S[typeof key]>
+    initialValues[key as Keys] = initialValue
+    fields[key as Keys] = ref(cloneFieldValue(initialValue)) as Ref<InferValue<S[typeof key]>>
     errors[key as Keys] = ref(null)
   }
 
@@ -61,22 +88,24 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
 
   function reset(): void {
     for (const key in schema) {
-      fields[key as Keys].value = schema[key].initialValue as InferValue<S[typeof key]>
+      fields[key as Keys].value = cloneFieldValue(initialValues[key as Keys])
       errors[key as Keys].value = null
     }
+    generalErrors.value = []
   }
 
   async function handleSubmit(fn: () => Promise<void> | void): Promise<boolean> {
+    generalErrors.value = []
     if (!validate()) return false
     try {
       await fn()
       return true
     }
     catch (err) {
-      const laravelErrors = (err as { response?: { status?: number, data?: { errors?: LaravelValidationErrors } } })
+      const response = (err as { response?: { status?: number, data?: { errors?: LaravelValidationErrors } } })
         ?.response
-      if (laravelErrors?.status === 422 && laravelErrors.data?.errors) {
-        fromLaravelErrors({ errors } as Pick<PrFormReturn<S>, 'errors'>, laravelErrors.data.errors)
+      if (response?.status === 422 && response.data?.errors) {
+        generalErrors.value = fromLaravelErrors({ errors } as Pick<PrFormReturn<S>, 'errors'>, response.data.errors)
         return false
       }
       throw err
@@ -88,10 +117,10 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
   )
 
   const isDirty = computed(() =>
-    Object.keys(schema).some(key => fields[key as Keys].value !== schema[key].initialValue),
+    Object.keys(schema).some(key => !isFieldValueEqual(fields[key as Keys].value, initialValues[key as Keys])),
   )
 
-  return { fields, errors, validate, validateField, reset, handleSubmit, isValid, isDirty }
+  return { fields, errors, generalErrors, validate, validateField, reset, handleSubmit, isValid, isDirty }
 }
 
 // Built-in validation rule helpers
@@ -145,14 +174,33 @@ export const max =
 // Laravel 422 error integration
 export type LaravelValidationErrors = Record<string, string[]>
 
+/**
+ * Applies a Laravel 422 error bag to a form's `errors` refs. Array-item keys
+ * (e.g. `items.0.name`) fall back to their base field (`items.name`) when no
+ * exact match exists, since a flat form schema can't declare one field per
+ * row index. Messages that still don't match any field are returned instead
+ * of being silently dropped, so callers can surface them (e.g. `generalErrors`).
+ */
 export function fromLaravelErrors<S extends PrFormSchema>(
   form: Pick<PrFormReturn<S>, 'errors'>,
   laravelErrors: LaravelValidationErrors,
-): void {
+): string[] {
   const errors = form.errors as Record<string, Ref<string | null>>
+  const unmatched: string[] = []
+
   for (const field in laravelErrors) {
-    if (field in errors) {
-      errors[field].value = laravelErrors[field]?.[0] ?? null
+    const message = laravelErrors[field]?.[0]
+    if (!message) continue
+
+    const target = field in errors ? field : field.replace(/\.\d+(?=\.|$)/g, '')
+
+    if (target in errors) {
+      errors[target].value = message
+    }
+    else {
+      unmatched.push(message)
     }
   }
+
+  return unmatched
 }

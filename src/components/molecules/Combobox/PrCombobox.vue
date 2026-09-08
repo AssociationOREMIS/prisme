@@ -101,6 +101,8 @@ function clearValue() {
           :id="inputId"
           class="pr-combobox__input min-w-0 grow bg-transparent py-[var(--pr-space-2)] text-[length:var(--pr-font-size-md)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed"
           :placeholder="hasValue ? undefined : placeholder"
+          :required="required"
+          :aria-required="required || undefined"
           :aria-invalid="error ? 'true' : undefined"
           :aria-describedby="describedBy"
         />
@@ -145,6 +147,12 @@ function clearValue() {
         </ComboboxContent>
       </ComboboxPortal>
     </ComboboxRoot>
+    <!-- ComboboxInput only ever carries the search text, not the selected
+         value(s), so native form submission goes through these hidden inputs. -->
+    <template v-if="name">
+      <input v-if="!multiple" type="hidden" :name="name" :value="typeof modelValue === 'string' ? modelValue : ''">
+      <input v-for="value in Array.isArray(modelValue) ? modelValue : []" v-else :key="value" type="hidden" :name="name" :value="value">
+    </template>
     <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>

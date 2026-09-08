@@ -105,6 +105,10 @@ function onPaste(event: ClipboardEvent) {
   addTags(tokens)
   inputValue.value = ''
 }
+
+// The template root is a wrapper <div>, not the draft <input> — forward
+// fallthrough attrs (autocomplete, data-*, ...) to that control.
+defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
@@ -145,13 +149,13 @@ function onPaste(event: ClipboardEvent) {
       <input
         :id="inputId"
         ref="inputRef"
+        v-bind="$attrs"
         v-model="inputValue"
         class="pr-tag-input__input min-w-[6rem] grow bg-transparent py-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed"
         type="text"
         :placeholder="(modelValue?.length ?? 0) === 0 ? placeholder : undefined"
         :disabled="disabled || !canAddMore"
         :required="required && (modelValue?.length ?? 0) === 0"
-        :name="name"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
         @keydown="onKeydown"
@@ -159,6 +163,11 @@ function onPaste(event: ClipboardEvent) {
         @paste="onPaste"
       />
     </div>
+    <!-- The draft input above only ever holds in-progress text, so the
+         committed tags are submitted natively through these hidden inputs. -->
+    <template v-if="name">
+      <input v-for="(tag, index) in modelValue" :key="`${inputId}-${index}`" type="hidden" :name="name" :value="tag">
+    </template>
     <p v-if="error" :id="errorId" class="pr-tag-input__message pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-tag-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>

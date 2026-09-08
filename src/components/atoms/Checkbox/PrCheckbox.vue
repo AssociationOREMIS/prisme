@@ -14,6 +14,8 @@ export interface PrCheckboxProps {
   required?: boolean
   id?: string
   name?: string
+  /** Value submitted with `name` in a native form when checked (defaults to `"on"`, matching the native `<input type="checkbox">` behavior) — set it to distinguish checkboxes sharing the same `name="options[]"`. */
+  value?: string
 }
 
 const props = withDefaults(defineProps<PrCheckboxProps>(), {
@@ -27,6 +29,7 @@ const props = withDefaults(defineProps<PrCheckboxProps>(), {
   required: false,
   id: undefined,
   name: undefined,
+  value: undefined,
 })
 
 const emit = defineEmits<{
@@ -65,6 +68,7 @@ const checkboxClass = computed(() => [
       :required="required"
       :id="id"
       :name="name"
+      :value="value"
       :aria-invalid="error ? 'true' : undefined"
       :aria-describedby="describedBy"
       @update:checked="emit('update:checked', $event)"

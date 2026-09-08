@@ -11,6 +11,8 @@ export interface PrDatePickerProps {
   required?: boolean
   min?: string
   max?: string
+  name?: string
+  id?: string
 }
 
 const props = withDefaults(defineProps<PrDatePickerProps>(), {
@@ -22,6 +24,8 @@ const props = withDefaults(defineProps<PrDatePickerProps>(), {
   required: false,
   min: undefined,
   max: undefined,
+  name: undefined,
+  id: undefined,
 })
 
 const emit = defineEmits<{
@@ -77,6 +81,8 @@ function onFocusOut() {
       :required="required"
       :min="min"
       :max="max"
+      :name="name"
+      :id="id"
       @update:model-value="onUpdate"
     />
   </div>

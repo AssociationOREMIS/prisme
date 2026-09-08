@@ -38,7 +38,7 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
 </script>
 
 <template>
-  <nav class="pr-navbar sticky top-0 col-[1/-1] row-[1] z-[50] flex h-[var(--pr-navbar-height)] w-full items-center justify-between bg-[#0d2c99] px-[var(--pr-space-4)] py-[var(--pr-space-3)] text-white [[data-pr-theme=dark]_&]:bg-[#21212e] max-[780px]:px-[var(--pr-space-3)]" aria-label="Navigation principale">
+  <nav class="pr-navbar sticky top-0 col-[1/-1] row-[1] z-[50] flex h-[var(--pr-navbar-height)] w-full items-center justify-between bg-[var(--pr-color-navbar)] px-[var(--pr-space-4)] py-[var(--pr-space-3)] text-[color:var(--pr-color-navbar-text)] max-[780px]:px-[var(--pr-space-3)]" aria-label="Navigation principale">
     <div class="pr-navbar__brand inline-flex min-w-0 items-center gap-[var(--pr-space-3)]">
       <slot name="brand">
         <img
@@ -59,12 +59,12 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
         <span
           class="pr-navbar__divider"
           :class="[
-            'h-8 w-0.5 shrink-0 bg-[#6d83cc] [[data-pr-theme=dark]_&]:bg-[#8b8ca9]',
+            'h-8 w-0.5 shrink-0 bg-[var(--pr-color-navbar-muted)]',
             { 'pr-navbar__divider--diagonal rotate-12': diagonalDivider },
           ]"
           aria-hidden="true"
         />
-        <h1 class="pr-navbar__title m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-white">{{ navbarTitle }}</h1>
+        <h1 class="pr-navbar__title m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</h1>
       </slot>
     </div>
 

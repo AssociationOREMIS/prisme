@@ -14,6 +14,12 @@
   transform: scaleX(-1);
 }
 
+/* Calendar / Carousel navigation arrows */
+[dir="rtl"] .pr-calendar__nav svg,
+[dir="rtl"] .pr-carousel__button svg {
+  transform: scaleX(-1);
+}
+
 /* Sheet: swap side positioning */
 [dir="rtl"] .pr-sheet[data-side="left"] {
   right: 0;
@@ -33,6 +39,14 @@
 [dir="rtl"] .pr-sidebar {
   border-right: none;
   border-left: 1px solid var(--pr-color-border);
+}
+
+/* Sidebar mobile flyout: anchor to the right edge instead of the left */
+@media (width <= 780px) {
+  [dir="rtl"] .pr-sidebar[data-mobile-expanded="true"] {
+    right: 0;
+    left: auto;
+  }
 }
 
 /* Form field messages and labels align start */

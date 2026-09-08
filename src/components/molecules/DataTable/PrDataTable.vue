@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { MoreHorizontal } from '@lucide/vue'
 import { PrButton } from '../../atoms/Button'
 import { PrCheckbox } from '../../atoms/Checkbox'
@@ -9,7 +9,7 @@ import { PrDropdownMenu } from '../DropdownMenu'
 import PrDataTableColumnHeader from './PrDataTableColumnHeader.vue'
 import PrDataTablePagination from './PrDataTablePagination.vue'
 import PrDataTableViewOptions from './PrDataTableViewOptions.vue'
-import type { PrDataTableColumn, PrDataTableProps, PrDataTableRowAction } from './types'
+import type { PrDataTableColumn, PrDataTableProps, PrDataTableRowAction, PrDataTableSort } from './types'
 import { compareDataTableValues } from './utils'
 
 const props = withDefaults(defineProps<PrDataTableProps>(), {
@@ -30,20 +30,30 @@ const props = withDefaults(defineProps<PrDataTableProps>(), {
   filterKey: undefined,
   filterPlaceholder: undefined,
   rowActions: () => [],
+  serverSide: false,
+  totalRows: 0,
+  page: undefined,
+  sort: undefined,
+  filter: undefined,
 })
 
 const emit = defineEmits<{
   'update:selectedRows': [rows: Record<string, unknown>[]]
   rowAction: [action: PrDataTableRowAction, row: Record<string, unknown>]
+  'update:page': [value: number]
+  'update:pageSize': [value: number]
+  'update:sort': [value: PrDataTableSort | null]
+  'update:filter': [value: string]
 }>()
 
-const page = ref(1)
+const page = ref(props.serverSide ? (props.page ?? 1) : 1)
 const activePageSize = ref(props.pageSize)
-const sortKey = ref('')
-const sortDirection = ref<'asc' | 'desc'>('asc')
-const filterValue = ref('')
+const sortKey = ref(props.serverSide ? (props.sort?.key ?? '') : '')
+const sortDirection = ref<'asc' | 'desc'>(props.serverSide ? (props.sort?.direction ?? 'asc') : 'asc')
+const filterValue = ref(props.serverSide ? (props.filter ?? '') : '')
 const selectedKeys = ref(new Set<string>())
 const hiddenColumnKeys = ref(new Set<string>())
+let filterDebounceTimer: ReturnType<typeof setTimeout> | undefined
 
 const slots = defineSlots<{
   toolbar?: (props: { filterValue: string }) => unknown
@@ -65,6 +75,8 @@ const visibleColumns = computed(() =>
 )
 
 const filteredRows = computed(() => {
+  if (props.serverSide) return sourceRows.value
+
   const query = filterValue.value.trim().toLocaleLowerCase()
   if (!query || !filterColumnKey.value) return sourceRows.value
 
@@ -75,7 +87,7 @@ const filteredRows = computed(() => {
 })
 
 const sortedRows = computed(() => {
-  if (!sortKey.value) return filteredRows.value
+  if (props.serverSide || !sortKey.value) return filteredRows.value
 
   return [...filteredRows.value].sort((a, b) => {
     const left = a[sortKey.value]
@@ -85,12 +97,17 @@ const sortedRows = computed(() => {
   })
 })
 
-const pageCount = computed(() => Math.max(1, Math.ceil(sortedRows.value.length / activePageSize.value)))
+const pageCount = computed(() => {
+  if (props.serverSide) return Math.max(1, Math.ceil((props.totalRows ?? 0) / activePageSize.value))
+  return Math.max(1, Math.ceil(sortedRows.value.length / activePageSize.value))
+})
 const visibleRows = computed(() => {
+  if (props.serverSide) return sourceRows.value
   if (!props.displayPagination) return sortedRows.value
   const start = (page.value - 1) * activePageSize.value
   return sortedRows.value.slice(start, start + activePageSize.value)
 })
+const filteredRowsCount = computed(() => (props.serverSide ? (props.totalRows ?? 0) : filteredRows.value.length))
 
 const selectedRows = computed(() => sourceRows.value.filter((row) => selectedKeys.value.has(rowId(row))))
 const allPageRowsSelected = computed(() => visibleRows.value.length > 0 && visibleRows.value.every((row) => selectedKeys.value.has(rowId(row))))
@@ -105,10 +122,34 @@ watch(() => props.pageSize, (value) => {
 
 watch([filterValue, activePageSize, sortKey, sortDirection], () => {
   page.value = 1
+  if (props.serverSide) emit('update:page', 1)
 })
 
 watch(pageCount, (count) => {
-  if (page.value > count) page.value = count
+  if (page.value > count) {
+    page.value = count
+    if (props.serverSide) emit('update:page', count)
+  }
+})
+
+watch(() => props.page, (value) => {
+  if (props.serverSide && value !== undefined) page.value = value
+})
+
+watch(() => props.sort, (value) => {
+  if (!props.serverSide) return
+  sortKey.value = value?.key ?? ''
+  sortDirection.value = value?.direction ?? 'asc'
+})
+
+watch(() => props.filter, (value) => {
+  if (props.serverSide) filterValue.value = value ?? ''
+})
+
+watch(filterValue, (value) => {
+  if (!props.serverSide) return
+  if (filterDebounceTimer) clearTimeout(filterDebounceTimer)
+  filterDebounceTimer = setTimeout(() => emit('update:filter', value), 300)
 })
 
 watch(sourceRows, () => {
@@ -141,6 +182,7 @@ function setSort(column: PrDataTableColumn, direction?: 'asc' | 'desc') {
   if (!column.sortable) return
   sortKey.value = column.key
   sortDirection.value = direction ?? (sortKey.value === column.key && sortDirection.value === 'asc' ? 'desc' : 'asc')
+  if (props.serverSide) emit('update:sort', { key: sortKey.value, direction: sortDirection.value })
 }
 
 function hideColumn(column: PrDataTableColumn) {
@@ -182,11 +224,18 @@ function togglePageRows(checked: boolean) {
 
 function setPageSize(value: number) {
   activePageSize.value = value
+  if (props.serverSide) emit('update:pageSize', value)
 }
 
 function goToPage(nextPage: number) {
-  page.value = Math.min(Math.max(nextPage, 1), pageCount.value)
+  const clamped = Math.min(Math.max(nextPage, 1), pageCount.value)
+  page.value = clamped
+  if (props.serverSide) emit('update:page', clamped)
 }
+
+onBeforeUnmount(() => {
+  if (filterDebounceTimer) clearTimeout(filterDebounceTimer)
+})
 </script>
 
 <template>
@@ -330,7 +379,7 @@ function goToPage(nextPage: number) {
       :page-size="activePageSize"
       :page-size-options="pageSizeOptions"
       :selected-rows-count="selectedRows.length"
-      :filtered-rows-count="filteredRows.length"
+      :filtered-rows-count="filteredRowsCount"
       :hide-selected-rows-count="hideSelectedRowsCount"
       @update:page="goToPage"
       @update:page-size="setPageSize"

@@ -31,7 +31,15 @@ import { PrCommand } from './molecules/Command'
 export type { PrCommandItem, PrCommandProps } from './molecules/Command'
 
 import { PrDataTable } from './molecules/DataTable'
-export type { PrDataTableColumn, PrDataTableProps } from './molecules/DataTable'
+export type { PrDataTableColumn, PrDataTableProps, PrDataTableSort } from './molecules/DataTable'
+export { fromLaravelPaginator } from './molecules/DataTable'
+export type {
+  LaravelFlatPaginatorResponse,
+  LaravelPaginatorMeta,
+  LaravelPaginatorResponse,
+  LaravelWrappedPaginatorResponse,
+  PrServerTableState,
+} from './molecules/DataTable'
 
 import { PrDatePicker } from './molecules/DatePicker'
 export type { PrDatePickerProps } from './molecules/DatePicker'

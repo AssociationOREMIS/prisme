@@ -116,6 +116,31 @@ app.mount('#prisme-app')
 
 Les deux approches sont interchangeables et peuvent cohabiter dans la meme application.
 
+### Eviter le flash de theme (FOUC) en Blade
+
+Dans une SPA, `usePrTheme()` applique le theme des le montage de Vue. En Blade, le HTML est deja affiche par le navigateur avant que le bundle Vue ne s'execute : sans intervention, la page s'affiche brievement dans le theme par defaut avant de basculer vers le theme reellement choisi (sombre par ex.).
+
+Pour l'eviter, il faut qu'un `<script>` **synchrone, non-module**, s'execute dans le `<head>` du layout Blade avant le premier paint — donc avant meme `@vite(...)`, dont les scripts sont charges en `type="module"` (differe par le navigateur). `getPrThemeInitScript()` fournit justement ce script : une chaine de JS vanilla, sans dependance, qui lit la preference stockee et pose `data-pr-theme`/`color-scheme` sur `<html>` immediatement.
+
+Le plus simple est de l'ecrire une fois dans un fichier statique servi tel quel (pas de build Vite dessus), a partir d'un petit script Node execute a la racine du projet :
+
+```js
+// scripts/write-theme-init-script.mjs
+import { writeFileSync } from 'node:fs'
+import { getPrThemeInitScript } from '@oremis/prisme'
+
+writeFileSync('public/prisme-theme-init.js', getPrThemeInitScript())
+```
+
+```blade
+<head>
+    <script src="{{ asset('prisme-theme-init.js') }}"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.ts'])
+</head>
+```
+
+Sans cette etape, `getPrThemeInitScript()` — bien que fournie a cet effet — n'a aucun effet : le flash de theme qu'elle est censee eviter se produira quand meme, puisque `usePrTheme()`/`setPrTheme()` ne s'executent qu'apres l'hydratation du bundle Vue, donc apres le premier paint.
+
 ## Development
 
 ```bash

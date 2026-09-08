@@ -33,7 +33,8 @@ const componentTag = computed(() => props.as ?? (props.href ? 'a' : 'button'))
 const resolvedActive = computed(() => {
   if (props.active !== undefined) return props.active
   if (typeof window === 'undefined' || !props.href) return false
-  return window.location.pathname === props.href
+  const path = window.location.pathname
+  return path === props.href || path.startsWith(`${props.href}/`)
 })
 const internalExpanded = ref(props.defaultExpanded || resolvedActive.value)
 const isExpanded = computed({
