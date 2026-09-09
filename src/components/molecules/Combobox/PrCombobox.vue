@@ -80,6 +80,15 @@ const hasValue = computed(() => {
 function clearValue() {
   emit('update:modelValue', props.multiple ? [] : '')
 }
+
+function removeValue(value: string) {
+  if (!Array.isArray(props.modelValue)) return
+  emit('update:modelValue', props.modelValue.filter(v => v !== value))
+}
+
+function labelFor(value: string) {
+  return props.options?.find(o => o.value === value)?.label ?? value
+}
 </script>
 
 <template>
@@ -90,16 +99,32 @@ function clearValue() {
       :model-value="modelValue"
       :multiple="multiple"
       :disabled="disabled"
-      :display-value="displayValue"
       @update:model-value="emit('update:modelValue', $event)"
     >
       <ComboboxAnchor
-        class="pr-combobox__anchor inline-flex min-h-[2.375rem] w-full items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
+        class="pr-combobox__anchor inline-flex min-h-[2.375rem] w-full flex-wrap items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] py-[var(--pr-space-1)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
         :class="{ 'border-[var(--pr-color-danger)]': Boolean(error) }"
       >
+        <span
+          v-for="value in multiple && Array.isArray(modelValue) ? modelValue : []"
+          :key="value"
+          class="pr-combobox__tag inline-flex items-center gap-[var(--pr-space-1)] rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] px-[var(--pr-space-2)] py-0.5 text-[length:var(--pr-font-size-xs)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)]"
+        >
+          {{ labelFor(value) }}
+          <button
+            v-if="!disabled"
+            type="button"
+            class="inline-flex items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+            :aria-label="`Retirer ${labelFor(value)}`"
+            @click.stop="removeValue(value)"
+          >
+            <X :size="10" aria-hidden="true" />
+          </button>
+        </span>
         <ComboboxInput
           :id="inputId"
           class="pr-combobox__input min-w-0 grow bg-transparent py-[var(--pr-space-2)] text-[length:var(--pr-font-size-md)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed"
+          :display-value="multiple ? undefined : displayValue"
           :placeholder="hasValue ? undefined : placeholder"
           :required="required"
           :aria-required="required || undefined"

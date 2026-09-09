@@ -67,8 +67,8 @@ const switchClass = computed(() => [
     <SwitchRoot
       v-bind="$attrs"
       class="pr-switch__control relative inline-flex h-[1.375rem] w-[2.375rem] shrink-0 cursor-pointer items-center rounded-[var(--pr-radius-full)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface-subtle)] p-0.5 transition-[background-color,border-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] data-[state=checked]:border-[var(--pr-color-primary)] data-[state=checked]:bg-[var(--pr-color-primary)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"
-      :checked="checked"
-      :default-checked="defaultChecked"
+      :model-value="checked"
+      :default-value="defaultChecked"
       :disabled="disabled"
       :required="required"
       :id="id"
@@ -76,7 +76,7 @@ const switchClass = computed(() => [
       :value="value"
       :aria-invalid="error ? 'true' : undefined"
       :aria-describedby="describedBy"
-      @update:checked="emit('update:checked', $event)"
+      @update:model-value="emit('update:checked', $event)"
     >
       <SwitchThumb class="pr-switch__thumb block size-4 translate-x-0 rounded-[var(--pr-radius-full)] bg-[var(--pr-color-surface)] shadow-[var(--pr-shadow-xs)] transition-transform duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] data-[state=checked]:translate-x-4" />
     </SwitchRoot>

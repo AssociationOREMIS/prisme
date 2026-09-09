@@ -62,8 +62,8 @@ const checkboxClass = computed(() => [
     <CheckboxRoot
       v-bind="$attrs"
       class="pr-checkbox__control mt-[0.0625rem] inline-grid size-[1.125rem] shrink-0 cursor-pointer appearance-none place-items-center rounded-[var(--pr-radius-sm)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] p-0 leading-none text-[color:var(--pr-color-primary-contrast)] box-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] data-[state=checked]:border-[var(--pr-color-primary)] data-[state=checked]:bg-[var(--pr-color-primary)] data-[state=indeterminate]:border-[var(--pr-color-primary)] data-[state=indeterminate]:bg-[var(--pr-color-primary)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"
-      :checked="checked"
-      :default-checked="defaultChecked"
+      :model-value="checked"
+      :default-value="defaultChecked"
       :disabled="disabled"
       :required="required"
       :id="id"
@@ -71,7 +71,7 @@ const checkboxClass = computed(() => [
       :value="value"
       :aria-invalid="error ? 'true' : undefined"
       :aria-describedby="describedBy"
-      @update:checked="emit('update:checked', $event)"
+      @update:model-value="emit('update:checked', $event)"
     >
       <template #default="{ state }">
         <CheckboxIndicator

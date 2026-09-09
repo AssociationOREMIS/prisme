@@ -39,11 +39,11 @@ const toggleClass = computed(() => [
 <template>
   <Toggle
     :class="toggleClass"
-    :pressed="pressed"
-    :default-pressed="defaultPressed"
+    :model-value="pressed"
+    :default-value="defaultPressed"
     :disabled="disabled"
     :aria-label="ariaLabel"
-    @update:pressed="emit('update:pressed', $event)"
+    @update:model-value="emit('update:pressed', $event)"
   >
     <slot />
   </Toggle>

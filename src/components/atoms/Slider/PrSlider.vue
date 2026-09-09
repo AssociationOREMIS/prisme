@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui'
 import { PrLabel } from '../Label'
 
@@ -36,10 +36,23 @@ const emit = defineEmits<{
   'update:modelValue': [value: number]
 }>()
 
-const sliderValue = computed(() => [props.modelValue ?? props.defaultValue])
+// Without a v-model, `modelValue` is always undefined and `defaultValue` never
+// changes — binding SliderRoot straight to `modelValue ?? defaultValue` would
+// make it permanently controlled at a constant value, snapping the thumb back
+// on every drag. Track the live value locally so uncontrolled usage (only
+// `defaultValue` set) still moves, while a real v-model keeps taking priority.
+const internalValue = ref(props.modelValue ?? props.defaultValue)
+
+watch(() => props.modelValue, (value) => {
+  if (value !== undefined) internalValue.value = value
+})
+
+const sliderValue = computed(() => [props.modelValue ?? internalValue.value])
 
 function updateValue(value: number[] | undefined) {
-  emit('update:modelValue', value?.[0] ?? props.min)
+  const next = value?.[0] ?? props.min
+  internalValue.value = next
+  emit('update:modelValue', next)
 }
 
 // SliderThumb renders as a <span role="slider">, which isn't a labelable HTML
