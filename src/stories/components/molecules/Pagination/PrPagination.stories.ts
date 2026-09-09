@@ -26,3 +26,16 @@ export const Default: Story = {
     template: '<PrPagination v-model:page="page" v-bind="args" />',
   }),
 }
+
+export const FromTotalRows: Story = {
+  render: () => ({
+    components: { PrPagination },
+    setup() {
+      const page = ref(1)
+      // pageCount is derived (Math.ceil(132 / 20) = 7) instead of computed by hand —
+      // convenient when totalRows/pageSize already come from fromLaravelPaginator.
+      return { page }
+    },
+    template: '<PrPagination v-model:page="page" :total-rows="132" :page-size="20" />',
+  }),
+}

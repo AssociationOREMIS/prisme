@@ -6,12 +6,18 @@ import { buildPaginationItems } from './utils'
 export interface PrPaginationProps {
   page?: number
   pageCount?: number
+  /** Alternative to `pageCount`: total row count, combined with `pageSize` to compute it — mirrors `PrDataTable`'s server-side pagination so a consumer using `fromLaravelPaginator` doesn't have to compute `pageCount` by hand. Ignored when `pageCount` is set. */
+  totalRows?: number
+  /** Row count per page, used with `totalRows` to compute `pageCount`. */
+  pageSize?: number
   disabled?: boolean
 }
 
 const props = withDefaults(defineProps<PrPaginationProps>(), {
   page: 1,
-  pageCount: 1,
+  pageCount: undefined,
+  totalRows: undefined,
+  pageSize: 10,
   disabled: false,
 })
 
@@ -20,7 +26,11 @@ const emit = defineEmits<{
 }>()
 
 const currentPage = computed(() => props.page ?? 1)
-const currentPageCount = computed(() => props.pageCount ?? 1)
+const currentPageCount = computed(() => {
+  if (props.pageCount !== undefined) return props.pageCount
+  if (props.totalRows !== undefined) return Math.max(1, Math.ceil(props.totalRows / props.pageSize))
+  return 1
+})
 const isDisabled = computed(() => props.disabled ?? false)
 
 // Beyond a handful of pages, listing one button per page would be both
