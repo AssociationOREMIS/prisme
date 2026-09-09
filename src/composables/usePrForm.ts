@@ -22,6 +22,8 @@ export interface PrFormReturn<S extends PrFormSchema> {
   handleSubmit: (fn: () => Promise<void> | void) => Promise<boolean>
   isValid: ComputedRef<boolean>
   isDirty: ComputedRef<boolean>
+  /** True while `handleSubmit`'s callback is running — validation failures never set it, since the callback itself never runs. */
+  isSubmitting: Ref<boolean>
 }
 
 /** Deep-clones a field value so mutating a form field never mutates the schema's initial value (or a previous snapshot of it). */
@@ -52,6 +54,7 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
   const errors = {} as { [K in Keys]: Ref<string | null> }
   const initialValues = {} as { [K in Keys]: InferValue<S[K]> }
   const generalErrors = ref<string[]>([])
+  const isSubmitting = ref(false)
 
   for (const key in schema) {
     const initialValue = cloneFieldValue(schema[key].initialValue) as InferValue<S[typeof key]>
@@ -97,6 +100,7 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
   async function handleSubmit(fn: () => Promise<void> | void): Promise<boolean> {
     generalErrors.value = []
     if (!validate()) return false
+    isSubmitting.value = true
     try {
       await fn()
       return true
@@ -110,6 +114,9 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
       }
       throw err
     }
+    finally {
+      isSubmitting.value = false
+    }
   }
 
   const isValid = computed(() =>
@@ -120,7 +127,7 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
     Object.keys(schema).some(key => !isFieldValueEqual(fields[key as Keys].value, initialValues[key as Keys])),
   )
 
-  return { fields, errors, generalErrors, validate, validateField, reset, handleSubmit, isValid, isDirty }
+  return { fields, errors, generalErrors, validate, validateField, reset, handleSubmit, isValid, isDirty, isSubmitting }
 }
 
 // Built-in validation rule helpers

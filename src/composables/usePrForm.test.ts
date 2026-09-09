@@ -111,4 +111,26 @@ describe('usePrForm — handleSubmit', () => {
     expect(called).toBe(false)
     expect(form.errors.email.value).toBe('Ce champ est requis')
   })
+
+  it('tracks isSubmitting while the callback runs, resetting it whether it succeeds, fails validation, or throws', async () => {
+    const form = usePrForm({ email: { initialValue: 'test@example.com' } })
+    expect(form.isSubmitting.value).toBe(false)
+
+    let duringSubmit = false
+    await form.handleSubmit(async () => {
+      duringSubmit = form.isSubmitting.value
+      await Promise.resolve()
+    })
+    expect(duringSubmit).toBe(true)
+    expect(form.isSubmitting.value).toBe(false)
+
+    const invalidForm = usePrForm({ email: { initialValue: '', rules: [required()] } })
+    await invalidForm.handleSubmit(() => {})
+    expect(invalidForm.isSubmitting.value).toBe(false)
+
+    await expect(form.handleSubmit(() => {
+      throw new Error('boom')
+    })).rejects.toThrow('boom')
+    expect(form.isSubmitting.value).toBe(false)
+  })
 })
