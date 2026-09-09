@@ -153,6 +153,12 @@ export type { PrComboboxOption, PrComboboxProps } from './molecules/Combobox'
 import { PrFileUpload } from './molecules/FileUpload'
 export type { PrFileUploadProps, PrRejectedFile } from './molecules/FileUpload'
 
+import { PrNumberInput } from './atoms/NumberInput'
+export type { PrNumberInputProps } from './atoms/NumberInput'
+
+import { PrTagInput } from './atoms/TagInput'
+export type { PrTagInputProps } from './atoms/TagInput'
+
 /**
  * Central registry of Prisme's public components.
  *
@@ -186,6 +192,7 @@ export const componentRegistry = {
   PrListItem,
   PrNavbar,
   PrNavigationMenu,
+  PrNumberInput,
   PrPagination,
   PrPopover,
   PrProgress,
@@ -203,6 +210,7 @@ export const componentRegistry = {
   PrSwitch,
   PrTable,
   PrTabs,
+  PrTagInput,
   PrTextarea,
   PrThemeToggle,
   PrToast,
