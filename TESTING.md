@@ -48,16 +48,18 @@ Page de test conservée dans `forge` (`resources/views/dev/native-form-test.blad
 
 ## Accessibilité (lecteur d'écran)
 
-- [ ] `PrAlert` en variante `danger`/`warning` : vérifier qu'un lecteur d'écran (NVDA/VoiceOver) interrompt et annonce immédiatement le message (role="alert").
-- [ ] `PrSlider` avec `label` : cliquer sur le label et vérifier que le focus va bien sur le curseur ; vérifier que le lecteur d'écran annonce le label fourni (pas "Valeur" en dur) quand on focus le curseur.
-- [ ] `PrThemeToggle` avec une prop `label` custom : vérifier que le lecteur d'écran annonce ce label plutôt que le message dynamique par défaut.
+Testé le 2026-09-09 via une page de démo dédiée dans `forge` (`/dev/a11y-test`), navigateur Playwright réel (arbre d'accessibilité du DOM — `role`, `aria-label` — plutôt qu'un lecteur d'écran physique, qui n'est pas disponible dans cet environnement ; ces attributs sont exactement ce qu'un lecteur d'écran lit).
+
+- [x] `PrAlert` en variante `danger`/`warning` : vérifier qu'un lecteur d'écran (NVDA/VoiceOver) interrompt et annonce immédiatement le message (role="alert"). Déjà correct dans le code (`PrAlert.vue`, `alertRole` computed) : `role="alert"` confirmé sur les deux variantes.
+- [x] `PrSlider` avec `label` : cliquer sur le label et vérifier que le focus va bien sur le curseur ; vérifier que le lecteur d'écran annonce le label fourni (pas "Valeur" en dur) quand on focus le curseur. **Bug trouvé et corrigé** : l'`id` généré était posé sur `SliderRoot` (un conteneur non focusable), pas sur `SliderThumb` (le `<span role="slider" tabindex="0">` réellement interactif) — un clic sur le `<label for="...">` ne focalisait donc rien. `SliderThumb` de reka-ui n'étant pas un élément "labelable" au sens HTML (ni input/button/select/textarea), même avec le bon `id` le comportement natif du label ne suffit pas : ajouté un handler `@click` explicite sur `PrLabel` qui appelle `.focus()` sur le curseur. Vérifié après fix : le clic sur le label envoie bien le focus sur le curseur. L'annonce du label custom (`aria-label`) était déjà correcte (pas de bug là-dessus).
+- [x] `PrThemeToggle` avec une prop `label` custom : vérifier que le lecteur d'écran annonce ce label plutôt que le message dynamique par défaut. Déjà correct dans le code (`accessibleLabel = props.label ?? nextThemeLabel.value`) : vérifié, le `aria-label` est exactement le label custom fourni quand il est présent.
 
 ## Responsive (testé le 2026-09-09 via `forge`, Chromium/Playwright headless)
 
 - [x] Pas de scroll horizontal de page à 360px, 390px, 780px et 1440px de large sur une page avec `PrDataTable` + formulaire complexe (`PrToggleGroup` 7 items, `PrSelect`) + `PrDialog`. Un bug d'app consommatrice (wrapper `display:grid` sans colonnes explicites, cf. `BACKLOG.md`) faisait déborder la page et sortir `PrNavbar` du cadre au scroll horizontal — corrigé côté `forge`, pas un bug Prisme, mais bon réflexe à vérifier sur toute nouvelle page.
 - [x] `PrSidebar` en dessous de 780px : passe bien en rail icônes réduit (`data-collapsed`/`max-[780px]`), le bouton `PrSidebarCollapseButton` fonctionne.
 - [x] `PrDataTable` sur petit écran : les colonnes en trop restent accessibles via le scroll horizontal interne (`.pr-data-table__scroll`) sans faire déborder la page.
-- [ ] Tiroir mobile `PrSidebar` en overlay (`data-mobile-expanded`) : pas testé (seul le mode rail réduit a été exercé, pas le mode tiroir déployé par-dessus le contenu).
+- [x] Tiroir mobile `PrSidebar` en overlay (`data-mobile-expanded`) : testé le 2026-09-09 dans `forge` (n'importe quelle page, le sidebar est partagé par le layout), navigateur Playwright réel à 375px de large. **Bug trouvé et corrigé** : il n'y avait ni scrim/overlay assombrissant le contenu derrière le tiroir déployé, ni fermeture au clic en dehors — seule la fermeture au clic sur un item existait (`closeMobileFlyout()` déjà appelé par `PrSidebarItem`). Ajouté dans `PrSidebar.vue` : un `<div>` de backdrop (`bg-[var(--pr-color-overlay)]`, même token que `PrDialog`/`PrSheet`) affiché sous le tiroir ouvert et au-dessus du contenu, qui ferme le tiroir au clic ; ajouté aussi la fermeture au clavier (`Escape`). Vérifié après fix : le backdrop apparaît à l'ouverture, le clic dessus referme le tiroir.
 
 ## RTL (`dir="rtl"`)
 
@@ -76,7 +78,7 @@ Page de test conservée dans `forge` (`resources/views/dev/native-form-test.blad
 
 ## Pagination
 
-- [ ] `PrPagination` avec un `pageCount` élevé (ex: 500) : vérifier que la troncature `1 … 49 50 51 … 500` s'affiche et se met à jour correctement en naviguant vers les extrémités.
+- [x] `PrPagination` avec un `pageCount` élevé (ex: 500) : vérifier que la troncature `1 … 49 50 51 … 500` s'affiche et se met à jour correctement en naviguant vers les extrémités. Testé le 2026-09-09 via une page de démo dédiée dans `forge` (`/dev/pagination-test`, `pageCount=500`), navigateur Playwright réel : à la page 50, affiche exactement `1 … 49 50 51 … 500` ; à la dernière page (500), affiche `1 … 499 500` (pas de fenêtre après la dernière page, correct). Aucun bug — déjà couvert par `buildPaginationItems` et ses tests unitaires existants (`utils.test.ts`).
 
 ## FileUpload
 
