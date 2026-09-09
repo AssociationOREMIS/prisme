@@ -17,6 +17,7 @@ export interface PrAccordionItem {
 
 export interface PrAccordionProps {
   modelValue?: string | string[]
+  defaultValue?: string | string[]
   items?: PrAccordionItem[]
   type?: 'single' | 'multiple'
   collapsible?: boolean
@@ -24,6 +25,7 @@ export interface PrAccordionProps {
 
 withDefaults(defineProps<PrAccordionProps>(), {
   modelValue: undefined,
+  defaultValue: undefined,
   items: () => [],
   type: 'single',
   collapsible: true,
@@ -39,6 +41,7 @@ const emit = defineEmits<{
     class="pr-accordion grid overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)]"
     :type="type"
     :model-value="modelValue"
+    :default-value="defaultValue"
     :collapsible="collapsible"
     @update:model-value="emit('update:modelValue', $event)"
   >

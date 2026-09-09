@@ -32,12 +32,17 @@ Ce document liste ce qui doit être vérifié manuellement (ou via une app Larav
 
 ## Soumission de formulaire native (sans JS, `<form method="POST">` Blade classique)
 
-- [ ] `PrCheckbox` / `PrSwitch` : plusieurs cases avec `name="options[]"` et des `value` distincts → vérifier côté Laravel (`$request->input('options')`) que le tableau contient bien les valeurs cochées.
-- [ ] `PrTagInput` avec `name="tags[]"` : ajouter plusieurs tags, soumettre le formulaire, vérifier que Laravel reçoit bien le tableau complet des tags validés (pas le texte de saisie en cours).
-- [ ] `PrCombobox` en mode simple et en mode `multiple`, avec `name` renseigné : vérifier la valeur reçue côté serveur dans les deux cas.
-- [ ] `PrToggleGroup` en `type="single"` et `type="multiple"`, avec `name` renseigné : vérifier la valeur reçue côté serveur.
-- [ ] `PrDatePicker` avec `name` renseigné : vérifier que la date sélectionnée arrive bien côté serveur.
-- [ ] `PrInput` / `PrNumberInput` / `PrTextarea` / `PrTagInput` : passer `autocomplete`, `maxlength`, `pattern`, `inputmode` ou un `data-*` custom et vérifier via l'inspecteur DOM que l'attribut est bien sur le `<input>`/`<textarea>` réel, pas sur le `<div>` englobant.
+Testé le 2026-09-09 via une page de test dédiée dans `forge` (`/dev/native-form-test`, route + contrôleur + vue Blade + îlot Vue séparés, aucune interférence avec la démo `/users`) : formulaire `<form method="POST">` **réel**, sans `usePrForm`, sans axios, sans `@submit.prevent`, piloté par un navigateur Playwright réel (remplissage de chaque composant, clic sur le bouton `submit`, lecture du payload JSON reçu côté Laravel via `$request->all()`).
+
+- [x] `PrCheckbox` / `PrSwitch` : plusieurs cases avec `name="options[]"` et des `value` distincts → vérifié, Laravel reçoit `options: ["a", "b"]`. `PrSwitch` avec `name="newsletter"` reçu comme `"on"`.
+- [x] `PrTagInput` avec `name="tags[]"` : ajout de deux tags via l'UI (saisie + Entrée), Laravel reçoit `tags: ["benevolat", "logistique"]` (pas le texte de saisie en cours, uniquement les tags validés).
+- [x] `PrCombobox` en mode simple et en mode `multiple`, avec `name` renseigné : simple → `country: "fr"` ; multiple → `skills: ["accueil", "communication"]`. Les deux modes utilisent des inputs cachés gérés par Prisme lui-même (pas par reka-ui), avec le même `name` répété par valeur pour le mode multiple.
+- [x] `PrToggleGroup` en `type="single"` et `type="multiple"`, avec `name` renseigné : single → `plan: "yearly"` ; multiple → `days: ["mon", "fri"]`. Point notable (pas un bug) : en `type="multiple"`, l'input caché généré par reka-ui indexe le nom (`days[0]`, `days[1]`, recalculé à chaque changement de sélection) plutôt que de répéter `days[]` — au global équivalent côté PHP (tableau séquentiel identique), mais une convention différente de celle de `PrCombobox`/`PrTagInput`/`PrCheckbox` qui répètent le même `name`. À garder en tête si un jour on inspecte le payload brut (hors `$request->input()`).
+- [x] `PrDatePicker` avec `name` renseigné : date sélectionnée (`2026-12-25`) reçue telle quelle côté serveur.
+- [x] `PrInput` / `PrNumberInput` / `PrTextarea` : `autocomplete`, `maxlength`, `pattern`, `inputmode` et `data-*` custom vérifiés via l'inspecteur DOM (évaluation JS dans la page) — tous atterrissent bien sur l'élément natif (`<input>`/`<textarea>`), pas sur le `<div>` englobant. Bonus : le `pattern="[a-z]+"` a effectivement bloqué la soumission native du navigateur sur une valeur non conforme (`bénévole`), confirmant que la validation HTML5 fonctionne de bout en bout. `PrTagInput` non re-testé spécifiquement sur ce point (pas d'attribut custom passé dans ce test), mais son `<input>` de saisie a `v-bind="$attrs"` donc le même mécanisme s'applique.
+- [x] Bug trouvé et corrigé au passage (sans lien direct avec la checklist, découvert en préparant ce test) : `PrTagInput` et `PrNumberInput` existaient et étaient buildés (`@oremis/prisme/components/atoms/TagInput`, `.../NumberInput`) mais étaient absents de `src/components/registry.ts` — invisibles à `app.use(Prisme)` (enregistrement global) et à `componentPaths`/`paths.generated.ts`. Ajoutés au registre. Voir `BACKLOG.md`.
+
+Page de test conservée dans `forge` (`resources/views/dev/native-form-test.blade.php`, `resources/js/pages/native-form-test.js` + `native-form-test/Index.vue`, route `dev.native-form-test`) — pas commitée, utile comme page de régression manuelle pour un futur upgrade de Prisme. À supprimer si jugée inutile à terme.
 
 ## Accessibilité (lecteur d'écran)
 

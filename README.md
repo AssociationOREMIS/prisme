@@ -42,6 +42,37 @@ import { PrButton } from '@oremis/prisme'
 https://associationoremis.github.io/prisme/
 ```
 
+### Composants controles (v-model)
+
+Chaque composant a etat ouvert/coche reprend le nom de prop de la primitive [reka-ui](https://reka-ui.com) qu'il enveloppe, plutot que d'imposer une convention `modelValue` uniforme. Un `v-model` nu ne fonctionne donc que sur `PrAccordion` :
+
+| Composant(s) | Prop | v-model |
+| --- | --- | --- |
+| `PrAccordion` | `modelValue` | `v-model="valeur"` |
+| `PrCheckbox`, `PrSwitch` | `checked` | `v-model:checked="valeur"` |
+| `PrToggle` | `pressed` | `v-model:pressed="valeur"` |
+| `PrCollapsible`, `PrDialog`, `PrSheet`, `PrPopover`, `PrToast`, `PrAlertDialog`, `PrDropdownMenu` | `open` | `v-model:open="valeur"` |
+
+Chacun de ces composants accepte aussi un `default-xxx` (`defaultValue`, `defaultChecked`, `defaultPressed`, `defaultOpen`) pour un usage non controle, sans avoir a gerer l'etat cote consommateur.
+
+### Empiler plusieurs composants Prisme verticalement
+
+`PrDataTable` et les autres composants larges (formulaires avec beaucoup de champs) utilisent `flex flex-col` en interne, pas `display: grid`. Un wrapper consommateur en `display: grid` sans `grid-template-columns` explicite autour d'un tel composant produit un debordement (CSS Grid blowout) : la piste implicite se dimensionne sur le contenu le plus large, meme si le conteneur a `min-width: 0` (qui ne protege que sa propre boite, pas sa piste interne).
+
+Pour empiler plusieurs composants Prisme verticalement (DataTable, formulaire, etc.), utilisez `flex flex-col` (ou `display: block`) plutot qu'une grille nue :
+
+```html
+<!-- A eviter : grille sans colonnes explicites -->
+<div class="grid">
+  <PrDataTable ... />
+</div>
+
+<!-- Recommande -->
+<div class="flex flex-col">
+  <PrDataTable ... />
+</div>
+```
+
 ## Laravel Blade
 
 Dans une application Laravel avec Vite, Prisme peut etre monte dans une vue Blade via une petite application Vue.
