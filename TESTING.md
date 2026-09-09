@@ -4,18 +4,26 @@ Ce document liste ce qui doit être vérifié manuellement (ou via une app Larav
 
 ## DataTable — mode `serverSide`
 
-- [ ] Brancher `PrDataTable` en `serverSide` sur un vrai endpoint Laravel `Model::paginate()` (forme brute *et* forme wrappée en API Resource `{ data, meta }`) via `fromLaravelPaginator`.
-- [ ] Changer de page, de tri, de taille de page et de filtre : vérifier que chaque action déclenche bien un seul appel réseau avec les bons paramètres (le filtre est débouncé à 300ms côté composant).
-- [ ] Vérifier l'état `isLoading` pendant le fetch (skeleton rows).
-- [ ] Vérifier que la sélection de lignes (`selectedRows`) se comporte correctement quand on change de page côté serveur (les lignes sélectionnées hors page courante ne doivent pas disparaître silencieusement du modèle).
-- [ ] Réduire `totalRows` côté serveur pendant qu'on est sur une page qui n'existe plus (ex: suppression en masse) : vérifier que le composant retombe bien sur la dernière page valide et émet `update:page`.
+- [x] Brancher `PrDataTable` en `serverSide` sur un vrai endpoint Laravel `Model::paginate()` **forme wrappée en API Resource `{ data, meta }`** via `fromLaravelPaginator`. Validé le 2026-09-09 dans `forge` (`/users`, 51 lignes réelles, pagination sur 6 pages). — La **forme brute** (non wrappée) n'a volontairement pas été rebranchée séparément (voir `forge`'s `UserController::data()`, qui n'utilise que la forme wrappée, jugée plus idiomatique côté Laravel) : reste non testée en conditions réelles.
+- [x] Changer de page, de tri (colonnes Nom/Email/Statut) et de filtre (par nom) : chaque action déclenche bien un rechargement avec les bons résultats. Validé fonctionnellement dans `forge`. — Le débounce 300ms du filtre et le fait qu'une seule requête réseau parte par action n'ont pas été vérifiés précisément (pas d'inspection de l'onglet réseau).
+- [ ] Vérifier l'état `isLoading` pendant le fetch (skeleton rows) — pas observé spécifiquement (transitoire, pas capturé).
+- [ ] Vérifier que la sélection de lignes (`selectedRows`) se comporte correctement quand on change de page côté serveur — non testé (`forge` n'utilise pas `selectable` sur son DataTable).
+- [ ] Réduire `totalRows` côté serveur pendant qu'on est sur une page qui n'existe plus (ex: suppression en masse) : vérifier que le composant retombe bien sur la dernière page valide et émet `update:page` — non testé.
 
 ## usePrForm
 
-- [ ] Formulaire avec un champ tableau dynamique (ajout/suppression de lignes) : vérifier que `isDirty` ne reste plus bloqué à `true` en permanence, et que `reset()` restaure bien l'état initial sans le corrompre après plusieurs cycles.
-- [ ] Simuler une réponse 422 Laravel avec des clés imbriquées (`items.0.name`, `items.1.email`) sur un schéma qui déclare `items.name` : vérifier que le message atterrit sur le bon champ.
-- [ ] Simuler une réponse 422 avec une clé qui ne correspond à aucun champ du schéma : vérifier que le message apparaît dans `generalErrors` (à afficher quelque part dans l'UI — ce n'est pas automatique, c'est au consommateur de le faire).
-- [ ] Vérifier qu'il n'y a **pas** d'état `isSubmitting` intégré : le bouton de soumission doit être désactivé manuellement par l'app consommatrice pendant `handleSubmit`. (Cf. BACKLOG.md — feature manquante, pas un bug.)
+- [ ] Formulaire avec un champ tableau dynamique (ajout/suppression de lignes) : vérifier que `isDirty` ne reste plus bloqué à `true` en permanence, et que `reset()` restaure bien l'état initial sans le corrompre après plusieurs cycles. — Non testé : le champ tableau de `forge` (`availabilities`, via `PrToggleGroup type="multiple"`) est un tableau de valeurs scalaires, pas un tableau de lignes ajoutées/supprimées dynamiquement — scénario différent de celui visé ici.
+- [ ] Simuler une réponse 422 Laravel avec des clés imbriquées (`items.0.name`, `items.1.email`) sur un schéma qui déclare `items.name` — non testé (le formulaire `forge` n'a pas de champ imbriqué de ce type).
+- [ ] Simuler une réponse 422 avec une clé qui ne correspond à aucun champ du schéma : vérifier que le message apparaît dans `generalErrors` — le rendu (`PrAlert` affichant `generalErrors`) est bien câblé et fonctionnel dans `forge`, mais le scénario précis (clé 422 non déclarée dans le schéma) n'a pas été spécifiquement déclenché en conditions réelles.
+- [x] Vérifier qu'il n'y a **pas** d'état `isSubmitting` intégré : le bouton de soumission doit être désactivé manuellement par l'app consommatrice pendant `handleSubmit`. Confirmé — `forge` gère un `ref isSubmitting` local passé au prop `loading` de `PrButton`. (Cf. BACKLOG.md — feature manquante, pas un bug.)
+
+## PrDialog / PrAlertDialog / PrToast (nouveau, testé le 2026-09-09 via `forge`)
+
+- [x] `PrSelect` (ou tout popover) à l'intérieur d'une `PrDialog` : le menu déroulant s'ouvre bien au-dessus de la modale et reste cliquable. Cassé avant le fix z-index de cette session (cf. `BACKLOG.md`), validé après sur mobile (360px) et desktop.
+- [x] `PrDialog` utilisée comme modale d'édition (formulaire pré-rempli, boutons dans le slot `footer`, fermeture via la croix/Annuler/Escape) : fonctionne correctement, y compris en responsive.
+- [x] `PrAlertDialog` pour une confirmation de suppression : attention, ses boutons `confirm`/`cancel` ferment la modale eux-mêmes (`AlertDialogAction`/`AlertDialogCancel` de Reka UI) en émettant `update:open(false)` **en même temps** que `@confirm`/`@cancel` — un consommateur qui vide sa donnée "cible" dans le handler `update:open` va la perdre avant que `@confirm` ne s'exécute (bug reproduit et corrigé côté `forge` : séparer l'état visuel de la modale de la donnée métier, ne vider cette dernière qu'après l'action réellement effectuée).
+- [x] `PrToast` avec `variant` (`success`/`danger`) et barre de progression : rendu correct, couleurs conformes.
+- [x] `PrToast` (`duration` par défaut) créé pendant qu'une `PrDialog` est encore ouverte, juste avant sa fermeture : disparaît bien après `duration`, y compris en séquence réaliste (plusieurs modifications à la suite) et contre le build de production. Un soupçon de bug ici plus tôt dans la session ne s'est pas confirmé — cf. `BACKLOG.md` § "Investigué le 2026-09-09".
 
 ## PrCalendar — fuseau horaire
 
@@ -37,6 +45,13 @@ Ce document liste ce qui doit être vérifié manuellement (ou via une app Larav
 - [ ] `PrSlider` avec `label` : cliquer sur le label et vérifier que le focus va bien sur le curseur ; vérifier que le lecteur d'écran annonce le label fourni (pas "Valeur" en dur) quand on focus le curseur.
 - [ ] `PrThemeToggle` avec une prop `label` custom : vérifier que le lecteur d'écran annonce ce label plutôt que le message dynamique par défaut.
 
+## Responsive (testé le 2026-09-09 via `forge`, Chromium/Playwright headless)
+
+- [x] Pas de scroll horizontal de page à 360px, 390px, 780px et 1440px de large sur une page avec `PrDataTable` + formulaire complexe (`PrToggleGroup` 7 items, `PrSelect`) + `PrDialog`. Un bug d'app consommatrice (wrapper `display:grid` sans colonnes explicites, cf. `BACKLOG.md`) faisait déborder la page et sortir `PrNavbar` du cadre au scroll horizontal — corrigé côté `forge`, pas un bug Prisme, mais bon réflexe à vérifier sur toute nouvelle page.
+- [x] `PrSidebar` en dessous de 780px : passe bien en rail icônes réduit (`data-collapsed`/`max-[780px]`), le bouton `PrSidebarCollapseButton` fonctionne.
+- [x] `PrDataTable` sur petit écran : les colonnes en trop restent accessibles via le scroll horizontal interne (`.pr-data-table__scroll`) sans faire déborder la page.
+- [ ] Tiroir mobile `PrSidebar` en overlay (`data-mobile-expanded`) : pas testé (seul le mode rail réduit a été exercé, pas le mode tiroir déployé par-dessus le contenu).
+
 ## RTL (`dir="rtl"`)
 
 - [ ] Passer une page de démo en `dir="rtl"` et vérifier visuellement : chevrons de `PrCalendar`/`PrCarousel`/`PrPagination` inversés, tiroir mobile de `PrSidebar` ancré à droite (en dessous de 780px de large).
@@ -50,6 +65,7 @@ Ce document liste ce qui doit être vérifié manuellement (ou via une app Larav
 
 - [ ] `PrSidebarItem` / `PrSidebarSubItem` / `PrNavigationMenu` sans prop `active` explicite, sur des routes Blade réelles avec sous-pages (ex: `/settings` et `/settings/security`) : vérifier que l'item parent reste actif sur les sous-routes.
 - [ ] Vérifier qu'un `href` qui est un préfixe accidentel d'un autre (ex: `/settings` vs `/settings-other`) ne déclenche pas un faux positif.
+- [x] Piège d'intégration (pas un bug Prisme) : `PrSidebarItem` compare `href` à `window.location.pathname`, qui est toujours un **chemin relatif**. Si `href` est généré via `route('...')` côté Laravel (URL absolue par défaut), l'item n'est jamais actif. Trouvé et corrigé dans `forge` en passant `route('users.index', absolute: false)`.
 
 ## Pagination
 

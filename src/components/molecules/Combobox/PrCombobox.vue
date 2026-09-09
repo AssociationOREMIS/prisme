@@ -123,7 +123,7 @@ function clearValue() {
       </ComboboxAnchor>
       <ComboboxPortal>
         <ComboboxContent
-          class="pr-combobox__content z-[70] max-h-[min(20rem,calc(100vh-var(--pr-space-8)))] w-[var(--reka-combobox-trigger-width)] overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[side=top]:origin-bottom data-[side=bottom]:origin-top"
+          class="pr-combobox__content z-[95] max-h-[min(20rem,calc(100vh-var(--pr-space-8)))] w-[var(--reka-combobox-trigger-width)] overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[side=top]:origin-bottom data-[side=bottom]:origin-top"
           position="popper"
           :side-offset="8"
         >

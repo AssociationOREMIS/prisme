@@ -8,6 +8,12 @@ const meta = {
   title: 'Feedback/Toast',
   component: PrToast,
   tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: ['default', 'info', 'success', 'warning', 'danger'],
+    },
+  },
   args: {
     title: 'Dossier mis a jour',
     description: 'Les changements ont ete sauvegardes.',
@@ -62,6 +68,61 @@ export const Default: Story = {
             :title="toast.title"
             :description="toast.description"
             :duration="args.duration"
+            @update:open="onOpenChange(toast, $event)"
+          />
+        </PrToastProvider>
+      </div>
+    `,
+  }),
+}
+
+// noinspection JSUnusedGlobalSymbols
+export const Variants: Story = {
+  render: () => ({
+    components: { PrButton, PrToast, PrToastProvider },
+    setup() {
+      const VARIANTS = [
+        { variant: 'success' as const, title: 'Benevole ajoute', description: 'Jeanne Dupont a ete ajoutee a la liste.' },
+        { variant: 'danger' as const, title: 'Benevole supprime', description: 'Jeanne Dupont a ete retiree de la liste.' },
+        { variant: 'warning' as const, title: 'Verification requise', description: 'Certains champs meritent une relecture.' },
+        { variant: 'info' as const, title: 'Information', description: 'La liste a ete synchronisee.' },
+      ]
+
+      const toasts = ref<Array<{ id: number, open: boolean, variant: typeof VARIANTS[number]['variant'], title: string, description: string }>>([])
+      let id = 0
+
+      const addToast = (preset: typeof VARIANTS[number]) => {
+        id += 1
+        toasts.value.push({ id, open: true, ...preset })
+      }
+
+      const onOpenChange = (toast: { id: number, open: boolean }, open: boolean) => {
+        toast.open = open
+        if (!open) {
+          window.setTimeout(() => {
+            toasts.value = toasts.value.filter((item) => item.id !== toast.id)
+          }, 180)
+        }
+      }
+
+      return { VARIANTS, addToast, onOpenChange, toasts }
+    },
+    template: `
+      <div class="story-toast-demo">
+        <PrToastProvider>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <PrButton v-for="preset in VARIANTS" :key="preset.variant" @click="addToast(preset)">
+              {{ preset.variant }}
+            </PrButton>
+          </div>
+          <PrToast
+            v-for="toast in toasts"
+            :key="toast.id"
+            :open="toast.open"
+            :variant="toast.variant"
+            :title="toast.title"
+            :description="toast.description"
+            :duration="4000"
             @update:open="onOpenChange(toast, $event)"
           />
         </PrToastProvider>

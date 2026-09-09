@@ -48,5 +48,34 @@ async function buildComponentEntries() {
   }
 }
 
+/**
+ * Composables get the same single-entry treatment as components: a consumer
+ * that only needs `usePrForm` (e.g. a Blade/Vue "island" page with a form)
+ * shouldn't have to pull in the whole component registry — and thus every
+ * component in the library — just to import it from the main entry.
+ */
+async function buildComposableEntries() {
+  const composablesDir = path.resolve(root, 'src/composables')
+
+  for (const dirent of fs.readdirSync(composablesDir, { withFileTypes: true })) {
+    if (!dirent.isFile() || !dirent.name.endsWith('.ts') || dirent.name.endsWith('.test.ts')) continue
+
+    const name = dirent.name.replace(/\.ts$/, '')
+    await build({
+      configFile,
+      logLevel: 'warn',
+      build: {
+        emptyOutDir: false,
+        lib: {
+          entry: path.resolve(composablesDir, dirent.name),
+          formats: ['es'],
+          fileName: () => `composables/${name}.js`,
+        },
+      },
+    })
+  }
+}
+
 await buildMain()
 await buildComponentEntries()
+await buildComposableEntries()

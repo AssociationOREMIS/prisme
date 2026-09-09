@@ -24,6 +24,10 @@
       "types": "./dist/components/*/index.d.ts",
       "import": "./dist/components/*.js"
     },
+    "./composables/*": {
+      "types": "./dist/composables/*.d.ts",
+      "import": "./dist/composables/*.js"
+    },
     "./styles.css": "./dist/styles.css"
   },
   "types": "./dist/index.d.ts",

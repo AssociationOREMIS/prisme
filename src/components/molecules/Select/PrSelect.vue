@@ -92,7 +92,7 @@ const describedBy = computed(() => {
       </SelectTrigger>
       <SelectPortal>
         <SelectContent
-          class="pr-select__content z-[70] max-h-[min(20rem,calc(100vh-var(--pr-space-8)))] min-w-[var(--reka-select-trigger-width)] overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[side=top]:origin-bottom data-[side=right]:origin-left data-[side=bottom]:origin-top data-[side=left]:origin-right"
+          class="pr-select__content z-[95] max-h-[min(20rem,calc(100vh-var(--pr-space-8)))] min-w-[var(--reka-select-trigger-width)] overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[side=top]:origin-bottom data-[side=right]:origin-left data-[side=bottom]:origin-top data-[side=left]:origin-right"
           position="popper"
           :side-offset="8"
         >
