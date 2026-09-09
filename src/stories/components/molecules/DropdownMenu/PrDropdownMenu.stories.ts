@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { MoreHorizontal } from '@lucide/vue'
+import { Check, MoreHorizontal } from '@lucide/vue'
+import { ref } from 'vue'
 import { PrButton } from '../../../../components/atoms/Button'
 import { PrDropdownMenu } from '../../../../components/molecules/DropdownMenu'
 import '../../../stories.css'
@@ -49,6 +50,43 @@ export const Default: Story = {
             <component :is="separator" :class="separatorClass" />
             <component :is="item" :class="dangerItemClass">
               Supprimer
+            </component>
+          </template>
+        </PrDropdownMenu>
+      </div>
+    `,
+  }),
+}
+
+export const WithCheckboxItems: Story = {
+  render: () => ({
+    components: { Check, MoreHorizontal, PrButton, PrDropdownMenu },
+    setup() {
+      const showArchived = ref(false)
+      const showDrafts = ref(true)
+      return { showArchived, showDrafts }
+    },
+    template: `
+      <div class="story-panel">
+        <PrDropdownMenu label="Affichage">
+          <template #trigger>
+            <PrButton variant="secondary">
+              Filtres
+              <MoreHorizontal :size="16" aria-hidden="true" />
+            </PrButton>
+          </template>
+          <template #default="{ checkboxItem, itemIndicator, checkboxItemClass }">
+            <component :is="checkboxItem" v-model="showArchived" :class="checkboxItemClass">
+              <component :is="itemIndicator" class="absolute left-[var(--pr-space-3)] inline-flex">
+                <Check :size="14" aria-hidden="true" />
+              </component>
+              Afficher les archives
+            </component>
+            <component :is="checkboxItem" v-model="showDrafts" :class="checkboxItemClass">
+              <component :is="itemIndicator" class="absolute left-[var(--pr-space-3)] inline-flex">
+                <Check :size="14" aria-hidden="true" />
+              </component>
+              Afficher les brouillons
             </component>
           </template>
         </PrDropdownMenu>

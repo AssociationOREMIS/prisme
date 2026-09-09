@@ -11,6 +11,7 @@ export interface PrTypographyProps {
     | 'blockquote'
     | 'ul'
     | 'ol'
+    | 'table'
     | 'inline-code'
     | 'code'
     | 'code-block'
@@ -34,6 +35,7 @@ const typographyVariantClass = computed(() => ({
   blockquote: 'mt-[var(--pr-space-6)] border-l-2 border-[var(--pr-color-border)] pl-[var(--pr-space-6)] italic text-[color:var(--pr-color-text-muted)]',
   ul: 'my-[var(--pr-space-6)] list-disc pl-[var(--pr-space-6)] text-[color:var(--pr-color-text)] [&>li]:mt-[var(--pr-space-2)] [&>li]:text-inherit',
   ol: 'my-[var(--pr-space-6)] list-decimal pl-[var(--pr-space-6)] text-[color:var(--pr-color-text)] [&>li]:mt-[var(--pr-space-2)] [&>li]:text-inherit',
+  table: 'my-[var(--pr-space-6)] w-full border-collapse text-left text-[length:var(--pr-font-size-sm)] [&_th]:border-b [&_th]:border-[var(--pr-color-border)] [&_th]:px-[var(--pr-space-3)] [&_th]:py-[var(--pr-space-2)] [&_th]:font-[750] [&_th]:text-[color:var(--pr-color-text-muted)] [&_td]:border-b [&_td]:border-[var(--pr-color-border)] [&_td]:px-[var(--pr-space-3)] [&_td]:py-[var(--pr-space-2)] [&_td]:text-[color:var(--pr-color-text)] [&_tr:last-child>td]:border-b-0',
   'inline-code': 'rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] px-[var(--pr-space-1)] py-[0.125rem] font-[var(--pr-font-mono)] text-[length:var(--pr-font-size-sm)]',
   'code-block': 'flex w-full overflow-x-auto rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] p-[var(--pr-space-3)] text-[color:var(--pr-color-text)]',
   lead: 'text-xl leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text-muted)]',

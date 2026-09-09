@@ -53,6 +53,7 @@ export const States: Story = {
         <PrRadioGroup model-value="normal" label="Vertical" :options="options" />
         <PrRadioGroup model-value="high" label="Horizontal" :options="options" orientation="horizontal" />
         <PrRadioGroup model-value="low" label="Desactive" :options="options" disabled />
+        <PrRadioGroup model-value="" label="Avec erreur" :options="options" error="Merci de choisir une priorite." />
       </div>
     `,
   }),

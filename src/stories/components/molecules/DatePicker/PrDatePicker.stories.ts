@@ -25,3 +25,22 @@ export const Default: Story = {
     template: '<PrDatePicker v-model="value" v-bind="args" />',
   }),
 }
+
+export const States: Story = {
+  render: () => ({
+    components: { PrDatePicker },
+    setup() {
+      const value = ref('2026-08-19')
+      const emptyValue = ref('')
+      const rangedValue = ref('2026-08-19')
+      return { value, emptyValue, rangedValue }
+    },
+    template: `
+      <div class="story-column">
+        <PrDatePicker v-model="emptyValue" label="Avec erreur" error="La date d'echeance est requise." />
+        <PrDatePicker v-model="value" label="Desactive" disabled />
+        <PrDatePicker v-model="rangedValue" label="Bornee (aout 2026)" min="2026-08-01" max="2026-08-31" hint="Du 1er au 31 aout 2026" />
+      </div>
+    `,
+  }),
+}

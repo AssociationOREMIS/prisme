@@ -33,3 +33,32 @@ export const Default: Story = {
     template: '<PrToggleGroup v-model="value" v-bind="args" />',
   }),
 }
+
+export const Multiple: Story = {
+  render: () => ({
+    components: { PrToggleGroup },
+    setup() {
+      const value = ref(['day', 'week'])
+      return { items, value }
+    },
+    template: '<PrToggleGroup v-model="value" type="multiple" :items="items" aria-label="Vues affichees" />',
+  }),
+}
+
+export const States: Story = {
+  render: () => ({
+    components: { PrToggleGroup },
+    setup() {
+      const disabledValue = ref('week')
+      const errorValue = ref('')
+      return { items, disabledValue, errorValue }
+    },
+    template: `
+      <div class="story-column">
+        <PrToggleGroup v-model="disabledValue" :items="items" disabled aria-label="Vue (desactive)" />
+        <PrToggleGroup v-model="errorValue" :items="items" error="Merci de choisir une vue." aria-label="Vue (erreur)" />
+        <PrToggleGroup v-model="disabledValue" :items="items" hint="La vue par defaut est Semaine." aria-label="Vue (astuce)" />
+      </div>
+    `,
+  }),
+}

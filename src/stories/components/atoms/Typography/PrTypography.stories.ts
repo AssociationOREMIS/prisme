@@ -57,9 +57,10 @@ export const BlockQuoteStory: Story = {
 export const TableStory: Story = {
   name: 'Table',
   render: () => ({
+    components: { PrTypography },
     template: `
-      <div class="pr-typography-table-wrap">
-        <table class="pr-typography-table">
+      <div class="overflow-x-auto">
+        <PrTypography variant="table">
           <thead>
             <tr>
               <th>Dispositif</th>
@@ -80,7 +81,7 @@ export const TableStory: Story = {
               <td>Objectifs mis a jour apres evaluation</td>
             </tr>
           </tbody>
-        </table>
+        </PrTypography>
       </div>
     `,
   }),
@@ -117,6 +118,14 @@ export const ListOLStory: Story = {
 export const InlineCodeStory: Story = {
   name: 'InlineCode',
   ...typographyStory('inline-code'),
+}
+
+export const CodeStory: Story = {
+  name: 'Code',
+  render: () => ({
+    components: { PrTypography },
+    template: '<PrTypography variant="code">variant="code" est un alias de "inline-code"</PrTypography>',
+  }),
 }
 
 export const CodeBlockStory: Story = {

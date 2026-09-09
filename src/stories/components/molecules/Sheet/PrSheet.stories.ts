@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, screen, userEvent, waitFor, within } from 'storybook/test'
 import { PrButton } from '../../../../components/atoms/Button'
 import { PrSwitch } from '../../../../components/atoms/Switch'
 import { PrSheet } from '../../../../components/molecules/Sheet'
@@ -45,4 +46,14 @@ export const Default: Story = {
       </PrSheet>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Ouvrir' }))
+
+    const dialog = await screen.findByRole('dialog')
+    await expect(within(dialog).getByText('Parametres')).toBeInTheDocument()
+
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Fermer' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  },
 }

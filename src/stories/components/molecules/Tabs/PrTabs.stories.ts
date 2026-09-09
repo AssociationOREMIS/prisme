@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import { ref } from 'vue'
 import { PrTabs } from '../../../../components/molecules/Tabs'
 import '../../../stories.css'
@@ -39,6 +40,22 @@ export const Default: Story = {
       </PrTabs>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const overviewTab = canvas.getByRole('tab', { name: 'Vue d\'ensemble' })
+    await expect(overviewTab).toHaveAttribute('aria-selected', 'true')
+    await expect(canvas.getByText('Contenu de la vue d\'ensemble.')).toBeVisible()
+
+    await userEvent.click(canvas.getByRole('tab', { name: 'Activité' }))
+    await expect(canvas.getByRole('tab', { name: 'Activité' })).toHaveAttribute('aria-selected', 'true')
+    await expect(overviewTab).toHaveAttribute('aria-selected', 'false')
+    await expect(canvas.getByText('Historique des activités récentes.')).toBeVisible()
+
+    // A disabled tab must not steal the active state on click.
+    await userEvent.click(canvas.getByRole('tab', { name: 'Paramètres' }))
+    await expect(canvas.getByRole('tab', { name: 'Activité' })).toHaveAttribute('aria-selected', 'true')
+  },
 }
 
 export const Vertical: Story = {

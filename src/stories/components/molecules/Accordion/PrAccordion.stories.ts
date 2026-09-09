@@ -33,3 +33,26 @@ export const Default: Story = {
     template: '<PrAccordion v-model="value" v-bind="args" />',
   }),
 }
+
+export const Multiple: Story = {
+  render: () => ({
+    components: { PrAccordion },
+    setup() {
+      const value = ref(['info', 'activity'])
+      return { items, value }
+    },
+    template: '<PrAccordion v-model="value" type="multiple" :items="items" />',
+  }),
+}
+
+export const DisabledItem: Story = {
+  render: () => ({
+    components: { PrAccordion },
+    setup() {
+      const value = ref('info')
+      const itemsWithDisabled = items.map(item => item.value === 'documents' ? { ...item, disabled: true } : item)
+      return { value, itemsWithDisabled }
+    },
+    template: '<PrAccordion v-model="value" :items="itemsWithDisabled" />',
+  }),
+}

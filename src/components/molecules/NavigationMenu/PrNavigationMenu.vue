@@ -6,6 +6,12 @@ export interface PrNavigationMenuItem {
   active?: boolean
 }
 
+/**
+ * A flat list of navigation links with active-state detection — not the full
+ * reka-ui `NavigationMenu` pattern (nested submenus opened by a trigger).
+ * Use `PrDropdownMenu` for an actual flyout, or `PrSidebarItem`/`PrSidebarSubItem`
+ * if a two-level nav structure is needed.
+ */
 export interface PrNavigationMenuProps {
   items?: PrNavigationMenuItem[]
   label?: string

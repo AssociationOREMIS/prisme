@@ -12,6 +12,13 @@ const meta = {
   title: 'Navigation/NavigationMenu',
   component: PrNavigationMenu,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component: 'Une liste plate de liens de navigation avec detection d\'etat actif — pas le pattern reka-ui `NavigationMenu` complet (sous-menus imbriques ouverts par un declencheur). Pour un vrai flyout, voir `PrDropdownMenu` ; pour une navigation a deux niveaux, voir `PrSidebarItem`/`PrSidebarSubItem`.',
+      },
+    },
+  },
   args: {
     items,
   },
