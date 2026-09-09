@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import { PrCarousel } from '../../../../components/molecules/Carousel'
 import '../../../stories.css'
 
@@ -18,4 +19,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const carousel = canvas.getByRole('region', { name: 'Carrousel' })
+
+    await expect(canvas.getByText('Etape 1')).toBeVisible()
+
+    carousel.focus()
+    await userEvent.keyboard('{ArrowRight}')
+    await expect(canvas.getByText('Etape 2')).toBeVisible()
+
+    await userEvent.keyboard('{ArrowLeft}')
+    await expect(canvas.getByText('Etape 1')).toBeVisible()
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Element suivant' }))
+    await expect(canvas.getByText('Etape 2')).toBeVisible()
+  },
+}
