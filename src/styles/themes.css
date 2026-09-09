@@ -1,5 +1,10 @@
+/* Deliberately `[data-pr-theme="x"]` alone, not `:root[data-pr-theme="x"]` too — both
+   match `<html data-pr-theme="x">` since :root IS <html>, but the compound form has
+   higher specificity (0,2,0 vs 0,1,0) and silently wins over a consumer's own
+   `:root { --pr-color-navbar: ... }` override (the pattern documented in the README),
+   even though it loads after this stylesheet. Keep these single-selector so a plain
+   :root override from consumer CSS wins on the normal "later source wins" tie-break. */
 :root,
-:root[data-pr-theme="light"],
 [data-pr-theme="light"] {
   color-scheme: light;
 
@@ -44,7 +49,6 @@
   --pr-color-info-border: var(--pr-blue-200);
 }
 
-:root[data-pr-theme="dark"],
 [data-pr-theme="dark"] {
   color-scheme: dark;
 
