@@ -22,3 +22,21 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+export const DisabledItem: Story = {
+  render: () => ({
+    components: { PrCommand },
+    setup() {
+      const itemsWithDisabled = items.map(item => item.value === 'export' ? { ...item, disabled: true } : item)
+      return { itemsWithDisabled }
+    },
+    template: '<PrCommand :items="itemsWithDisabled" placeholder="Rechercher une action" />',
+  }),
+}
+
+export const NoResults: Story = {
+  render: () => ({
+    components: { PrCommand },
+    template: '<PrCommand :items="[]" placeholder="Rechercher une action" empty-text="Aucune action ne correspond a cette recherche." />',
+  }),
+}
