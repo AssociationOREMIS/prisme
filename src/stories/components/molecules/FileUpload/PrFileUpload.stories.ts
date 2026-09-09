@@ -71,6 +71,43 @@ export const States: Story = {
   }),
 }
 
+export const WithUpload: Story = {
+  render: () => ({
+    components: { PrFileUpload },
+    setup() {
+      const files = ref<File[]>([])
+
+      // Simulates a real backend call: progress ticks over ~1s, and any file
+      // whose name contains "fail" rejects like a Laravel 422 response would.
+      function upload(file: File, onProgress: (percent: number) => void) {
+        return new Promise<void>((resolve, reject) => {
+          let percent = 0
+          const interval = setInterval(() => {
+            percent += 20
+            onProgress(percent)
+            if (percent >= 100) {
+              clearInterval(interval)
+              if (file.name.includes('fail')) {
+                reject({ response: { data: { errors: { file: ['Ce fichier est corrompu.'] } } } })
+              }
+              else {
+                resolve()
+              }
+            }
+          }, 200)
+        })
+      }
+
+      return { files, upload }
+    },
+    template: `
+      <div class="story-column">
+        <PrFileUpload v-model="files" label="Documents" multiple :upload="upload" hint="Nommez un fichier avec 'fail' pour simuler une erreur serveur" />
+      </div>
+    `,
+  }),
+}
+
 export const Playground: Story = {
   render: (args) => ({
     components: { PrFileUpload },
