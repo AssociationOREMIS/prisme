@@ -89,6 +89,9 @@ export type { PrProgressProps } from './atoms/Progress'
 import { PrRadioGroup } from './molecules/RadioGroup'
 export type { PrRadioGroupProps, PrRadioOption } from './molecules/RadioGroup'
 
+import { PrRichTextEditor } from './molecules/RichTextEditor'
+export type { PrRichTextEditorProps } from './molecules/RichTextEditor'
+
 import { PrSelect } from './molecules/Select'
 export type { PrSelectOption, PrSelectProps } from './molecules/Select'
 
@@ -197,6 +200,7 @@ export const componentRegistry = {
   PrPopover,
   PrProgress,
   PrRadioGroup,
+  PrRichTextEditor,
   PrScrollArea,
   PrSelect,
   PrSheet,

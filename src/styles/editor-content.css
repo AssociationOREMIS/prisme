@@ -1,0 +1,228 @@
+/**
+ * Shared "rendered rich text" stylesheet.
+ *
+ * Styles the HTML produced by `PrRichTextEditor` (tables, task lists, code
+ * blocks, collapsible `<details>` sections, and `Callout` boxes) using
+ * Prisme's `--pr-*` design tokens. `PrRichTextEditor` imports this file for
+ * its own editable content area, and a consumer app importing
+ * `@oremis/prisme/styles/editor-content.css` gets an identical read-only
+ * render of that same HTML (e.g. a lesson/article view) without pulling in
+ * the rest of Prisme's `styles.css`.
+ *
+ * Apply the `.pr-editor-content` class to the element wrapping the rendered
+ * HTML (`<div class="pr-editor-content" v-html="content" />`).
+ */
+
+.pr-editor-content {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  color: var(--pr-color-text);
+}
+
+/*
+ * A host page's own typography reset (e.g. Storybook's docs-mode "sbdocs"
+ * stylesheet, or a consumer app's own `p`/`li`/`td` rules) can target these
+ * tags directly and win over the `color` inherited from `.pr-editor-content`
+ * above — a rule that directly matches an element always beats inheritance
+ * from an ancestor, regardless of the ancestor's specificity. `!important`
+ * makes sure our text stays legible no matter what the host page does.
+ * `inherit` (not a hardcoded token) so nested contexts with their own color
+ * — Callout boxes, code blocks — still win via the more specific selectors
+ * below, since among `!important` rules normal specificity still decides.
+ */
+.pr-editor-content p,
+.pr-editor-content li,
+.pr-editor-content td,
+.pr-editor-content th,
+.pr-editor-content blockquote,
+.pr-editor-content dd,
+.pr-editor-content dt,
+.pr-editor-content summary {
+  color: inherit !important;
+}
+
+.pr-editor-content figure {
+  margin: var(--pr-space-6) 0;
+  max-width: 100%;
+}
+
+/* Embedded YouTube video (tiptap's `data-youtube-video` wrapper) */
+.pr-editor-content div[data-youtube-video] {
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: var(--pr-space-6) 0;
+}
+
+.pr-editor-content div[data-youtube-video] iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.pr-editor-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--pr-radius-md);
+}
+
+.pr-editor-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pr-editor-content table td,
+.pr-editor-content table th {
+  border: 1px solid var(--pr-color-border);
+  padding: var(--pr-space-2);
+}
+
+.pr-editor-content mark {
+  background: var(--pr-yellow-200);
+  color: var(--pr-neutral-900);
+  border-radius: var(--pr-radius-xs);
+  padding: 0 0.1em;
+}
+
+.pr-editor-content ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.pr-editor-content ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pr-space-2);
+}
+
+.pr-editor-content ul[data-type="taskList"] li > label {
+  margin-top: 0.2em;
+}
+
+.pr-editor-content pre {
+  background: var(--pr-neutral-800);
+  color: var(--pr-neutral-200);
+  border-radius: var(--pr-radius-lg);
+  padding: var(--pr-space-4);
+  overflow-x: auto;
+  font-family: var(--pr-font-mono);
+  font-size: var(--pr-font-size-sm);
+}
+
+.pr-editor-content pre code {
+  background: none;
+  padding: 0;
+}
+
+.pr-editor-content .hljs-keyword,
+.pr-editor-content .hljs-selector-tag,
+.pr-editor-content .hljs-literal {
+  color: var(--pr-red-300);
+}
+
+.pr-editor-content .hljs-string {
+  color: var(--pr-green-300);
+}
+
+.pr-editor-content .hljs-comment {
+  color: var(--pr-neutral-400);
+  font-style: italic;
+}
+
+.pr-editor-content .hljs-number {
+  color: var(--pr-yellow-300);
+}
+
+.pr-editor-content .hljs-title,
+.pr-editor-content .hljs-name,
+.pr-editor-content .hljs-built_in {
+  color: var(--pr-blue-300);
+}
+
+.pr-editor-content .hljs-attr,
+.pr-editor-content .hljs-attribute,
+.pr-editor-content .hljs-variable {
+  color: var(--pr-neutral-300);
+}
+
+/* Collapsible section ("Details/Summary") */
+.pr-editor-content details {
+  margin: var(--pr-space-6) 0;
+  padding: var(--pr-space-3) var(--pr-space-4);
+  border: 1px solid var(--pr-color-border);
+  border-radius: var(--pr-radius-lg);
+  background: var(--pr-color-surface-subtle);
+}
+
+.pr-editor-content details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pr-editor-content details[open] summary {
+  margin-bottom: var(--pr-space-3);
+}
+
+.pr-editor-content details div[data-type="detailsContent"] > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Callout boxes inserted from the editor */
+.pr-editor-content div[data-callout] {
+  margin: var(--pr-space-6) 0;
+  padding: var(--pr-space-4) var(--pr-space-5) var(--pr-space-4) var(--pr-space-12);
+  border-radius: var(--pr-radius-lg);
+  border-left: 4px solid;
+  position: relative;
+}
+
+.pr-editor-content div[data-callout]::before {
+  position: absolute;
+  left: var(--pr-space-4);
+  top: var(--pr-space-4);
+  font-weight: 700;
+}
+
+.pr-editor-content div[data-callout] > *:last-child {
+  margin-bottom: 0;
+}
+
+.pr-editor-content div[data-callout][data-variant="info"] {
+  background: var(--pr-color-info-soft);
+  border-color: var(--pr-color-info-border);
+  color: var(--pr-color-info);
+}
+
+.pr-editor-content div[data-callout][data-variant="info"]::before {
+  content: "\2139";
+}
+
+.pr-editor-content div[data-callout][data-variant="success"] {
+  background: var(--pr-color-success-soft);
+  border-color: var(--pr-color-success-border);
+  color: var(--pr-color-success);
+}
+
+.pr-editor-content div[data-callout][data-variant="success"]::before {
+  content: "\2713";
+}
+
+.pr-editor-content div[data-callout][data-variant="warning"] {
+  background: var(--pr-color-warning-soft);
+  border-color: var(--pr-color-warning-border);
+  color: var(--pr-color-warning);
+}
+
+.pr-editor-content div[data-callout][data-variant="warning"]::before {
+  content: "\26A0";
+}
+
+.pr-editor-content div[data-callout][data-variant="danger"] {
+  background: var(--pr-color-danger-soft);
+  border-color: var(--pr-color-danger-border);
+  color: var(--pr-color-danger);
+}
+
+.pr-editor-content div[data-callout][data-variant="danger"]::before {
+  content: "\2715";
+}

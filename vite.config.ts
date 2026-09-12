@@ -27,7 +27,15 @@ export default defineConfig({
       cssFileName: 'styles',
     },
     rollupOptions: {
-      external: ['vue'],
+      // `vue` and every tiptap package `PrRichTextEditor`/`src/tiptap/callout.ts`
+      // import are peerDependencies (see package.json), not bundled dependencies —
+      // externalizing them keeps consumer apps that don't use the rich text
+      // editor from paying for ~15 tiptap packages inside `dist/prisme.js`, and
+      // (more importantly) avoids a second, non-deduped copy of ProseMirror
+      // shipping inside Prisme's own bundle for apps that *do* already depend on
+      // tiptap directly — two copies of `@tiptap/pm` in one page break tiptap's
+      // internal `instanceof` checks.
+      external: id => id === 'vue' || id.startsWith('@tiptap/') || id === 'lowlight' || id === 'tiptap-extension-resize-image',
       output: {
         globals: {
           vue: 'Vue',

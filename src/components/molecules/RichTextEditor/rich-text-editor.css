@@ -1,0 +1,29 @@
+/**
+ * Editor-chrome-only styles for `PrRichTextEditor`'s content area — the
+ * parts that only make sense while the content is actually editable
+ * (minimum height, inner padding, focus outline suppression, the
+ * placeholder pseudo-element). Everything about how the *rendered content
+ * itself* looks (tables, callouts, code blocks, ...) lives in
+ * `../../../styles/editor-content.css` instead, shared with read-only
+ * consumers — kept separate so that shared stylesheet stays free of
+ * editing-only concerns.
+ *
+ * Plain global CSS (not a Vue `<style scoped>` block) because tiptap/
+ * ProseMirror renders its `.tiptap` contenteditable root and every node
+ * inside it at runtime — there is no template element for Tailwind
+ * utility classes to attach to.
+ */
+
+.pr-rich-text-editor__content .tiptap {
+  min-height: 20rem;
+  padding: var(--pr-space-4) var(--pr-space-5);
+  outline: none;
+}
+
+.pr-rich-text-editor__content .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--pr-color-text-subtle);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

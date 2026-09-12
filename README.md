@@ -55,6 +55,65 @@ Chaque composant a etat ouvert/coche reprend le nom de prop de la primitive [rek
 
 Chacun de ces composants accepte aussi un `default-xxx` (`defaultValue`, `defaultChecked`, `defaultPressed`, `defaultOpen`) pour un usage non controle, sans avoir a gerer l'etat cote consommateur.
 
+### `PrRichTextEditor`
+
+Editeur de texte riche (Vue 3 + [tiptap](https://tiptap.dev)), avec titres, listes, tableaux, images, video YouTube, blocs de code colores, sections repliables et encadres `Callout` (info/succes/avertissement/danger).
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { PrRichTextEditor } from '@oremis/prisme'
+
+const content = ref('<p>Contenu initial</p>')
+
+async function uploadImage(file: File, onProgress?: (percent: number) => void) {
+  const body = new FormData()
+  body.append('file', file)
+
+  const response = await fetch('/upload', { method: 'POST', body })
+  // Adaptez selon votre backend : pas de progression reelle possible avec
+  // `fetch`, un client HTTP capable de suivre l'upload (axios, XHR) permet
+  // d'appeler `onProgress(percent)` pendant l'envoi.
+  onProgress?.(100)
+
+  const { url } = await response.json()
+  return url
+}
+</script>
+
+<template>
+  <PrRichTextEditor v-model="content" label="Contenu" :upload-image="uploadImage" />
+</template>
+```
+
+Ses dependances tiptap (`@tiptap/*`, `lowlight`, `tiptap-extension-resize-image`) sont des `peerDependencies` optionnelles — installez-les explicitement dans l'application consommatrice (memes versions que celles listees dans `package.json#peerDependencies` de Prisme) :
+
+```bash
+npm install @tiptap/vue-3@3.31.3 @tiptap/starter-kit@3.31.3 @tiptap/extension-link@3.31.3 # ... voir peerDependencies
+```
+
+Le node tiptap `Callout` utilise par l'editeur est aussi exporte separement, pour une app qui monterait son propre editeur tiptap sans passer par `PrRichTextEditor` :
+
+```ts
+import { Callout } from '@oremis/prisme/tiptap/callout'
+```
+
+Le rendu du contenu (tableaux, `Callout`, blocs de code, sections repliables) est stylise par `@oremis/prisme/styles/editor-content.css`, importable seul par une vue de lecture seule qui n'a pas besoin du reste de Prisme :
+
+```ts
+import '@oremis/prisme/styles/editor-content.css'
+```
+
+```html
+<div class="pr-editor-content" v-html="content" />
+```
+
+Comme `PrCombobox`/`PrTagInput`, le contenu de l'editeur n'est pas un `<textarea>` natif : pour une soumission de formulaire native (`<form method="POST">` sans JS de soumission), passez un `name` — un `<input type="hidden">` synchronise avec `modelValue` est rendu automatiquement.
+
+```vue
+<PrRichTextEditor v-model="content" name="body" />
+```
+
 ### Empiler plusieurs composants Prisme verticalement
 
 `PrDataTable` et les autres composants larges (formulaires avec beaucoup de champs) utilisent `flex flex-col` en interne, pas `display: grid`. Un wrapper consommateur en `display: grid` sans `grid-template-columns` explicite autour d'un tel composant produit un debordement (CSS Grid blowout) : la piste implicite se dimensionne sur le contenu le plus large, meme si le conteneur a `min-width: 0` (qui ne protege que sa propre boite, pas sa piste interne).

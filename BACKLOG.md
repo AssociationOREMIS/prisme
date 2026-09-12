@@ -2,6 +2,10 @@
 
 Ce qui reste à faire ou à décider sur Prisme. Voir `TESTING.md` pour la checklist de validation manuelle.
 
+## Rappel : l'enregistrement dans `registry.ts` est manuel et facile à oublier
+
+`PrTagInput`/`PrNumberInput` avaient déjà été oubliés une fois (voir plus bas, § "Soumission de formulaire native") : buildés et exportables via `@oremis/prisme/components/...`, mais absents de `src/components/registry.ts`, donc invisibles à `app.use(Prisme)` et à `componentPaths`/`paths.generated.ts`. `PrRichTextEditor` (ajouté le 2026-09-12) a bien été enregistré dans `registry.ts` (+ `src/index.ts`) dès sa création — mais comme ce n'est vérifié par aucun test automatisé (rien n'échoue si un nouveau composant reste juste un dossier sous `src/components/`), tout futur nouveau composant reste exposé au même oubli. À envisager : un test qui compare la liste des dossiers sous `src/components/{atoms,molecules,layouts}` à `Object.keys(componentRegistry)` pour détecter l'oubli automatiquement.
+
 ## Bug critique corrigé le 2026-09-09 (noté a posteriori vu la gravité)
 
 **`PrCheckbox`, `PrSwitch` et `PrToggle` étaient totalement non-contrôlables** : leur wiring interne passait `:checked`/`:default-checked` (ou `:pressed`/`:default-pressed`) aux composants reka-ui sous-jacents (`CheckboxRoot`, `SwitchRoot`, `Toggle`), mais ces trois primitives reka-ui utilisent en réalité `modelValue`/`update:modelValue` (et `defaultValue`), pas `checked`/`pressed`. Résultat : `:checked`/`@update:checked` atterrissaient dans les `$attrs` de la primitive (silencieusement absorbés, aucune erreur), qui tournait alors en mode **non contrôlé** — un clic faisait bien visuellement basculer l'état (`data-state`), mais aucun `update:checked`/`update:pressed` n'était jamais émis vers le parent, et changer la prop `checked` depuis le parent n'avait aucun effet visuel. Un `v-model:checked`/`v-model:pressed` — le pattern documenté dans le README — ne fonctionnait donc jamais réellement.
@@ -20,4 +24,4 @@ Corrigé (`src/components/molecules/ScrollArea/PrScrollArea.vue`) avec le patter
 
 ## Couverture de tests d'interaction
 
-Le pattern `play` function (Storybook + `storybook/test`) a été introduit sur `PrDialog`, `PrSheet`, `PrTabs` et `PrCarousel` — jusqu'ici aucune story n'en avait, la suite ne faisait que vérifier l'absence d'erreur au rendu. Reste à étendre le même pattern aux autres composants interactifs qui n'en ont pas encore (`PrAccordion`, `PrCombobox`, `PrSelect`, `PrPopover`, `PrDropdownMenu`, `PrToggleGroup`, `PrCommand`, etc.), au fil de l'eau plutôt qu'en un seul lot.
+Le pattern `play` function (Storybook + `storybook/test`) a été introduit sur `PrDialog`, `PrSheet`, `PrTabs`, `PrCarousel` et `PrRichTextEditor` (`Interaction` story, 2026-09-12 : frappe réelle dans le contenteditable + clic toolbar, exécutée en navigateur réel via Playwright) — jusqu'ici aucune story n'en avait, la suite ne faisait que vérifier l'absence d'erreur au rendu. Reste à étendre le même pattern aux autres composants interactifs qui n'en ont pas encore (`PrAccordion`, `PrCombobox`, `PrSelect`, `PrPopover`, `PrDropdownMenu`, `PrToggleGroup`, `PrCommand`, etc.), au fil de l'eau plutôt qu'en un seul lot.
