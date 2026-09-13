@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronDown } from '@lucide/vue'
+import { ChevronRight } from '@lucide/vue'
 import { computed, inject, ref, useSlots, watch } from 'vue'
 import PrSidebarIcon from './PrSidebarIcon.vue'
 import PrSidebarItemBody from './PrSidebarItemBody.vue'
@@ -20,6 +20,9 @@ const props = withDefaults(defineProps<PrSidebarItemProps>(), {
   disabled: false,
   expanded: undefined,
   defaultExpanded: false,
+  badgeCount: undefined,
+  badgeMax: 99,
+  badgeDot: false,
 })
 
 const emit = defineEmits<{
@@ -113,12 +116,18 @@ function handleClick() {
       :title="sidebar?.isNarrow.value && itemLabel ? itemLabel : undefined"
       @click="handleClick"
     >
-      <PrSidebarIcon :icon="icon" :active="resolvedActive" />
+      <PrSidebarIcon
+        :icon="icon"
+        :active="resolvedActive"
+        :badge-count="badgeCount"
+        :badge-max="badgeMax"
+        :badge-dot="badgeDot"
+      />
       <PrSidebarItemBody :label="label" :description="description" :active="resolvedActive" />
-      <ChevronDown
+      <ChevronRight
         v-if="hasSubItems"
-        class="pr-sidebar-item__chevron shrink-0 text-[color:var(--pr-color-text-subtle)] transition-[color,transform] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]"
-        :class="{ 'rotate-180': isExpanded }"
+        class="pr-sidebar-item__chevron shrink-0 text-[color:var(--pr-color-text-subtle)] transition-[color,transform] duration-[200ms] ease-[var(--pr-ease-standard)]"
+        :class="{ 'rotate-90': isExpanded }"
         aria-hidden="true"
         :size="16"
       />

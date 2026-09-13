@@ -43,7 +43,7 @@ provide(prAppShellContextKey, {
 
 <template>
   <div
-    class="pr-app-shell pr-shell-grid bg-[var(--pr-color-background)] text-[color:var(--pr-color-text)]"
+    class="pr-app-shell pr-shell-grid bg-[var(--pr-color-surface-subtle)] text-[color:var(--pr-color-text)]"
     :data-sidebar-collapsed="collapsed ? 'true' : 'false'"
   >
     <slot name="navbar" />

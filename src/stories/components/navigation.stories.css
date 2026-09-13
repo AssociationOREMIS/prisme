@@ -43,6 +43,7 @@
   margin: 0;
   font-size: 1.5rem;
   line-height: 1.2;
+  color: var(--pr-color-text);
 }
 
 .nav-story-muted {

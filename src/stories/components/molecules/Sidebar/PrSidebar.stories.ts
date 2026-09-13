@@ -191,6 +191,21 @@ export const WithSubmenu: Story = {
   `, defaultContent(), '/settings/security'),
 }
 
+export const WithBadges: Story = {
+  name: 'With notification badges',
+  render: () => shellStory(`
+    <PrSidebar>
+      <PrSidebarItem :icon="House" label="Tableau de bord" href="/" :active="isActive('/')" />
+      <PrSidebarItem :icon="Users" label="Membres" href="/members" :active="isActive('/members')" :badge-count="3" />
+      <PrSidebarItem :icon="CalendarDays" label="Evénements" href="/events" :active="isActive('/events')" :badge-count="128" />
+      <PrSidebarItem :icon="Bell" label="Notifications" href="/notifications" :active="isActive('/notifications')" badge-dot />
+      <PrSidebarItem :icon="Settings" label="Paramètres" description="Configuration" default-expanded>
+        <PrSidebarItem :icon="ShieldCheck" label="Sécurité" description="Accès et authentification" href="/settings/security" :active="isActive('/settings/security')" :badge-count="1" />
+      </PrSidebarItem>
+    </PrSidebar>
+  `),
+}
+
 export const ActiveStates: Story = {
   render: () => shellStory(`
     <PrSidebar>

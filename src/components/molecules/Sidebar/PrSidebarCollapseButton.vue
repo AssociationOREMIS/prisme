@@ -22,7 +22,7 @@ const ariaLabel = computed(() => (
 <template>
   <button
     v-if="sidebar"
-    class="pr-sidebar__collapse inline-grid min-h-9 w-full grid-flow-col cursor-pointer place-items-center justify-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[length:var(--pr-font-size-sm)] font-[650] text-[color:var(--pr-color-text-muted)] transition-[background-color,color,border-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+    class="pr-sidebar__collapse inline-grid w-full grid-flow-col cursor-pointer place-items-center justify-center gap-[var(--pr-space-2)] border-t border-[var(--pr-color-border)] bg-[var(--pr-color-surface-subtle)] p-[0.875rem] text-[length:var(--pr-font-size-sm)] font-[650] text-[color:var(--pr-color-text-subtle)] transition-[background-color,color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:bg-[var(--pr-color-border)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
     type="button"
     :aria-label="ariaLabel"
     :aria-pressed="sidebar.isNarrow.value"

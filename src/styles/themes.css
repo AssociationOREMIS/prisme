@@ -23,6 +23,7 @@
   --pr-color-navbar-text: var(--pr-neutral-0);
   --pr-color-navbar-border: rgb(255 255 255 / 20%);
   --pr-color-navbar-muted: rgb(255 255 255 / 12%);
+  --pr-color-sidebar-active: #31c48d;
 
   --pr-color-primary: var(--pr-blue-600);
   --pr-color-primary-contrast: var(--pr-neutral-0);
@@ -67,6 +68,7 @@
   --pr-color-navbar-text: var(--pr-neutral-0);
   --pr-color-navbar-border: rgb(255 255 255 / 14%);
   --pr-color-navbar-muted: rgb(182 197 249 / 14%);
+  --pr-color-sidebar-active: #31c48d;
 
   --pr-color-primary: #fafaff;
   --pr-color-primary-contrast: #21212e;
@@ -112,6 +114,7 @@
     --pr-color-navbar-text: var(--pr-neutral-0);
     --pr-color-navbar-border: rgb(255 255 255 / 14%);
     --pr-color-navbar-muted: rgb(182 197 249 / 14%);
+    --pr-color-sidebar-active: #31c48d;
 
     --pr-color-primary: #fafaff;
     --pr-color-primary-contrast: #21212e;

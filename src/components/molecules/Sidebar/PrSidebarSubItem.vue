@@ -8,6 +8,9 @@ withDefaults(defineProps<PrSidebarSubItemProps>(), {
   description: undefined,
   active: undefined,
   disabled: false,
+  badgeCount: undefined,
+  badgeMax: 99,
+  badgeDot: false,
 })
 </script>
 
@@ -20,5 +23,8 @@ withDefaults(defineProps<PrSidebarSubItemProps>(), {
     :description="description"
     :active="active"
     :disabled="disabled"
+    :badge-count="badgeCount"
+    :badge-max="badgeMax"
+    :badge-dot="badgeDot"
   />
 </template>

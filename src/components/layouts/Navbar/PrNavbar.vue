@@ -32,7 +32,7 @@ const resolvedLogoSrc = computed(() => {
   if (props.logoVariant === 'icon-only') {
     return props.iconSrc ?? '/oremis-icon.svg'
   }
-  return props.logoSrc ?? '/oremis-logo.svg'
+  return props.logoSrc ?? 'https://static.oremis.fr/img/logos/oremis-logo-white.svg'
 })
 const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
 </script>
