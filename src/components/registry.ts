@@ -71,8 +71,8 @@ export type { PrDialogProps } from './molecules/Dialog'
 import { PrHoverCard } from './molecules/HoverCard'
 export type { PrHoverCardProps } from './molecules/HoverCard'
 
-import { PrNavbar } from './layouts/Navbar'
-export type { PrNavbarProps } from './layouts/Navbar'
+import { PrNavbar, PrNavbarUserMenu } from './layouts/Navbar'
+export type { PrNavbarProps, PrNavbarUserMenuProps } from './layouts/Navbar'
 
 import { PrNavigationMenu } from './molecules/NavigationMenu'
 export type { PrNavigationMenuItem, PrNavigationMenuProps } from './molecules/NavigationMenu'
@@ -194,6 +194,7 @@ export const componentRegistry = {
   PrLabel,
   PrListItem,
   PrNavbar,
+  PrNavbarUserMenu,
   PrNavigationMenu,
   PrNumberInput,
   PrPagination,
