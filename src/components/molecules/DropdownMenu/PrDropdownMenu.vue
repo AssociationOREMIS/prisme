@@ -34,7 +34,7 @@ const emit = defineEmits<{
 
 const itemClass = 'pr-dropdown-menu__item flex min-h-9 cursor-pointer items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-md)] px-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] outline-none data-[highlighted]:bg-[var(--pr-color-surface-subtle)] data-[disabled]:cursor-not-allowed data-[disabled]:text-[color:var(--pr-color-text-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]'
 const checkboxItemClass = 'pr-dropdown-menu__checkbox-item relative flex min-h-9 cursor-pointer items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-md)] py-0 pr-[var(--pr-space-3)] pl-[var(--pr-space-8)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] outline-none data-[highlighted]:bg-[var(--pr-color-surface-subtle)] data-[disabled]:cursor-not-allowed data-[disabled]:text-[color:var(--pr-color-text-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]'
-const dangerItemClass = `${itemClass} pr-dropdown-menu__item--danger text-[color:var(--pr-color-danger)] data-[highlighted]:bg-[var(--pr-color-danger-soft)]`
+const dangerItemClass = `${itemClass} pr-dropdown-menu__item--danger text-[color:var(--pr-color-danger)]! data-[highlighted]:bg-[var(--pr-color-danger-soft)]`
 const separatorClass = 'pr-dropdown-menu__separator my-[var(--pr-space-1)] h-px bg-[var(--pr-color-border)]'
 </script>
 
