@@ -94,3 +94,12 @@ Extrait le 2026-09-12 de `LessonEditor.vue` (Formation) vers `PrRichTextEditor`.
 - [ ] Chaque variante `Callout` (info/succès/avertissement/danger) : insertion, bascule vers une autre variante sans dupliquer l'encadré, et retrait (toggle sur la même variante) qui "délift" le contenu sans le perdre. Vérifier aussi que `editor-content.css` rend les callouts à l'identique en édition et dans la vue étudiant en lecture seule (couleurs, icône, retrait `border-left`).
 - [ ] Comparaison visuelle du rendu HTML avant/après migration entre l'ancien `_lesson_content.scss` (Bootstrap) et `@oremis/prisme/styles/editor-content.css` (tokens `--pr-*`) sur un contenu de leçon existant représentatif (tableaux, code, callouts, détails) — les tokens de couleur ont changé de valeurs exactes (palette Prisme vs Bootstrap), un écart de nuance est attendu, seule une régression de lisibilité/contraste serait un bug.
 - [ ] Prop `disabled` : vérifier que l'éditeur devient réellement non éditable (`editor.isEditable === false`), que tous les boutons de la toolbar sont désactivés, et qu'aucune image ne peut être déposée (drag & drop) pendant que l'éditeur est désactivé.
+
+## Sidebar — badges de notification + réalignement visuel sur `data`/`formation` (2026-09-13)
+
+Vérifié dans Storybook (Playwright, story `Complete example`/`With notification badges`) en clair, en sombre et au survol — voir `BACKLOG.md` pour le détail des écarts corrigés (fond, bordure d'icône, couleurs survol/actif). Reste à valider dans une vraie app :
+
+- [ ] `badge-count`/`badge-dot` branchés sur un vrai compteur Laravel (ex: remplacer le badge codé en dur de `data` sur `pending-changes.index` par la prop `PrSidebarItem`) : vérifier le rendu en conditions réelles, y compris sidebar réduite sur mobile.
+- [ ] Comparaison côte à côte avec `data`/`formation` dans un navigateur réel (pas seulement Storybook) pour confirmer que le fond de sidebar/contenu, l'accent vert actif (`--pr-color-sidebar-active`), le bouton "Réduire la navigation" et le chevron de sous-menu rendent aussi bien une fois intégrés à une vraie page Blade.
+- [ ] Logo navbar par défaut (`https://static.oremis.fr/img/logos/oremis-logo-white.svg`) : vérifier le chargement réel dans une app consommatrice (pas de blocage CORS/CSP, affichage correct sur le fond bleu navbar).
+- [ ] Police `Roboto` : vérifier que l'app consommatrice charge bien la police (lien Google Fonts documenté dans `README.md`) — sans ce lien, tout Prisme retombe silencieusement sur la police système, y compris `forge` s'il n'a pas encore ce `<link>`.

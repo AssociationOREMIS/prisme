@@ -10,6 +10,14 @@ Elle fournit des composants, des styles et des tokens de design pour construire 
 2. Vue 3.5 ou plus recent.
 3. Un navigateur moderne compatible avec Tailwind CSS v4.
 
+## Typographie
+
+Le token `--pr-font-sans` (utilisé par tous les composants via `reset.css`) declare `Roboto` en premier, pour rester coherent avec les applications OREMIS existantes (`data`, `formation`). Prisme ne charge pas la police lui-meme : sans action de votre part, les navigateurs retombent silencieusement sur la police systeme (`ui-sans-serif`/`system-ui`). Ajoutez, comme le fait deja `data`/`formation` (`resources/views/layouts/app.blade.php`), un lien Google Fonts dans le `<head>` de votre application :
+
+```html
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+```
+
 ## Usage
 
 1. Installez le package.
