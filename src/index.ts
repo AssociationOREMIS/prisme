@@ -164,3 +164,9 @@ export type {
   PrFormSchema,
   PrValidationRule,
 } from './composables/usePrForm'
+
+export { mountPrismeIsolated } from './composables/mountPrismeIsolated'
+export type {
+  PrIsolatedMountOptions,
+  PrIsolatedMountResult,
+} from './composables/mountPrismeIsolated'

@@ -239,6 +239,28 @@ writeFileSync('public/prisme-theme-init.js', getPrThemeInitScript())
 
 Sans cette etape, `getPrThemeInitScript()` — bien que fournie a cet effet — n'a aucun effet : le flash de theme qu'elle est censee eviter se produira quand meme, puisque `usePrTheme()`/`setPrTheme()` ne s'executent qu'apres l'hydratation du bundle Vue, donc apres le premier paint.
 
+### Isoler Prisme dans une page qui utilise un autre framework CSS (Bootstrap, etc.)
+
+`@oremis/prisme/styles.css` inclut un reset Tailwind non prefixe (`.flex`, `.p-4`, `.hidden`, `.grid`, etc. sans espace de nom). Importe normalement (import global ou `@vite(...)`) dans une page Blade qui charge deja un autre framework CSS non-Tailwind (Bootstrap par exemple), ce reset s'applique a toute la page, pas seulement au composant monte : il peut silencieusement casser l'apparence ou le comportement d'elements totalement sans rapport ailleurs sur la meme page. Incident reel : la sidebar d'une app consommatrice s'est retrouvee bloquee en position repliee des qu'un composant Prisme etait monte sur la meme page.
+
+Pour une app Blade deja construite sur un autre framework CSS, montez le composant dans un shadow DOM plutot que dans le document courant, avec `mountPrismeIsolated()` : le style de Prisme reste alors entierement confine a l'interieur, sans jamais pouvoir affecter le reste de la page (et inversement, le CSS de l'hote ne peut pas polluer l'interieur du composant).
+
+```ts
+import { mountPrismeIsolated } from '@oremis/prisme'
+import prismeStyles from '@oremis/prisme/styles.css?inline' // Vite: recupere le CSS en chaine, sans l'injecter dans <head>
+import MyPrismeComponent from './MyPrismeComponent.vue'
+
+const host = document.getElementById('prisme-app')
+
+if (host) {
+  mountPrismeIsolated(MyPrismeComponent, host, { styles: prismeStyles })
+}
+```
+
+`mountPrismeIsolated()` renvoie `{ app, shadowRoot, unmount }` si vous avez besoin d'aller plus loin (demonter le composant, inspecter le shadow root, etc.).
+
+Attention avec `PrRichTextEditor` (et tout autre composant qui accepte un prop `name` pour rendre un `<input>` cache destine a une soumission de formulaire native) : un element place dans un shadow DOM n'est pas inclus dans la soumission native du `<form>` ancetre. Ne passez pas `name` dans ce cas : gardez un vrai `<input type="hidden">` dans le DOM normal (hors du shadow root), et synchronisez-le vous-meme via `v-model`/un callback plutot que de compter sur l'auto-rendu du composant.
+
 ## Development
 
 ```bash
