@@ -14,6 +14,9 @@ const config: StorybookConfig = {
     name: '@storybook/vue3-vite',
     options: {},
   },
+  features: {
+    experimentalDocgenServer: true,
+  },
   docs: {
     defaultName: 'Docs',
   },
