@@ -69,7 +69,7 @@ Vérifié visuellement (Playwright) + type-check + 201 tests (198 + 3 nouvelles 
 
 Le pattern `play` function (Storybook + `storybook/test`) a été introduit sur `PrDialog`, `PrSheet`, `PrTabs`, `PrCarousel` et `PrRichTextEditor` (`Interaction` story, 2026-09-12 : frappe réelle dans le contenteditable + clic toolbar, exécutée en navigateur réel via Playwright) — jusqu'ici aucune story n'en avait, la suite ne faisait que vérifier l'absence d'erreur au rendu. Reste à étendre le même pattern aux autres composants interactifs qui n'en ont pas encore (`PrAccordion`, `PrCombobox`, `PrSelect`, `PrPopover`, `PrDropdownMenu`, `PrToggleGroup`, `PrCommand`, etc.), au fil de l'eau plutôt qu'en un seul lot.
 
-## Retours d'intégration OREMIS Chat (2026-09-30, version 0.13.0 non publiée)
+## Retours d'intégration OREMIS Chat (2026-09-30, version 0.13.0)
 
 Voir `CHANGELOG.md` § 0.13.0 pour le détail. En bref :
 - `PrRichTextEditor` sorti de l'entrée principale vers `@oremis/prisme/editor` (plus aucun import tiptap dans `dist/prisme.js`/`dist/registry.js`, garanti par `src/entries.test.ts`). Changement cassant ; aucune app connue n'importait l'éditeur depuis l'entrée principale (data l'importe par chemin).
