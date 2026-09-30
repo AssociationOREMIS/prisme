@@ -103,3 +103,12 @@ Vérifié dans Storybook (Playwright, story `Complete example`/`With notificatio
 - [ ] Comparaison côte à côte avec `data`/`formation` dans un navigateur réel (pas seulement Storybook) pour confirmer que le fond de sidebar/contenu, l'accent vert actif (`--pr-color-sidebar-active`), le bouton "Réduire la navigation" et le chevron de sous-menu rendent aussi bien une fois intégrés à une vraie page Blade.
 - [ ] Logo navbar par défaut (`https://static.oremis.fr/img/logos/oremis-logo-white.svg`) : vérifier le chargement réel dans une app consommatrice (pas de blocage CORS/CSP, affichage correct sur le fond bleu navbar).
 - [ ] Police `Roboto` : vérifier que l'app consommatrice charge bien la police (lien Google Fonts documenté dans `README.md`) — sans ce lien, tout Prisme retombe silencieusement sur la police système, y compris `forge` s'il n'a pas encore ce `<link>`.
+
+## `mountPrismeIsolated()` et entrée `@oremis/prisme/editor` (0.13.0, 2026-09-30)
+
+Automatisé : `src/entries.test.ts` (aucun paquet tiptap atteignable depuis l'entrée principale/`registry`), `src/editor.test.ts` (plugin `PrismeEditor`), `mountPrismeIsolated.test.ts` (option `theme`), story `Composables/mountPrismeIsolated` (tokens définis et appliqués dans le shadow root, clair/sombre, dans une iframe vierge sans le CSS global de Storybook). Vérifié aussi à la main : une app sans tiptap importe `dist/prisme.js` et `dist/registry.js` sans erreur (échec reproduit avec la 0.12.0). Reste à valider dans les apps consommatrices :
+
+- [ ] chat : lanceur (`ChatLauncher.vue`) monté avec `theme: 'light'` et sans `data-pr-theme` sur sa racine : couleurs et espacements corrects sur le site WordPress.
+- [ ] chat/ca : `import { PrButton } from '@oremis/prisme'` fonctionne au build et aux tests sans tiptap installé.
+- [ ] data : éditeur de campagne sans le `replaceAll(':root', ':root,:host')` et avec `theme: 'light'` : rendu identique, y compris avec un OS en mode sombre.
+- [ ] data : vérifier que la police/couleur de texte de Prisme désormais appliquées sur `:host` ne détonnent pas dans la page Bootstrap.

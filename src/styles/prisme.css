@@ -6,5 +6,10 @@
 @import "./animations.css";
 @import "./layout.css";
 @import "./rtl.css";
+/* PrRichTextEditor lives in the separate `@oremis/prisme/editor` JS entry (so the
+   main entry doesn't require tiptap), but its CSS still ships here: consumers keep
+   importing a single `styles.css`, whichever entry their components come from. */
+@import "./editor-content.css";
+@import "../components/molecules/RichTextEditor/rich-text-editor.css";
 
 @source "../components";

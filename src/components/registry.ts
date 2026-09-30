@@ -89,9 +89,6 @@ export type { PrProgressProps } from './atoms/Progress'
 import { PrRadioGroup } from './molecules/RadioGroup'
 export type { PrRadioGroupProps, PrRadioOption } from './molecules/RadioGroup'
 
-import { PrRichTextEditor } from './molecules/RichTextEditor'
-export type { PrRichTextEditorProps } from './molecules/RichTextEditor'
-
 import { PrSelect } from './molecules/Select'
 export type { PrSelectOption, PrSelectProps } from './molecules/Select'
 
@@ -168,6 +165,12 @@ export type { PrTagInputProps } from './atoms/TagInput'
  * Single source of truth used both by the named exports
  * (`src/index.ts`) and by the Vue plugin (`src/plugin.ts`, `app.use(Prisme)`).
  * Adding a component here is enough to make it available in both places.
+ *
+ * `PrRichTextEditor` is deliberately NOT listed here: it statically imports
+ * tiptap and lowlight (optional peerDependencies), so anything reachable from
+ * this registry would force every consumer to install them, even apps that
+ * never render an editor. It lives in its own `@oremis/prisme/editor` entry
+ * (`src/editor.ts`) instead.
  */
 export const componentRegistry = {
   PrAccordion,
@@ -201,7 +204,6 @@ export const componentRegistry = {
   PrPopover,
   PrProgress,
   PrRadioGroup,
-  PrRichTextEditor,
   PrScrollArea,
   PrSelect,
   PrSheet,

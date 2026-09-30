@@ -16,6 +16,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/prisme.js"
     },
+    "./editor": {
+      "types": "./dist/editor.d.ts",
+      "import": "./dist/editor.js"
+    },
     "./registry": {
       "types": "./dist/registry.d.ts",
       "import": "./dist/registry.js"

@@ -4,12 +4,21 @@
   box-sizing: border-box;
 }
 
-html {
+/* `:host`: the shadow host of mountPrismeIsolated() plays the role of <html>/<body>
+   inside its shadow root (which has neither), so the mounted components get Prisme's
+   font and text color instead of inheriting the host page's. No background there: the
+   host is the consumer's own element, painting it is their call. */
+html,
+:host {
   font-family: var(--pr-font-sans);
   line-height: var(--pr-line-height-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+:host {
+  color: var(--pr-color-text);
 }
 
 body {

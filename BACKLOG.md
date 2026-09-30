@@ -68,3 +68,15 @@ Vérifié visuellement (Playwright) + type-check + 201 tests (198 + 3 nouvelles 
 ## Couverture de tests d'interaction
 
 Le pattern `play` function (Storybook + `storybook/test`) a été introduit sur `PrDialog`, `PrSheet`, `PrTabs`, `PrCarousel` et `PrRichTextEditor` (`Interaction` story, 2026-09-12 : frappe réelle dans le contenteditable + clic toolbar, exécutée en navigateur réel via Playwright) — jusqu'ici aucune story n'en avait, la suite ne faisait que vérifier l'absence d'erreur au rendu. Reste à étendre le même pattern aux autres composants interactifs qui n'en ont pas encore (`PrAccordion`, `PrCombobox`, `PrSelect`, `PrPopover`, `PrDropdownMenu`, `PrToggleGroup`, `PrCommand`, etc.), au fil de l'eau plutôt qu'en un seul lot.
+
+## Retours d'intégration OREMIS Chat (2026-09-30, version 0.13.0 non publiée)
+
+Voir `CHANGELOG.md` § 0.13.0 pour le détail. En bref :
+- `PrRichTextEditor` sorti de l'entrée principale vers `@oremis/prisme/editor` (plus aucun import tiptap dans `dist/prisme.js`/`dist/registry.js`, garanti par `src/entries.test.ts`). Changement cassant ; aucune app connue n'importait l'éditeur depuis l'entrée principale (data l'importe par chemin).
+- Tokens déclarés aussi sur `:host` et option `theme` de `mountPrismeIsolated()` (story `Composables/mountPrismeIsolated`).
+- README : Roboto auto-hébergée (`@fontsource/roboto`) au lieu de Google Fonts (RGPD).
+
+Reste ouvert :
+- Les composants à portail (`PrDialog`, `PrPopover`, `PrTooltip`, `PrSelect`, `PrDropdownMenu`...) téléportent leur contenu dans `document.body`, donc hors du shadow root de `mountPrismeIsolated()` : ce contenu n'a alors pas les styles de Prisme. Non vérifié en conditions réelles ; à traiter si une app en a besoin (cible de portail configurable, par ex. via le `to` de `Teleport`/`ConfigProvider` de reka-ui).
+- Fournir les polices avec Prisme (par ex. `@oremis/prisme/fonts.css` basé sur `@fontsource/roboto`) plutôt que de laisser chaque app les installer : non fait, à décider.
+- Après publication : retirer les contournements côté data (`replaceAll(':root', ':root,:host')`, `dataset.prTheme = 'light'`), chat (`data-pr-theme="light"` dans `ChatLauncher.vue`, imports par chemin) et ca (imports par chemin, optionnel).

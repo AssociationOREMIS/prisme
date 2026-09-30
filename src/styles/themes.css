@@ -3,8 +3,18 @@
    higher specificity (0,2,0 vs 0,1,0) and silently wins over a consumer's own
    `:root { --pr-color-navbar: ... }` override (the pattern documented in the README),
    even though it loads after this stylesheet. Keep these single-selector so a plain
-   :root override from consumer CSS wins on the normal "later source wins" tie-break. */
+   :root override from consumer CSS wins on the normal "later source wins" tie-break.
+
+   The `:host` selectors are for mountPrismeIsolated(): inside a shadow root, `:root`
+   and `<html data-pr-theme>` are invisible, so the tokens are declared on the shadow
+   host instead, and its own `data-pr-theme` attribute (set by mountPrismeIsolated()'s
+   `theme` option) picks the theme. `:host` (0,1,0) mirrors `:root`, and
+   `:host([data-pr-theme="dark"])`/`:host(:not([data-pr-theme]))` (0,2,0) are the
+   smallest selectors that can target the host's attribute from inside the shadow
+   tree (`:host-context()` isn't supported everywhere). None of them match anything
+   in a regular document. */
 :root,
+:host,
 [data-pr-theme="light"] {
   color-scheme: light;
 
@@ -50,7 +60,8 @@
   --pr-color-info-border: var(--pr-blue-200);
 }
 
-[data-pr-theme="dark"] {
+[data-pr-theme="dark"],
+:host([data-pr-theme="dark"]) {
   color-scheme: dark;
 
   --pr-color-background: #12131b;
@@ -96,7 +107,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-pr-theme]) {
+  :root:not([data-pr-theme]),
+  :host(:not([data-pr-theme])) {
     color-scheme: dark;
 
     --pr-color-background: #12131b;

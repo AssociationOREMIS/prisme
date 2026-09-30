@@ -1,4 +1,8 @@
-:root {
+/* `:host` too, not just `:root`: inside the shadow root created by
+   mountPrismeIsolated(), `:root` matches nothing, so the tokens would never be
+   defined there. `:host` matches nothing in a regular document. */
+:root,
+:host {
   --pr-blue-50: #eff8ff;
   --pr-blue-100: #dff0ff;
   --pr-blue-200: #b8e1ff;

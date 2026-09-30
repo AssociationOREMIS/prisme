@@ -12,11 +12,23 @@ Elle fournit des composants, des styles et des tokens de design pour construire 
 
 ## Typographie
 
-Le token `--pr-font-sans` (utilisé par tous les composants via `reset.css`) declare `Roboto` en premier, pour rester coherent avec les applications OREMIS existantes (`data`, `formation`). Prisme ne charge pas la police lui-meme : sans action de votre part, les navigateurs retombent silencieusement sur la police systeme (`ui-sans-serif`/`system-ui`). Ajoutez, comme le fait deja `data`/`formation` (`resources/views/layouts/app.blade.php`), un lien Google Fonts dans le `<head>` de votre application :
+Le token `--pr-font-sans` (utilisé par tous les composants via `reset.css`) declare `Roboto` en premier, pour rester coherent avec les applications OREMIS existantes (`data`, `formation`). Prisme ne charge pas la police lui-meme : sans action de votre part, les navigateurs retombent silencieusement sur la police systeme (`ui-sans-serif`/`system-ui`).
 
-```html
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+Auto-hebergez Roboto plutot que de la charger depuis Google Fonts : avec un `<link>` vers `fonts.googleapis.com`, le navigateur de chaque visiteur transmet son adresse IP a Google, ce qui a deja ete sanctionne en Europe au titre du RGPD (sans consentement prealable). Pour une association dont le public peut etre vulnerable, ce n'est pas acceptable. Le plus simple est [`@fontsource/roboto`](https://fontsource.org/fonts/roboto), dont les fichiers sont ensuite servis par votre application, comme le fait OREMIS Chat :
+
+```bash
+npm install @fontsource/roboto
 ```
+
+```ts
+import '@fontsource/roboto/300.css'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/500.css'
+import '@fontsource/roboto/700.css'
+import '@oremis/prisme/styles.css'
+```
+
+Avec `mountPrismeIsolated()`, chargez la police dans le document hote (import ci-dessus dans l'entree JS de la page), pas dans l'option `styles` : les navigateurs Chromium ignorent les `@font-face` declares a l'interieur d'un shadow root. Une fois declaree dans la page, la police est utilisable dans le shadow DOM.
 
 ## Usage
 
@@ -32,7 +44,7 @@ npm install @oremis/prisme
 import '@oremis/prisme/styles.css'
 ```
 
-3. Utilisez les composants.
+3. Utilisez les composants. L'entree principale ne depend pas de tiptap : seul `PrRichTextEditor` en a besoin, et il est expose par une entree dediee (voir plus bas).
 
 ```vue
 <script setup lang="ts">
@@ -67,10 +79,12 @@ Chacun de ces composants accepte aussi un `default-xxx` (`defaultValue`, `defaul
 
 Editeur de texte riche (Vue 3 + [tiptap](https://tiptap.dev)), avec titres, listes, tableaux, images, video YouTube, blocs de code colores, sections repliables et encadres `Callout` (info/succes/avertissement/danger).
 
+Il est expose par l'entree dediee `@oremis/prisme/editor`, pas par l'entree principale ni par `app.use(Prisme)` : il importe tiptap et lowlight, et les garder hors de l'entree principale permet aux apps qui n'utilisent pas l'editeur d'importer `@oremis/prisme` sans installer ces paquets. Ses styles, eux, restent dans `@oremis/prisme/styles.css`.
+
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { PrRichTextEditor } from '@oremis/prisme'
+import { PrRichTextEditor } from '@oremis/prisme/editor'
 
 const content = ref('<p>Contenu initial</p>')
 
@@ -94,7 +108,7 @@ async function uploadImage(file: File, onProgress?: (percent: number) => void) {
 </template>
 ```
 
-Ses dependances tiptap (`@tiptap/*`, `lowlight`, `tiptap-extension-resize-image`) sont des `peerDependencies` optionnelles — installez-les explicitement dans l'application consommatrice (memes versions que celles listees dans `package.json#peerDependencies` de Prisme) :
+Ses dependances tiptap (`@tiptap/*`, `lowlight`, `tiptap-extension-resize-image`) sont des `peerDependencies` optionnelles : installez-les explicitement dans l'application consommatrice (memes versions que celles listees dans `package.json#peerDependencies` de Prisme) :
 
 ```bash
 npm install @tiptap/vue-3@3.31.3 @tiptap/starter-kit@3.31.3 @tiptap/extension-link@3.31.3 # ... voir peerDependencies
@@ -103,7 +117,7 @@ npm install @tiptap/vue-3@3.31.3 @tiptap/starter-kit@3.31.3 @tiptap/extension-li
 Le node tiptap `Callout` utilise par l'editeur est aussi exporte separement, pour une app qui monterait son propre editeur tiptap sans passer par `PrRichTextEditor` :
 
 ```ts
-import { Callout } from '@oremis/prisme/tiptap/callout'
+import { Callout } from '@oremis/prisme/editor' // ou '@oremis/prisme/tiptap/callout'
 ```
 
 Le rendu du contenu (tableaux, `Callout`, blocs de code, sections repliables) est stylise par `@oremis/prisme/styles/editor-content.css`, importable seul par une vue de lecture seule qui n'a pas besoin du reste de Prisme :
@@ -207,6 +221,15 @@ app.mount('#prisme-app')
 </div>
 ```
 
+`app.use(Prisme)` n'enregistre pas `PrRichTextEditor` (voir plus haut). Pour utiliser `<pr-rich-text-editor>` en Blade, ajoutez le plugin `PrismeEditor` de l'entree dediee (tiptap doit alors etre installe) :
+
+```ts
+import Prisme from '@oremis/prisme'
+import { PrismeEditor } from '@oremis/prisme/editor'
+
+app.use(Prisme).use(PrismeEditor)
+```
+
 ### `app.use(Prisme)` ou imports nommes ?
 
 - `app.use(Prisme)` enregistre en une seule fois tous les composants Prisme comme composants globaux de l'application. C'est le plus adapte quand les composants sont utilises directement dans du HTML/Blade (pas de `<script setup>` pour les declarer), au prix d'inclure l'integralite de la bibliotheque dans le bundle.
@@ -258,6 +281,39 @@ if (host) {
 ```
 
 `mountPrismeIsolated()` renvoie `{ app, shadowRoot, unmount }` si vous avez besoin d'aller plus loin (demonter le composant, inspecter le shadow root, etc.).
+
+#### Theme
+
+Dans le shadow root, les tokens (`--pr-color-*`, `--pr-space-*`...) sont declares sur `:host`, c'est-a-dire l'element `host` passe a `mountPrismeIsolated()`. Le `data-pr-theme` que `usePrTheme()` pose sur `<html>` n'y est pas visible : c'est l'attribut `data-pr-theme` de l'element hote qui choisit le theme. L'option `theme` le pose pour vous :
+
+| `theme` | Effet |
+| --- | --- |
+| `'light'` / `'dark'` | Theme fixe, quel que soit celui de la page hote. |
+| `'document'` | Recopie `<html data-pr-theme>` et suit ses changements (theme de la page Prisme hote, `PrThemeToggle`). Sans cet attribut sur `<html>`, suit la preference du systeme. |
+| omise | L'attribut de l'element hote n'est pas touche. Sans attribut, le composant suit la preference du systeme (`prefers-color-scheme`). |
+
+```ts
+// Page Bootstrap sans mode sombre : forcer le theme clair.
+mountPrismeIsolated(MyPrismeComponent, host, { styles: prismeStyles, theme: 'light' })
+```
+
+Pour surcharger un token dans le shadow root, ajoutez la regle dans `styles`, apres le CSS de Prisme, sur `:host` pour le theme clair et `:host([data-pr-theme="dark"])` pour le sombre (plus specifique, il l'emporte sur une simple regle `:host`).
+
+#### Styles de vos propres composants
+
+Seul le CSS passe dans `styles` est injecte dans le shadow root. En build librairie/embed (Vite `build.lib`), les blocs `<style>` de vos propres SFC sont extraits dans une feuille separee, injectee (ou non) dans `<head>`, jamais dans le shadow root : ils n'y ont aucun effet. Mettez ce CSS dans un fichier importe en `?inline` et concatenez-le a celui de Prisme, comme le fait OREMIS Chat :
+
+```ts
+import prismeStyles from '@oremis/prisme/styles.css?inline'
+import launcherStyles from './launcher.css?inline'
+
+mountPrismeIsolated(ChatLauncher, host, {
+  styles: `${prismeStyles}\n${launcherStyles}`,
+  theme: 'light',
+})
+```
+
+La police se charge, elle, dans le document hote (voir [Typographie](#typographie)).
 
 Attention avec `PrRichTextEditor` (et tout autre composant qui accepte un prop `name` pour rendre un `<input>` cache destine a une soumission de formulaire native) : un element place dans un shadow DOM n'est pas inclus dans la soumission native du `<form>` ancetre. Ne passez pas `name` dans ce cas : gardez un vrai `<input type="hidden">` dans le DOM normal (hors du shadow root), et synchronisez-le vous-meme via `v-model`/un callback plutot que de compter sur l'auto-rendu du composant.
 

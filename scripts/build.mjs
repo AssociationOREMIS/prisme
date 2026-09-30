@@ -122,6 +122,31 @@ async function buildTiptapEntries() {
 }
 
 /**
+ * `@oremis/prisme/editor` (`src/editor.ts`): `PrRichTextEditor`, `Callout` and
+ * the `PrismeEditor` plugin, i.e. everything that imports tiptap/lowlight. A
+ * single-entry build of its own (not a third entry of `buildMain()`) so it can
+ * never end up in a chunk shared with `dist/prisme.js`: that would make the
+ * main entry import tiptap again.
+ */
+async function buildEditorEntry() {
+  await build({
+    configFile,
+    logLevel: 'warn',
+    build: {
+      emptyOutDir: false,
+      lib: {
+        entry: path.resolve(root, 'src/editor.ts'),
+        formats: ['es'],
+        fileName: () => 'editor.js',
+        // See the matching comment in buildComponentEntries(). The editor's CSS
+        // already ships in dist/styles.css (src/styles/prisme.css imports it).
+        cssFileName: 'editor',
+      },
+    },
+  })
+}
+
+/**
  * Plain static assets that aren't a JS entry point — `editor-content.css` is
  * consumer-facing CSS (imported both by `PrRichTextEditor` and, standalone,
  * by a consumer's read-only render), so it's copied to `dist/styles/` rather
@@ -155,6 +180,7 @@ function copyStaticStyles() {
 }
 
 await buildMain()
+await buildEditorEntry()
 await buildComponentEntries()
 await buildComposableEntries()
 await buildTiptapEntries()

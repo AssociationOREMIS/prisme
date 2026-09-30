@@ -33,7 +33,6 @@ export const {
   PrPopover,
   PrProgress,
   PrRadioGroup,
-  PrRichTextEditor,
   PrScrollArea,
   PrSelect,
   PrSheet,
@@ -97,7 +96,6 @@ export type {
   PrRadioGroupProps,
   PrRadioOption,
   PrRejectedFile,
-  PrRichTextEditorProps,
   PrScrollAreaProps,
   PrSelectOption,
   PrSelectProps,
@@ -169,4 +167,5 @@ export { mountPrismeIsolated } from './composables/mountPrismeIsolated'
 export type {
   PrIsolatedMountOptions,
   PrIsolatedMountResult,
+  PrIsolatedTheme,
 } from './composables/mountPrismeIsolated'
