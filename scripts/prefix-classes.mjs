@@ -118,6 +118,8 @@ function filesIn(dir) {
 let changed = 0
 for (const file of [...filesIn(path.join(root, 'src/components')), ...filesIn(path.join(root, 'src/stories'))]) {
   const source = fs.readFileSync(file, 'utf8')
+  // A file that names unprefixed classes on purpose (a test) says so.
+  if (source.includes('prefix-classes: ignore')) continue
   const edits = []
   if (file.endsWith('.vue')) {
     const { descriptor } = parseSfc(source, { filename: file })

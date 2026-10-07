@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect } from 'storybook/test'
 import '../stories.css'
 
+// prefix-classes: ignore (the class names below are the ones Prisme must not define).
 // Prisme's Tailwind classes are prefixed (`pr:flex`): it defines no `.hidden`, `.flex`, `.top-0`...
 // that would override an app's classes of the same name (`hidden md:flex`), or lose to them.
 const meta = {
