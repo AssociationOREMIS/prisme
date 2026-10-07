@@ -2,6 +2,17 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.19.1 (2026-10-07)
+
+### Ajouts
+
+- **Le bouton d'un formulaire en cours d'envoi affiche un indicateur** (navigation sans rechargement) : au-dela de 150 ms, un `PrButton` montre le meme indicateur qu'avec `loading`, et ne peut plus etre clique ; une reponse rapide ne fait rien clignoter. Le bouton porte `aria-disabled` et `data-prisme-submitting` pendant l'envoi.
+- **Prechargement sur ecran tactile** : sans survol possible, la page suivante est demandee des que le doigt touche un lien, un peu avant le clic.
+
+### Tests
+
+- Bouton marque pendant l'envoi puis libere, prechargement au toucher (pas a l'appui de la souris). Indicateur verifie dans Chromium (apparition apres 150 ms, largeur du bouton gardee).
+
 ## 0.19.0 (2026-10-07)
 
 ### Changements visibles
