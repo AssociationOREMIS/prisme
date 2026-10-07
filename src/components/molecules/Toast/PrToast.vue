@@ -9,6 +9,7 @@ export interface PrToastProps {
   defaultOpen?: boolean
   title?: string
   description?: string
+  /** Milliseconds before closing. Default 5000, except `danger`: stays until dismissed. `Infinity` never closes. */
   duration?: number
   variant?: 'default' | 'info' | 'success' | 'warning' | 'danger'
   actionLabel?: string
@@ -20,7 +21,7 @@ withDefaults(defineProps<PrToastProps>(), {
   defaultOpen: false,
   title: undefined,
   description: undefined,
-  duration: 5000,
+  duration: undefined,
   variant: 'default',
   actionLabel: undefined,
   closeLabel: 'Fermer',

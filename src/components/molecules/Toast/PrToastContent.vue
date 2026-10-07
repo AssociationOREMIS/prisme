@@ -8,6 +8,7 @@ interface PrToastContentProps {
   defaultOpen?: boolean
   title?: string
   description?: string
+  /** Milliseconds before closing. Default 5000, except `danger`: stays until dismissed. `Infinity` never closes. */
   duration?: number
   variant?: 'default' | 'info' | 'success' | 'warning' | 'danger'
   actionLabel?: string
@@ -19,7 +20,7 @@ const props = withDefaults(defineProps<PrToastContentProps>(), {
   defaultOpen: false,
   title: undefined,
   description: undefined,
-  duration: 5000,
+  duration: undefined,
   variant: 'default',
   actionLabel: undefined,
   closeLabel: 'Fermer',
@@ -69,7 +70,10 @@ const variantProgressClass = computed(() => ({
 
 // `Infinity` (or any non-finite/non-positive value) means "don't auto-dismiss" —
 // showing a depleting bar for a toast that never closes would be misleading.
-const showProgress = computed(() => Number.isFinite(props.duration) && props.duration > 0)
+// Without an explicit duration, an error stays until dismissed (WCAG 2.2.1: someone reading
+// slowly or using a screen reader must not lose it); other toasts close after 5 s.
+const effectiveDuration = computed(() => props.duration ?? (props.variant === 'danger' ? Infinity : 5000))
+const showProgress = computed(() => Number.isFinite(effectiveDuration.value) && effectiveDuration.value > 0)
 
 // Reka pauses the close timer while the toast is hovered or focused, or the window is in the
 // background, then resumes it with the time left: the bar must stop and restart with it, or it
@@ -83,7 +87,7 @@ const paused = ref(false)
     :class="variantAccentClass"
     :open="open"
     :default-open="defaultOpen"
-    :duration="duration"
+    :duration="effectiveDuration"
     @update:open="emit('update:open', $event)"
     @pause="paused = true"
     @resume="paused = false"
@@ -99,7 +103,7 @@ const paused = ref(false)
     <ToastAction
       v-if="actionLabel"
       class="pr-toast__action min-h-8 shrink-0 cursor-pointer rounded-[var(--pr-radius-md)] border-0 bg-transparent px-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-bold text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
-      alt-text="Action"
+      :alt-text="actionLabel"
       @click="emit('action')"
     >
       {{ actionLabel }}
@@ -111,7 +115,7 @@ const paused = ref(false)
       v-if="showProgress"
       class="pr-toast__progress absolute inset-x-0 bottom-0 h-[3px] origin-left [animation-fill-mode:forwards] [animation-name:pr-toast-progress] [animation-timing-function:linear]"
       :class="variantProgressClass"
-      :style="{ animationDuration: `${duration}ms`, animationPlayState: paused ? 'paused' : 'running' }"
+      :style="{ animationDuration: `${effectiveDuration}ms`, animationPlayState: paused ? 'paused' : 'running' }"
       aria-hidden="true"
     />
   </ToastRoot>

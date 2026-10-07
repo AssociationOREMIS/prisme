@@ -23,10 +23,14 @@
   --pr-color-surface-raised: var(--pr-neutral-0);
   --pr-color-surface-subtle: var(--pr-neutral-100);
   --pr-color-border: var(--pr-neutral-200);
-  --pr-color-border-strong: var(--pr-neutral-300);
+  /* Field borders must reach 3:1 against the surface (WCAG 1.4.11): neutral-300 gave 1.48. */
+  --pr-color-border-strong: #8291a7;
   --pr-color-text: var(--pr-neutral-900);
-  --pr-color-text-muted: var(--pr-neutral-500);
-  --pr-color-text-subtle: var(--pr-neutral-400);
+  /* Secondary text must stay at 4.5:1 on the light grey and light blue backgrounds too
+     (surface-subtle, soft tints, hovered rows): neutral-500 gave 4.13 to 4.42 there. */
+  --pr-color-text-muted: #5d6c82;
+  /* Placeholders and secondary labels: 4.5:1 minimum (neutral-400 gave 2.56). */
+  --pr-color-text-subtle: #5d6c82;
   --pr-color-focus: var(--pr-blue-500);
   --pr-color-overlay: rgb(15 23 42 / 38%);
   --pr-color-navbar: var(--pr-blue-900);
@@ -42,7 +46,7 @@
   --pr-color-primary-soft: var(--pr-blue-50);
   --pr-color-primary-border: var(--pr-blue-200);
 
-  --pr-color-success: var(--pr-green-600);
+  --pr-color-success: var(--pr-green-700);
   --pr-color-success-soft: var(--pr-green-50);
   --pr-color-success-border: var(--pr-green-200);
 
@@ -50,8 +54,8 @@
   --pr-color-warning-soft: var(--pr-yellow-50);
   --pr-color-warning-border: var(--pr-yellow-200);
 
-  --pr-color-danger: var(--pr-red-600);
-  --pr-color-danger-hover: var(--pr-red-700);
+  --pr-color-danger: var(--pr-red-700);
+  --pr-color-danger-hover: var(--pr-red-800);
   /* Filled danger surfaces with white text (danger button, counters): red-600/700 in both themes,
      since the dark theme's --pr-color-danger (red-400) is too light for white text (2.77:1). */
   --pr-color-danger-solid: var(--pr-red-600);
@@ -73,10 +77,10 @@
   --pr-color-surface-raised: #21212e;
   --pr-color-surface-subtle: #2c2d3c;
   --pr-color-border: #2c2d3c;
-  --pr-color-border-strong: #3d3f54;
+  --pr-color-border-strong: #64667e;
   --pr-color-text: #fafaff;
-  --pr-color-text-muted: #8b8ca9;
-  --pr-color-text-subtle: #606282;
+  --pr-color-text-muted: #999ab4;
+  --pr-color-text-subtle: #999ab4;
   --pr-color-focus: #b6c5f9;
   --pr-color-overlay: rgb(18 19 27 / 68%);
   --pr-color-navbar: #040e32;
@@ -122,10 +126,10 @@
     --pr-color-surface-raised: #21212e;
     --pr-color-surface-subtle: #2c2d3c;
     --pr-color-border: #2c2d3c;
-    --pr-color-border-strong: #3d3f54;
+    --pr-color-border-strong: #64667e;
     --pr-color-text: #fafaff;
-    --pr-color-text-muted: #8b8ca9;
-    --pr-color-text-subtle: #606282;
+    --pr-color-text-muted: #999ab4;
+    --pr-color-text-subtle: #999ab4;
     --pr-color-focus: #b6c5f9;
     --pr-color-overlay: rgb(18 19 27 / 68%);
     --pr-color-navbar: #040e32;

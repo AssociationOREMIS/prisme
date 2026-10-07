@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed, useAttrs, useId } from 'vue'
 import { PrLabel } from '../Label'
 
 export interface PrTextareaProps {
@@ -17,7 +17,7 @@ export interface PrTextareaProps {
 }
 
 const props = withDefaults(defineProps<PrTextareaProps>(), {
-  modelValue: '',
+  modelValue: undefined,
   label: undefined,
   hint: undefined,
   error: undefined,
@@ -30,6 +30,11 @@ const props = withDefaults(defineProps<PrTextareaProps>(), {
   resize: 'vertical',
 })
 
+// Without a model-value, a plain Blade `value="{{ old('x') }}"` (in $attrs) fills the field:
+// binding an empty modelValue default after $attrs used to wipe it.
+const attrs = useAttrs()
+const fieldValue = computed(() => props.modelValue ?? (attrs.value as string | number | undefined))
+
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
@@ -38,13 +43,10 @@ const generatedId = useId()
 const textareaId = computed(() => props.id ?? `pr-textarea-${generatedId}`)
 const hintId = computed(() => `${textareaId.value}-hint`)
 const errorId = computed(() => `${textareaId.value}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids = []
-
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
 
 const textareaClass = computed(() => [
@@ -95,7 +97,7 @@ defineOptions({ inheritAttrs: false })
       v-bind="$attrs"
       :class="textareaControlClass"
       :name="name"
-      :value="modelValue"
+      :value="fieldValue"
       :placeholder="placeholder"
       :disabled="disabled"
       :required="required"

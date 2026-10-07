@@ -143,6 +143,7 @@ defineOptions({ inheritAttrs: false })
         'cursor-text': !disabled,
         'cursor-not-allowed opacity-60': disabled,
       }"
+      :aria-disabled="disabled || undefined"
       @click="focusInput"
     >
       <span
@@ -154,7 +155,7 @@ defineOptions({ inheritAttrs: false })
         <button
           v-if="!disabled"
           type="button"
-          class="inline-flex items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+          class="-my-1 -mr-1.5 inline-grid size-6 place-items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="`Supprimer ${tag}`"
           @click.stop="removeTag(index)"
         >

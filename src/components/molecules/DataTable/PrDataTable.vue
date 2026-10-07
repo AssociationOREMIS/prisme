@@ -66,6 +66,8 @@ const columns = computed(() => props.columns)
 const sourceRows = computed(() => props.data ?? props.rows)
 const emptyMessage = computed(() => props.noResultsMessage ?? props.emptyText)
 const filterColumnKey = computed(() => props.filterKey ?? columns.value.find((column) => column.filterable !== false)?.key ?? '')
+const filterLabel = computed(() => props.filterPlaceholder
+  ?? `Filtrer ${columns.value.find((column) => column.key === filterColumnKey.value)?.label.toLocaleLowerCase() ?? 'les lignes'}...`)
 const pageSizeOptions = computed(() => props.pageSizeOptions)
 const hasRowActions = computed(() => Boolean(props.rowActions.length || 'row-actions' in slots))
 const hideSelectedRowsCount = computed(() => props.hideSelectedRowsCount)
@@ -166,6 +168,14 @@ function rowId(row: Record<string, unknown>) {
   return String(row[props.rowKey])
 }
 
+// What the row checkbox announces: the first visible column (a name, a title), not the row's
+// technical key, which read as "Sélectionner 42".
+function rowLabel(row: Record<string, unknown>): string {
+  const first = visibleColumns.value[0]
+  const value = first ? row[first.key] : undefined
+  return value === undefined || value === null || value === '' ? rowId(row) : String(value)
+}
+
 function columnStyle(column: PrDataTableColumn) {
   return {
     width: column.width,
@@ -247,7 +257,8 @@ onBeforeUnmount(() => {
             v-if="filterColumnKey"
             v-model="filterValue"
             class="pr-data-table__filter h-8 w-[min(100%,16rem)]"
-            :placeholder="filterPlaceholder ?? `Filtrer ${columns.find((column) => column.key === filterColumnKey)?.label.toLocaleLowerCase() ?? 'les lignes'}...`"
+            :placeholder="filterLabel"
+            :aria-label="filterLabel"
           />
         </slot>
       </div>
@@ -278,6 +289,7 @@ onBeforeUnmount(() => {
                 class="pr-data-table__header h-12 whitespace-nowrap px-[var(--pr-space-4)] text-left align-middle font-bold text-[color:var(--pr-color-text)]"
                 :class="column.headerClass"
                 :style="columnStyle(column)"
+                :aria-sort="sortKey === column.key ? (sortDirection === 'asc' ? 'ascending' : 'descending') : undefined"
               >
                 <PrDataTableColumnHeader
                   :column="column"
@@ -327,7 +339,7 @@ onBeforeUnmount(() => {
                 <td v-if="selectable" class="pr-data-table__cell p-[var(--pr-space-4)] align-middle">
                   <PrCheckbox
                     :checked="selectedKeys.has(rowId(row))"
-                    :aria-label="`Sélectionner ${rowId(row)}`"
+                    :aria-label="`Sélectionner ${rowLabel(row)}`"
                     @update:checked="toggleRow(row, Boolean($event))"
                   />
                 </td>

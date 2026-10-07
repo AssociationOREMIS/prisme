@@ -20,12 +20,13 @@ const ariaLabel = computed(() => (
 </script>
 
 <template>
+  <!-- The label itself says what a press does ("Réduire" / "Étendre"): adding aria-pressed
+       on top announced a contradictory "pressed" state. -->
   <button
     v-if="sidebar"
     class="pr-sidebar__collapse inline-grid w-full grid-flow-col cursor-pointer place-items-center justify-center gap-[var(--pr-space-2)] border-t border-[var(--pr-color-border)] bg-[var(--pr-color-surface-subtle)] p-[0.875rem] text-[length:var(--pr-font-size-sm)] font-[650] text-[color:var(--pr-color-text-subtle)] transition-[background-color,color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:bg-[var(--pr-color-border)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
     type="button"
     :aria-label="ariaLabel"
-    :aria-pressed="sidebar.isNarrow.value"
     @click="sidebar.toggle"
   >
     <ChevronRight v-if="sidebar.isNarrow.value" aria-hidden="true" :size="18" />

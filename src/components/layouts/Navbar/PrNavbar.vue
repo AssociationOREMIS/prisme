@@ -38,7 +38,10 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
 </script>
 
 <template>
-  <nav class="pr-navbar sticky top-0 col-[1/-1] row-[1] z-[50] flex h-[var(--pr-navbar-height)] w-full items-center justify-between bg-[var(--pr-color-navbar)] px-[var(--pr-space-4)] py-[var(--pr-space-3)] text-[color:var(--pr-color-navbar-text)] max-[780px]:px-[var(--pr-space-3)]" aria-label="Navigation principale">
+  <!-- A <header> (banner), not a <nav>: it holds the brand, theme and user menu, while the
+       sidebar is the navigation. The app name is a <p>, leaving each page its own <h1>. -->
+  <!-- Focus rings sit on the dark navbar here: a light blue (8:1) instead of the default blue-500 (2.35:1). -->
+  <header class="pr-navbar [--pr-color-focus:var(--pr-blue-200)] sticky top-0 col-[1/-1] row-[1] z-[50] flex h-[var(--pr-navbar-height)] w-full items-center justify-between bg-[var(--pr-color-navbar)] px-[var(--pr-space-4)] py-[var(--pr-space-3)] text-[color:var(--pr-color-navbar-text)] max-[780px]:px-[var(--pr-space-3)]">
     <div class="pr-navbar__brand inline-flex min-w-0 items-center gap-[var(--pr-space-3)]">
       <slot name="brand">
         <img
@@ -64,7 +67,7 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
           ]"
           aria-hidden="true"
         />
-        <h1 class="pr-navbar__title m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</h1>
+        <p class="pr-navbar__title m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
       </slot>
     </div>
 
@@ -80,5 +83,5 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
     <div v-if="$slots.user" class="pr-navbar__user ml-[var(--pr-space-3)] inline-flex shrink-0 items-center gap-[var(--pr-space-1)] border-l border-[var(--pr-color-navbar-border)] pl-[var(--pr-space-3)] max-[780px]:ml-[var(--pr-space-2)] max-[780px]:pl-[var(--pr-space-2)]">
       <slot name="user" />
     </div>
-  </nav>
+  </header>
 </template>

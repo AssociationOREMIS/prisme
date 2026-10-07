@@ -22,9 +22,10 @@ const isUnavailable = computed(() => props.disabled || props.loading)
 
 const buttonBaseClass = [
   'pr-button',
-  'relative inline-flex min-w-max items-center justify-center',
+  // Fits its label on one line when there is room, wraps instead of overflowing on a narrow screen.
+  'relative inline-flex max-w-full items-center justify-center text-center',
   'border border-transparent rounded-[var(--pr-radius-md)]',
-  'font-semibold leading-[var(--pr-line-height-tight)] no-underline whitespace-nowrap',
+  'font-semibold leading-[var(--pr-line-height-tight)] no-underline [overflow-wrap:anywhere]',
   'cursor-pointer transition-[background-color,border-color,color,box-shadow]',
   'duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]',
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]',
@@ -71,9 +72,10 @@ const buttonClass = computed(() => [
     >
       <PrSpinner size="sm" label="Chargement" />
     </span>
+    <!-- Hidden with opacity, not visibility: the label stays the button's accessible name while it loads. -->
     <span
       class="pr-button__content inline-flex items-center justify-center gap-[inherit]"
-      :class="{ invisible: loading }"
+      :class="{ 'opacity-0': loading }"
     >
       <slot />
     </span>

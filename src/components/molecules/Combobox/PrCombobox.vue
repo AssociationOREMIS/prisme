@@ -130,7 +130,7 @@ function labelFor(value: string) {
           <button
             v-if="!disabled"
             type="button"
-            class="inline-flex items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+            class="-my-1 -mr-1.5 inline-grid size-6 place-items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
             :aria-label="`Retirer ${labelFor(value)}`"
             @click.stop="removeValue(value)"
           >
@@ -150,7 +150,7 @@ function labelFor(value: string) {
         <button
           v-if="hasValue && !disabled"
           type="button"
-          class="pr-combobox__clear shrink-0 text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)]"
+          class="pr-combobox__clear inline-grid size-6 shrink-0 place-items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)]"
           :aria-label="'Effacer la sélection'"
           @click.stop="clearValue"
         >

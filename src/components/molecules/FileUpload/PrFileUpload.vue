@@ -104,13 +104,14 @@ function stateFor(file: File): PrFileUploadFileState {
 
 const generatedId = useId()
 const fieldId = computed(() => props.id ?? `pr-file-upload-${generatedId}`)
+const labelId = computed(() => `${fieldId.value}-label`)
+const instructionsId = computed(() => `${fieldId.value}-instructions`)
 const hintId = computed(() => `${fieldId.value}-hint`)
 const errorId = computed(() => `${fieldId.value}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids: string[] = []
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
 
 const inputRef = ref<HTMLInputElement | null>(null)
@@ -241,7 +242,22 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
 
 <template>
   <div class="pr-file-upload grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
-    <PrLabel v-if="label" :for="fieldId" :disabled="disabled">{{ label }}</PrLabel>
+    <PrLabel v-if="label" :id="labelId" :for="fieldId" :disabled="disabled">{{ label }}</PrLabel>
+    <!-- Outside the dropzone (a role="button" cannot hold another control) and out of the tab
+         order: the dropzone is the keyboard target, this input only opens the picker and posts. -->
+    <input
+      :id="fieldId"
+      ref="inputRef"
+      type="file"
+      class="sr-only"
+      tabindex="-1"
+      :multiple="multiple"
+      :accept="accept"
+      :disabled="disabled"
+      :required="required"
+      :name="name"
+      @change="onInputChange"
+    />
     <div
       class="pr-file-upload__dropzone flex cursor-pointer flex-col items-center justify-center gap-[var(--pr-space-3)] rounded-[var(--pr-radius-lg)] border-2 border-dashed border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-6)] py-[var(--pr-space-8)] text-center transition-colors duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]"
       :class="{
@@ -252,6 +268,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       }"
       :aria-disabled="disabled"
       :aria-invalid="error ? 'true' : undefined"
+      :aria-labelledby="label ? `${labelId} ${instructionsId}` : undefined"
       :aria-describedby="describedBy"
       tabindex="0"
       role="button"
@@ -263,25 +280,13 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       @dragleave="onDragLeave"
       @drop="onDrop"
     >
-      <input
-        :id="fieldId"
-        ref="inputRef"
-        type="file"
-        class="sr-only"
-        :multiple="multiple"
-        :accept="accept"
-        :disabled="disabled"
-        :required="required"
-        :name="name"
-        @change="onInputChange"
-      />
       <FileUp
         class="text-[color:var(--pr-color-text-muted)]"
         :size="32"
         aria-hidden="true"
       />
       <div>
-        <p class="m-0 text-[length:var(--pr-font-size-sm)] font-semibold text-[color:var(--pr-color-text)]">
+        <p :id="instructionsId" class="m-0 text-[length:var(--pr-font-size-sm)] font-semibold text-[color:var(--pr-color-text)]">
           Glisser-déposer ou <span class="text-[color:var(--pr-color-primary)]">choisir un fichier</span>
         </p>
         <p v-if="accept || maxSize" class="m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-xs)] text-[color:var(--pr-color-text-muted)]">
@@ -305,6 +310,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
             {{ formatSize(file.size) }}
           </p>
           <PrProgress
+            :aria-label="`Envoi de ${file.name}`"
             v-if="upload && stateFor(file).status === 'uploading'"
             class="pr-file-upload__progress mt-[var(--pr-space-1)]"
             :model-value="stateFor(file).progress"
@@ -323,7 +329,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         <button
           v-if="upload && stateFor(file).status === 'error'"
           type="button"
-          class="shrink-0 rounded-[var(--pr-radius-sm)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+          class="inline-grid size-6 shrink-0 place-items-center rounded-[var(--pr-radius-sm)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="`Réessayer l'envoi de ${file.name}`"
           @click="startUpload(file)"
         >
@@ -331,7 +337,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         </button>
         <button
           type="button"
-          class="shrink-0 rounded-[var(--pr-radius-sm)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+          class="inline-grid size-6 shrink-0 place-items-center rounded-[var(--pr-radius-sm)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="`Supprimer ${file.name}`"
           @click="removeFile(index)"
         >

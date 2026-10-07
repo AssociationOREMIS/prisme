@@ -331,7 +331,7 @@ export const CompleteExample: Story = {
 
       <PrCard>
         <div class="story-card-content">
-          <h3>Activité récente</h3>
+          <h2>Activité récente</h2>
           <p>Cette composition sert de référence visuelle pour ajuster le shell Prisme.</p>
           <PrButton size="sm">Voir le détail</PrButton>
         </div>

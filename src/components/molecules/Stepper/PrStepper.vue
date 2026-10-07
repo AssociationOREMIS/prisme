@@ -38,9 +38,11 @@ const emit = defineEmits<{
 </script>
 
 <template>
+  <!-- Horizontal steps keep one row and scroll sideways on a narrow screen instead of overflowing
+       (p-1 keeps the focus rings inside the scroll area). -->
   <StepperRoot
-    class="pr-stepper flex"
-    :class="orientation === 'vertical' ? 'flex-col gap-0' : 'flex-row items-start'"
+    class="pr-stepper flex max-w-full"
+    :class="orientation === 'vertical' ? 'flex-col gap-0' : 'flex-row items-start overflow-x-auto p-1'"
     :model-value="modelValue"
     :default-value="defaultValue"
     :linear="linear"
@@ -59,12 +61,14 @@ const emit = defineEmits<{
         class="flex items-center"
         :class="orientation === 'vertical' ? 'flex-col' : 'flex-row'"
       >
+        <!-- A real <button> around the indicator (as-child made the indicator a focusable <span>
+             with no role). Indicator text uses primary-contrast: white was invisible on the
+             dark theme's near-white primary. -->
         <StepperTrigger
-          class="pr-stepper__trigger flex cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] group-data-[disabled]/item:cursor-not-allowed group-data-[disabled]/item:opacity-50"
-          as-child
+          class="pr-stepper__trigger flex cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] group-data-[disabled]/item:cursor-not-allowed group-data-[disabled]/item:opacity-50"
         >
           <StepperIndicator
-            class="pr-stepper__indicator flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-[length:var(--pr-font-size-sm)] font-semibold transition-colors duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] group-data-[state=active]/item:border-[var(--pr-color-primary)] group-data-[state=active]/item:bg-[var(--pr-color-primary)] group-data-[state=active]/item:text-white group-data-[state=completed]/item:border-[var(--pr-color-primary)] group-data-[state=completed]/item:bg-[var(--pr-color-primary)] group-data-[state=completed]/item:text-white group-data-[state=incomplete]/item:border-[var(--pr-color-border-strong)] group-data-[state=incomplete]/item:bg-[var(--pr-color-surface)] group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
+            class="pr-stepper__indicator flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-[length:var(--pr-font-size-sm)] font-semibold transition-colors duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] group-data-[state=active]/item:border-[var(--pr-color-primary)] group-data-[state=active]/item:bg-[var(--pr-color-primary)] group-data-[state=active]/item:text-[color:var(--pr-color-primary-contrast)] group-data-[state=completed]/item:border-[var(--pr-color-primary)] group-data-[state=completed]/item:bg-[var(--pr-color-primary)] group-data-[state=completed]/item:text-[color:var(--pr-color-primary-contrast)] group-data-[state=incomplete]/item:border-[var(--pr-color-border-strong)] group-data-[state=incomplete]/item:bg-[var(--pr-color-surface)] group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
           >
             <Check :size="14" aria-hidden="true" class="hidden group-data-[state=completed]/item:block" />
             <span class="group-data-[state=completed]/item:hidden">{{ index + 1 }}</span>

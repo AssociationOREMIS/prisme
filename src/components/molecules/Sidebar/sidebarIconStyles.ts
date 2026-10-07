@@ -22,4 +22,6 @@ export const sidebarIconInactiveClass = [
 ].join(' ')
 
 export const sidebarIconActiveClass =
+  // White icon on the data/formation green, kept by design choice although it reaches only
+  // 2.23:1 (WCAG asks 3:1 for icons): the active entry is also marked by aria-current.
   'bg-[var(--pr-color-sidebar-active)] text-[color:var(--pr-neutral-0)]'

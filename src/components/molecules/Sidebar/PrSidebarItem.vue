@@ -88,8 +88,10 @@ watch(
   },
 )
 
-function handleClick() {
+function handleClick(event: MouseEvent) {
   if (props.disabled) {
+    // A disabled entry rendered as a link must not navigate.
+    event.preventDefault()
     return
   }
 
