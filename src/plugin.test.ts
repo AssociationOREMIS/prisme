@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { describe, expect, it } from 'vitest'
 import Prisme, { Prisme as NamedPrisme, PrBadge, PrButton, PrDataTable } from './index'
+import * as entry from './index'
 import { componentRegistry } from './components/registry'
 
 describe('Prisme plugin', () => {
@@ -33,5 +34,13 @@ describe('Prisme plugin', () => {
     expect(PrButton).toBe(componentRegistry.PrButton)
     expect(PrBadge).toBe(componentRegistry.PrBadge)
     expect(PrDataTable).toBe(componentRegistry.PrDataTable)
+  })
+
+  // PrNumberInput and PrTagInput were once registered but missing here: every registry
+  // component must also be a named export of the main entry.
+  it('exports every registered component by name from the main entry', () => {
+    for (const [name, component] of Object.entries(componentRegistry)) {
+      expect(entry[name as keyof typeof entry], name).toBe(component)
+    }
   })
 })
