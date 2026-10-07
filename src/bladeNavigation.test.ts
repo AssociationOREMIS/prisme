@@ -399,3 +399,50 @@ describe("registerPrisme navigation: 'swap', forms", () => {
     expect(document.querySelector('h1')?.textContent).toBe('419')
   })
 })
+
+describe("registerPrisme navigation: 'swap', feedback and touch", () => {
+  it('marks the button of a form being sent, until its answer is handled', async () => {
+    let answer!: (response: Response) => void
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((resolve) => { answer = resolve })))
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:x'), revokeObjectURL: vi.fn() }))
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+    mountFirstPage('<form method="POST" action="/export"><button id="export">Exporter</button><button id="other">Autre</button></form>')
+
+    submit('#export')
+    await settle()
+    const button = document.getElementById('export')!
+    expect(button.hasAttribute('data-prisme-submitting')).toBe(true)
+    expect(button.getAttribute('aria-disabled')).toBe('true')
+    expect(document.getElementById('other')!.hasAttribute('data-prisme-submitting')).toBe(false)
+
+    answer(new Response('a,b', { headers: { 'content-type': 'text/csv' } }))
+    await settle()
+    expect(button.hasAttribute('data-prisme-submitting')).toBe(false)
+    expect(button.hasAttribute('aria-disabled')).toBe(false)
+  })
+
+  it('fetches a link as soon as a finger touches it, not on a mouse press', async () => {
+    const fetchMock = stubServer({ '/regions': { html: pageHtml('Regions', '<h1>Regions</h1>') } })
+    document.body.innerHTML = new DOMParser().parseFromString(pageHtml('Accueil', '<a id="regions" href="/regions">Regions</a>'), 'text/html').body.innerHTML
+    const app = createApp({})
+    app.component('ShellCounter', ShellCounter)
+    registerPrisme(app, { navigation: 'swap', prefetch: 'prefetch', preload: false, transitions: false, measure: false })
+    app.mount('#app')
+    mountedApp = app
+
+    const press = (pointerType: string) => {
+      const event = new Event('pointerdown', { bubbles: true })
+      Object.defineProperty(event, 'pointerType', { value: pointerType })
+      document.getElementById('regions')!.dispatchEvent(event)
+    }
+    press('mouse')
+    expect(fetchMock).not.toHaveBeenCalled()
+    press('touch')
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    click('#regions')
+    await settle()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(document.querySelector('main h1')?.textContent).toBe('Regions')
+  })
+})

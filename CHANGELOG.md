@@ -2,6 +2,17 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.19.1 (2026-10-07)
+
+### Ajouts
+
+- **Le bouton d'un formulaire en cours d'envoi affiche un indicateur** (navigation sans rechargement) : au-dela de 150 ms, un `PrButton` montre le meme indicateur qu'avec `loading`, et ne peut plus etre clique ; une reponse rapide ne fait rien clignoter. Le bouton porte `aria-disabled` et `data-prisme-submitting` pendant l'envoi.
+- **Prechargement sur ecran tactile** : sans survol possible, la page suivante est demandee des que le doigt touche un lien, un peu avant le clic.
+
+### Tests
+
+- Bouton marque pendant l'envoi puis libere, prechargement au toucher (pas a l'appui de la souris). Indicateur verifie dans Chromium (apparition apres 150 ms, largeur du bouton gardee).
+
 ## 0.19.0 (2026-10-07)
 
 ### Changements visibles
@@ -14,6 +25,7 @@ Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement 
   - Jamais renvoye deux fois : un export est telecharge sans quitter la page, une redirection vers un autre site ou une autre mise en page est suivie normalement, une page d'erreur (419, 500) est affichee telle quelle.
   - Le navigateur garde les formulaires deja geres par l'app (`@submit.prevent`, `onsubmit` refuse), ceux qui ont une `target`, vont vers un autre site ou un `logout`, et ceux marques `data-prisme-reload`.
   - A verifier dans une app : un script qui agit apres l'envoi d'un formulaire en comptant sur le rechargement de la page.
+  - A verifier dans une app : un formulaire qui redirige vers un autre site (OAuth, paiement) doit porter `data-prisme-reload`, sinon il est envoye deux fois.
 
 ### Tests
 

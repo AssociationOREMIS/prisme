@@ -307,7 +307,7 @@ Ne sont jamais precharges : les liens vers un autre site, ceux qui ont `download
 
 #### Navigation sans rechargement (`navigation: 'swap'`, par defaut)
 
-Par defaut, un clic sur un lien ou l'envoi d'un formulaire ne recharge plus la page, dans tous les navigateurs. Prisme recupere la page suivante (le serveur renvoie toujours sa page Blade complete) et remplace seulement le contenu de `#app` : la navbar et la sidebar restent en place avec leur etat (sidebar repliee, defilement), leurs props sont mises a jour (element actif, badges), et le contenu (`.pr-shell-grid__content`, sinon tout `#app`) est reconstruit. Le titre, l'adresse, le token CSRF, les boutons Precedent/Suivant et le defilement suivent ; le focus passe au contenu et les lecteurs d'ecran entendent le titre de la nouvelle page. Le survol d'un lien precharge la page (sans Speculation Rules, inutiles ici).
+Par defaut, un clic sur un lien ou l'envoi d'un formulaire ne recharge plus la page, dans tous les navigateurs. Prisme recupere la page suivante (le serveur renvoie toujours sa page Blade complete) et remplace seulement le contenu de `#app` : la navbar et la sidebar restent en place avec leur etat (sidebar repliee, defilement), leurs props sont mises a jour (element actif, badges), et le contenu (`.pr-shell-grid__content`, sinon tout `#app`) est reconstruit. Le titre, l'adresse, le token CSRF, les boutons Precedent/Suivant et le defilement suivent ; le focus passe au contenu et les lecteurs d'ecran entendent le titre de la nouvelle page. Le survol d'un lien precharge la page (sans Speculation Rules, inutiles ici), et sur un ecran tactile, le simple contact du doigt sur le lien, juste avant le clic.
 
 Rien a changer dans les controleurs ni dans les vues. La page se recharge normalement :
 
@@ -315,7 +315,7 @@ Rien a changer dans les controleurs ni dans les vues. La page se recharge normal
 - si la reponse n'est pas du HTML (un export), vient d'un autre site (session expiree renvoyee au SSO) ou n'arrive pas ;
 - pour les liens `download`, `target`, `logout`, ou marques `data-prisme-reload` (sur le lien ou un parent).
 
-Les formulaires sont envoyes de la meme facon, sans rechargement : Prisme envoie les memes champs que le navigateur (bouton clique, token CSRF, fichiers, `@method('DELETE')` compris) et affiche la page vers laquelle le serveur redirige. Apres un succes, la page suivante avec son message flash ; apres une validation ratee, la meme page avec les erreurs et les anciennes valeurs, sans nouvelle entree dans l'historique, le defilement garde et le focus sur le premier champ en erreur (`aria-invalid`). Un formulaire `GET` (recherche, filtres) se comporte comme un lien vers son adresse. Un double clic n'envoie le formulaire qu'une fois, et le formulaire porte `aria-busy` pendant l'envoi.
+Les formulaires sont envoyes de la meme facon, sans rechargement : Prisme envoie les memes champs que le navigateur (bouton clique, token CSRF, fichiers, `@method('DELETE')` compris) et affiche la page vers laquelle le serveur redirige. Apres un succes, la page suivante avec son message flash ; apres une validation ratee, la meme page avec les erreurs et les anciennes valeurs, sans nouvelle entree dans l'historique, le defilement garde et le focus sur le premier champ en erreur (`aria-invalid`). Un formulaire `GET` (recherche, filtres) se comporte comme un lien vers son adresse. Un double clic n'envoie le formulaire qu'une fois. Pendant l'envoi, le formulaire porte `aria-busy` et le bouton clique `aria-disabled` et `data-prisme-submitting` : au-dela de 150 ms, un `PrButton` affiche le meme indicateur qu'avec `loading` (un autre bouton, seulement le curseur d'attente).
 
 Un formulaire n'est jamais envoye deux fois. Quand sa reponse ne peut pas remplacer le contenu :
 
@@ -323,7 +323,7 @@ Un formulaire n'est jamais envoye deux fois. Quand sa reponse ne peut pas rempla
 - une redirection vers un autre site (SSO) ou vers une page d'une autre mise en page est suivie normalement ;
 - une page d'erreur renvoyee par le formulaire lui-meme (session expiree 419, erreur 500) est affichee telle quelle.
 
-Seule exception : si la reponse n'arrive pas du tout (connexion coupee), le navigateur renvoie lui-meme le formulaire et affiche sa propre erreur, comme sans Prisme.
+Seule exception : si la reponse n'arrive pas (connexion coupee, ou redirection vers un autre site que le navigateur refuse de lire), le navigateur renvoie lui-meme le formulaire. Un formulaire qui redirige vers un autre site (connexion OAuth, paiement) doit donc porter `data-prisme-reload`, sinon son action s'execute deux fois.
 
 Le navigateur garde l'envoi des formulaires deja geres par l'app (`@submit.prevent`, un `onsubmit="return confirm(...)"` refuse), de ceux qui ont une `target`, qui vont vers un autre site ou vers une adresse contenant `logout`, et de ceux marques `data-prisme-reload` (sur le formulaire, un parent ou le bouton).
 

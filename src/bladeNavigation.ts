@@ -28,6 +28,9 @@ export const MARKER = 'data-prisme'
 /** Links never handled: opened elsewhere, downloads, logouts, opted out with `data-prisme-reload`. */
 const EXCLUDED_LINKS = '[download], [target]:not([target="_self"]), [data-prisme-reload] a, a[data-prisme-reload]'
 
+/** On the button of a form being sent, styled in layout.css. */
+const SUBMITTING = 'data-prisme-submitting'
+
 /** Forms always sent the browser's way, opted out with `data-prisme-reload` (see `requestOf` for the rest). */
 const EXCLUDED_FORMS = '[data-prisme-reload] form, form[data-prisme-reload]'
 
@@ -438,9 +441,20 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
     if (submitting.has(form)) return
     submitting.add(form)
     form.setAttribute('aria-busy', 'true')
+    // The button pressed shows it is working (styles.css, after a short delay) and cannot be pressed again.
+    const button = submitter ?? form.querySelector<HTMLElement>('button:not([type]), [type="submit"]')
+    const wasDisabled = button?.getAttribute('aria-disabled')
+    button?.setAttribute(SUBMITTING, '')
+    button?.setAttribute('aria-disabled', 'true')
     void submit(form, submitter, formRequest).finally(() => {
       submitting.delete(form)
       form.removeAttribute('aria-busy')
+      button?.removeAttribute(SUBMITTING)
+      if (wasDisabled == null) {
+        button?.removeAttribute('aria-disabled')
+      } else {
+        button?.setAttribute('aria-disabled', wasDisabled)
+      }
     })
   }, listen)
 
@@ -452,21 +466,36 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
 
   if (!options.prefetch) return
 
+  const prefetchableLink = (target: EventTarget | null): HTMLAnchorElement | null => {
+    const link = (target as Element | null)?.closest?.('a[href]')
+    if (!(link instanceof HTMLAnchorElement) || link.matches('[data-no-prefetch], [data-no-prefetch] a') || !isNavigableLink(link)) return null
+    return link
+  }
+
+  const prefetch = (link: HTMLAnchorElement): void => {
+    const url = withoutHash(link.href)
+    const entry = prefetched.get(url)
+    if (url === currentUrl || (entry && Date.now() - entry.at < PREFETCH_TTL)) return
+    prefetched.set(url, { page: fetchPage(link.href).catch(() => null), at: Date.now() })
+  }
+
   // Hover prefetch that works in every browser (Speculation Rules would load pages a swap never uses).
   let hoverTimer: ReturnType<typeof setTimeout> | undefined
   document.addEventListener('pointerover', (event) => {
-    const link = (event.target as Element | null)?.closest?.('a[href]')
-    if (!(link instanceof HTMLAnchorElement) || link.matches('[data-no-prefetch], [data-no-prefetch] a') || !isNavigableLink(link)) return
+    const link = prefetchableLink(event.target)
+    if (!link) return
 
     clearTimeout(hoverTimer)
-    hoverTimer = setTimeout(() => {
-      const url = withoutHash(link.href)
-      const entry = prefetched.get(url)
-      if (url === currentUrl || (entry && Date.now() - entry.at < PREFETCH_TTL)) return
-      prefetched.set(url, { page: fetchPage(link.href).catch(() => null), at: Date.now() })
-    }, HOVER_DELAY)
+    hoverTimer = setTimeout(() => prefetch(link), HOVER_DELAY)
   }, listen)
   document.addEventListener('pointerout', () => clearTimeout(hoverTimer), listen)
+
+  // A finger never hovers: the page is fetched as soon as it touches a link, a moment before the click.
+  document.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse') return
+    const link = prefetchableLink(event.target)
+    if (link) prefetch(link)
+  }, { ...listen, passive: true })
 }
 
 function measure(startedAt: number, url: string): void {
