@@ -2,6 +2,28 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.13.1 (2026-10-07)
+
+### Corrections
+
+- **Champs utilises sans `v-model`** (formulaire Blade classique, avec seulement `name` et `default-value`) : `PrRadioGroup` restait fige sur sa valeur par defaut, `PrTagInput` n'affichait ni n'envoyait les tags, `PrCombobox` envoyait une valeur vide, les boutons +/- de `PrNumberInput` ne faisaient rien, l'element choisi de `PrToggleGroup` devenait invisible et `PrRichTextEditor` envoyait le texte d'origine au lieu du texte modifie. Chacun garde maintenant sa valeur en local, comme `PrSlider` ; un `v-model` reste prioritaire. `PrTagInput`, `PrCombobox`, `PrNumberInput`, `PrToggleGroup` et `PrFileUpload` acceptent un `default-value`.
+- **`PrFileUpload` envoie enfin ses fichiers** dans un formulaire natif : les fichiers deposes ou ajoutes en plusieurs fois etaient perdus, et `required` bloquait l'envoi.
+- `PrCombobox` en choix multiple avec `required` bloquait l'envoi une fois des options choisies.
+- **`PrToast`** : la barre de progression s'arrete quand le toast est survole, a le focus ou que la fenetre est en arriere-plan, comme le minuteur de fermeture (avant, la barre se terminait et le toast restait affiche). La mise en page en 3 colonnes faisait passer la croix a la ligne avec une icone et une action, et repoussait un texte court vers la droite : elle est remplacee par un flex.
+- `PrNumberInput` et `PrTagInput` (et leurs types) sont exportes par l'entree principale ; un test verifie desormais que tout composant enregistre l'est aussi.
+
+### Accessibilite
+
+- `PrRadioGroup` est nomme par son libelle (`aria-labelledby`) : un lecteur d'ecran annonce la question avant les options.
+- Bouton `danger` en theme sombre : texte blanc sur rouge a 2,77:1, porte a 4,83:1 avec les nouveaux tokens `--pr-color-danger-solid` et `--pr-color-danger-solid-hover` (aussi utilises par les pastilles de la sidebar).
+- `aria-describedby` ne pointe plus vers l'aide quand l'erreur l'a remplacee (`PrRadioGroup`, `PrTagInput`, `PrCombobox`, `PrNumberInput`, `PrToggleGroup`).
+- Accents retablis dans les textes lus par les lecteurs d'ecran (« Page précédente », « Sélectionner », « Réduire la navigation », « Passer en thème sombre »...).
+
+### Publication
+
+- Merger `develop` dans `main` publie la version de `package.json` sur npm, puis cree le tag et la release GitHub (voir README, « Publier une version »). Les tests tournent sans droits, la publication dans un job a part.
+- Nouveau workflow `ci.yml` : verification des types, tests et build sur chaque PR et sur `develop`.
+
 ## 0.13.0 (2026-09-30)
 
 ### Changements cassants
