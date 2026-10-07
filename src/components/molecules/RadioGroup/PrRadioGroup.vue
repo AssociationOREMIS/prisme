@@ -3,6 +3,7 @@ import { computed, ref, useId, watch } from 'vue'
 import { Circle } from '@lucide/vue'
 import { RadioGroupIndicator, RadioGroupItem, RadioGroupRoot } from 'reka-ui'
 import { PrLabel } from '../../atoms/Label'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrRadioOption {
   label: string
@@ -17,7 +18,7 @@ export interface PrRadioGroupProps {
   options?: PrRadioOption[]
   label?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   name?: string
   orientation?: 'horizontal' | 'vertical'
   disabled?: boolean
@@ -36,6 +37,9 @@ const props = withDefaults(defineProps<PrRadioGroupProps>(), {
   disabled: false,
   required: false,
 })
+
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -58,7 +62,7 @@ const hintId = computed(() => `pr-radio-group-${generatedId}-hint`)
 const errorId = computed(() => `pr-radio-group-${generatedId}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -88,7 +92,7 @@ function updateValue(value: unknown) {
       :disabled="disabled"
       :required="required"
       :name="name"
-      :aria-invalid="error ? 'true' : undefined"
+      :aria-invalid="errorText ? 'true' : undefined"
       :aria-labelledby="label ? labelId : undefined"
       :aria-describedby="describedBy"
       @update:model-value="updateValue"
@@ -117,7 +121,7 @@ function updateValue(value: unknown) {
         </span>
       </label>
     </RadioGroupRoot>
-    <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

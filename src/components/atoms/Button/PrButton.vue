@@ -8,6 +8,8 @@ export interface PrButtonProps {
   type?: 'button' | 'submit' | 'reset'
   disabled?: boolean
   loading?: boolean
+  /** Renders a link (`<a>`) styled as a button: for navigation, a button inside a link is not accessible. */
+  href?: string
 }
 
 const props = withDefaults(defineProps<PrButtonProps>(), {
@@ -16,6 +18,7 @@ const props = withDefaults(defineProps<PrButtonProps>(), {
   type: 'button',
   disabled: false,
   loading: false,
+  href: undefined,
 })
 
 const isUnavailable = computed(() => props.disabled || props.loading)
@@ -30,6 +33,8 @@ const buttonBaseClass = [
   'duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]',
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]',
   'disabled:cursor-not-allowed disabled:opacity-[0.58]',
+  // A link has no `disabled`: aria-disabled, and no pointer events so neither hover nor click.
+  'aria-disabled:pointer-events-none aria-disabled:opacity-[0.58]',
   '[&_svg]:shrink-0',
 ]
 
@@ -58,10 +63,16 @@ const buttonClass = computed(() => [
 </script>
 
 <template>
-  <button
+  <!-- A link when `href` is given. A disabled link drops its href (not focusable, not
+       followed) and is announced as a disabled link. -->
+  <component
+    :is="href ? 'a' : 'button'"
     :class="buttonClass"
-    :type="type"
-    :disabled="isUnavailable"
+    :type="href ? undefined : type"
+    :disabled="href ? undefined : isUnavailable"
+    :href="href && !isUnavailable ? href : undefined"
+    :role="href && isUnavailable ? 'link' : undefined"
+    :aria-disabled="href && isUnavailable ? 'true' : undefined"
     :aria-busy="loading ? 'true' : undefined"
     :data-loading="loading ? 'true' : 'false'"
   >
@@ -79,5 +90,5 @@ const buttonClass = computed(() => [
     >
       <slot />
     </span>
-  </button>
+  </component>
 </template>

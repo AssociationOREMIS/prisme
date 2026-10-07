@@ -3,6 +3,7 @@ import { CircleCheck, CircleX, FileUp, RotateCw, X } from '@lucide/vue'
 import { computed, reactive, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 import { PrProgress } from '../../atoms/Progress'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrRejectedFile {
   file: File
@@ -14,7 +15,7 @@ export type PrFileUploadStatus = 'idle' | 'uploading' | 'success' | 'error'
 export interface PrFileUploadFileState {
   status: PrFileUploadStatus
   progress: number
-  error?: string
+  error?: PrFieldError
 }
 
 export interface PrFileUploadProps {
@@ -56,6 +57,9 @@ const props = withDefaults(defineProps<PrFileUploadProps>(), {
   id: undefined,
   upload: undefined,
 })
+
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
 
 const emit = defineEmits<{
   'update:modelValue': [files: File[]]
@@ -110,7 +114,7 @@ const hintId = computed(() => `${fieldId.value}-hint`)
 const errorId = computed(() => `${fieldId.value}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -263,11 +267,11 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       :class="{
         'border-[var(--pr-color-primary)] bg-[var(--pr-color-surface-subtle)]': isDraggingOver,
         'cursor-not-allowed opacity-60': disabled,
-        'border-[var(--pr-color-danger)]': Boolean(error) && !isDraggingOver,
+        'border-[var(--pr-color-danger)]': Boolean(errorText) && !isDraggingOver,
         'hover:border-[var(--pr-color-primary)] hover:bg-[var(--pr-color-surface-subtle)]': !disabled,
       }"
       :aria-disabled="disabled"
-      :aria-invalid="error ? 'true' : undefined"
+      :aria-invalid="errorText ? 'true' : undefined"
       :aria-labelledby="label ? `${labelId} ${instructionsId}` : undefined"
       :aria-describedby="describedBy"
       tabindex="0"
@@ -345,7 +349,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         </button>
       </li>
     </ul>
-    <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

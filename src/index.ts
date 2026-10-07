@@ -122,6 +122,7 @@ export type {
 } from './components/registry'
 
 export { fromLaravelPaginator } from './components/registry'
+export type { PrFieldError } from './components/fieldError'
 export type {
   LaravelFlatPaginatorResponse,
   LaravelPaginatorMeta,

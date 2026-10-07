@@ -1,0 +1,7 @@
+/* Roboto, self-hosted: `@oremis/prisme/fonts.css`, imported before styles.css. The app's
+   bundler serves the font files itself, so no visitor IP goes to Google Fonts (RGPD). The
+   weights Prisme uses: 300, 400, 500 (components) and 700 (headings, buttons). */
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';

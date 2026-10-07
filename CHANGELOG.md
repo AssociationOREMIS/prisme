@@ -2,6 +2,28 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.15.0 (2026-10-07)
+
+### Ajouts
+
+- **`@oremis/prisme/styles-scoped.css`** : la feuille de Prisme pour une page Bootstrap (ou autre). Aucune regle sur `html`, `body` ou les elements nus, et chaque classe utilitaire ne s'applique qu'aux elements Prisme et a leur contenu. `styles.css` definit des `.collapse`, `.container`, `.table`, `.border`... sans prefixe : `.collapse { visibility: collapse }` cachait la sidebar repliable de Bootstrap. Les composants s'ecrivent ensuite dans la page, sans shadow DOM (voir README).
+- **`@oremis/prisme/fonts.css`** : Roboto auto-hebergee (`@fontsource/roboto`, desormais dependance de Prisme), en une ligne au lieu de quatre imports.
+- **`PrButton` avec `href`** rend un vrai lien `<a>` style comme un bouton (desactive : sans `href`, `aria-disabled`).
+- **`PrSelect` accepte une option vide** (`{ value: '' }`, « Aucun ») : reka-ui la refusait ; v-model et formulaire recoivent `''`.
+- **`error` accepte le tableau de messages de Laravel** sur tous les champs (`string | string[]`, premier message affiche). Type `PrFieldError` exporte.
+- `PrNavbar` : `hide-title-on-mobile` (garde seulement le logo sous 780 px). `PrNavbarUserMenu` : emplacement `header` pour des lignes supplementaires dans l'en-tete du menu.
+
+### Corrections
+
+- **`PrCheckbox` avec `default-checked` sans valeur** (usage Blade) restait decochee : le type importe de reka empechait Vue de reconnaitre un booleen.
+- `PrPagination` change de page sans `v-model:page`.
+
+### Tests
+
+- Interactions de `PrCheckbox`, `PrSwitch`, `PrToggle`, `PrDatePicker` et `PrPagination`, avec et sans `v-model` ; option vide de `PrSelect` ; lien `PrButton` ; tableau d'erreurs.
+- Tests unitaires de `usePrTheme` et de `getPrThemeInitScript` (le script avant Vue applique le meme theme), et de la transformation de `styles-scoped.css`.
+- `TESTING.md` a jour.
+
 ## 0.14.0 (2026-10-07)
 
 ### Changements visibles

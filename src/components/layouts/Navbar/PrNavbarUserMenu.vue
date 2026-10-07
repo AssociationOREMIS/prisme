@@ -26,6 +26,7 @@ const props = withDefaults(defineProps<PrNavbarUserMenuProps>(), {
 // Declared rather than inferred: the inferred slot type copied reka's whole DropdownMenuItem
 // type into the published .d.ts, which fails type checking in apps with other Vue/TS versions.
 defineSlots<{
+  header?: () => unknown
   default?: (props: {
     item: Component
     separator: Component
@@ -68,6 +69,8 @@ const rolesLabel = computed(() => (
         <div class="overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-sm)] font-semibold text-[color:var(--pr-color-text)]">{{ displayName }}</div>
         <div v-if="email" class="overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-xs)] text-[color:var(--pr-color-text-muted)]">{{ email }}</div>
         <div class="overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-xs)] text-[color:var(--pr-color-text-muted)]">{{ rolesLabel }}</div>
+        <!-- Extra lines of the header (e.g. the role in the current app), below the roles. -->
+        <slot name="header" />
       </div>
 
       <slot

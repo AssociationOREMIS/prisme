@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { SwitchRoot, SwitchThumb } from 'reka-ui'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrSwitchProps {
   checked?: boolean
@@ -8,7 +9,7 @@ export interface PrSwitchProps {
   label?: string
   description?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   id?: string
@@ -31,6 +32,9 @@ const props = withDefaults(defineProps<PrSwitchProps>(), {
   value: undefined,
 })
 
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
+
 const emit = defineEmits<{
   'update:checked': [value: boolean]
 }>()
@@ -44,7 +48,7 @@ const hintId = computed(() => `pr-switch-${generatedId}-hint`)
 const errorId = computed(() => `pr-switch-${generatedId}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -73,13 +77,13 @@ const switchClass = computed(() => [
       :id="id"
       :name="name"
       :value="value"
-      :aria-invalid="error ? 'true' : undefined"
+      :aria-invalid="errorText ? 'true' : undefined"
       :aria-describedby="describedBy"
       @update:model-value="emit('update:checked', $event)"
     >
       <SwitchThumb class="pr-switch__thumb block size-4 translate-x-0 rounded-[var(--pr-radius-full)] bg-[var(--pr-color-surface)] shadow-[var(--pr-shadow-xs)] transition-transform duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] data-[state=checked]:translate-x-4" />
     </SwitchRoot>
   </label>
-  <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+  <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
   <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>

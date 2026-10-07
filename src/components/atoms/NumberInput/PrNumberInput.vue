@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { Minus, Plus } from '@lucide/vue'
 import { computed, ref, useId, watch } from 'vue'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrNumberInputProps {
   modelValue?: number
   defaultValue?: number
   label?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   min?: number
@@ -34,6 +35,9 @@ const props = withDefaults(defineProps<PrNumberInputProps>(), {
   name: undefined,
 })
 
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
+
 const emit = defineEmits<{
   'update:modelValue': [value: number]
 }>()
@@ -44,7 +48,7 @@ const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -143,7 +147,7 @@ defineOptions({ inheritAttrs: false })
     </label>
     <div
       class="pr-number-input__control inline-flex min-h-[2.375rem] w-full overflow-hidden rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] transition-[border-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
-      :class="{ 'border-[var(--pr-color-danger)]': Boolean(error) }"
+      :class="{ 'border-[var(--pr-color-danger)]': Boolean(errorText) }"
     >
       <button
         type="button"
@@ -168,7 +172,7 @@ defineOptions({ inheritAttrs: false })
         :disabled="disabled"
         :required="required"
         :name="name"
-        :aria-invalid="error ? 'true' : undefined"
+        :aria-invalid="errorText ? 'true' : undefined"
         :aria-describedby="describedBy"
         @input="onInput"
         @focus="onFocus"
@@ -185,7 +189,7 @@ defineOptions({ inheritAttrs: false })
         <Plus :size="14" aria-hidden="true" />
       </button>
     </div>
-    <p v-if="error" :id="errorId" class="pr-number-input__message pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-number-input__message pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-number-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

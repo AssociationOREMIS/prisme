@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, useAttrs, useId } from 'vue'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrInputProps {
   modelValue?: string | number
   label?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   type?: string
@@ -27,6 +28,9 @@ const props = withDefaults(defineProps<PrInputProps>(), {
   name: undefined,
 })
 
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
+
 // Without a model-value, a plain Blade `value="{{ old('x') }}"` (in $attrs) fills the field:
 // binding an empty modelValue default after $attrs used to wipe it.
 const attrs = useAttrs()
@@ -42,7 +46,7 @@ const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -52,12 +56,12 @@ const inputClass = computed(() => [
 
 const inputControlClass = computed(() => [
   'pr-input__control min-h-[2.375rem] w-full rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] text-[length:var(--pr-font-size-md)] text-[color:var(--pr-color-text)] transition-[background-color,border-color,box-shadow] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] placeholder:text-[color:var(--pr-color-text-subtle)] hover:not-disabled:border-[var(--pr-neutral-400)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] disabled:cursor-not-allowed disabled:bg-[var(--pr-color-surface-subtle)] disabled:text-[color:var(--pr-color-text-muted)]',
-  props.error ? 'border-[var(--pr-color-danger)]' : '',
+  errorText.value ? 'border-[var(--pr-color-danger)]' : '',
 ])
 
 const inputMessageClass = computed(() => [
   'pr-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)]',
-  props.error
+  errorText.value
     ? 'pr-input__message--error pr-field-message--error text-[color:var(--pr-color-danger)]'
     : 'text-[color:var(--pr-color-text-muted)]',
 ])
@@ -92,13 +96,13 @@ defineOptions({ inheritAttrs: false })
       :placeholder="placeholder"
       :disabled="disabled"
       :required="required"
-      :aria-invalid="error ? 'true' : undefined"
+      :aria-invalid="errorText ? 'true' : undefined"
       :aria-describedby="describedBy"
       @input="updateValue"
     >
 
-    <p v-if="error" :id="errorId" :class="inputMessageClass">
-      {{ error }}
+    <p v-if="errorText" :id="errorId" :class="inputMessageClass">
+      {{ errorText }}
     </p>
     <p v-else-if="hint" :id="hintId" :class="inputMessageClass">
       {{ hint }}

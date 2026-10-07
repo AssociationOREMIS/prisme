@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, within } from 'storybook/test'
 import { PrButton } from '../../../../components/atoms/Button'
 import '../../../stories.css'
 
@@ -91,4 +92,34 @@ export const Playground: Story = {
     },
     template: '<PrButton v-bind="args">Action</PrButton>',
   }),
+}
+
+// With `href`, PrButton is a real link styled as a button (navigation must not be a <button>
+// inside an <a>). A disabled link loses its href and is announced as disabled.
+// noinspection JSUnusedGlobalSymbols
+export const AsLink: Story = {
+  render: () => ({
+    components: { PrButton },
+    template: `
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <PrButton>Bouton</PrButton>
+        <PrButton href="#fiche">Voir la fiche</PrButton>
+        <PrButton href="#fiche" variant="secondary">Retour</PrButton>
+        <PrButton href="#fiche" disabled>Indisponible</PrButton>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const link = canvas.getByRole('link', { name: 'Voir la fiche' })
+    await expect(link.tagName).toBe('A')
+    await expect(link).toHaveAttribute('href', '#fiche')
+    await expect(link).not.toHaveAttribute('type')
+    // Same look as a real button of the same variant.
+    await expect(getComputedStyle(link).backgroundColor).toBe(getComputedStyle(canvas.getByRole('button', { name: 'Bouton' })).backgroundColor)
+
+    const disabled = canvas.getByRole('link', { name: 'Indisponible' })
+    await expect(disabled).not.toHaveAttribute('href')
+    await expect(disabled).toHaveAttribute('aria-disabled', 'true')
+  },
 }

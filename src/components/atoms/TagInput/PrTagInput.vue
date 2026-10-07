@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { X } from '@lucide/vue'
 import { computed, ref, useId, watch } from 'vue'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrTagInputProps {
   modelValue?: string[]
   defaultValue?: string[]
   label?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   placeholder?: string
@@ -30,6 +31,9 @@ const props = withDefaults(defineProps<PrTagInputProps>(), {
   name: undefined,
 })
 
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
+
 const emit = defineEmits<{
   'update:modelValue': [value: string[]]
 }>()
@@ -40,7 +44,7 @@ const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 const inputRef = ref<HTMLInputElement | null>(null)
@@ -139,7 +143,7 @@ defineOptions({ inheritAttrs: false })
     <div
       class="pr-tag-input__field flex min-h-[2.375rem] w-full flex-wrap items-center gap-[var(--pr-space-1)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-2)] py-[var(--pr-space-1)] transition-[border-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
       :class="{
-        'border-[var(--pr-color-danger)]': Boolean(error),
+        'border-[var(--pr-color-danger)]': Boolean(errorText),
         'cursor-text': !disabled,
         'cursor-not-allowed opacity-60': disabled,
       }"
@@ -172,7 +176,7 @@ defineOptions({ inheritAttrs: false })
         :placeholder="tags.length === 0 ? placeholder : undefined"
         :disabled="disabled || !canAddMore"
         :required="required && tags.length === 0"
-        :aria-invalid="error ? 'true' : undefined"
+        :aria-invalid="errorText ? 'true' : undefined"
         :aria-describedby="describedBy"
         @keydown="onKeydown"
         @blur="onBlur"
@@ -184,7 +188,7 @@ defineOptions({ inheritAttrs: false })
     <template v-if="name">
       <input v-for="(tag, index) in tags" :key="`${inputId}-${index}`" type="hidden" :name="name" :value="tag">
     </template>
-    <p v-if="error" :id="errorId" class="pr-tag-input__message pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-tag-input__message pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-tag-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>
