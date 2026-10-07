@@ -3,7 +3,7 @@ import { createApp, defineComponent, h, nextTick, ref, type App } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { registerPrisme } from './blade'
 
-// navigation: 'swap' replaces the page's #app without reloading: the shell keeps its components
+// navigation: 'swap' (the default) replaces the page's #app without reloading: the shell keeps its components
 // (and their state), the main content is rebuilt, and anything unusual falls back to a page load.
 
 let mountedShells = 0
@@ -166,19 +166,49 @@ describe("registerPrisme navigation: 'swap'", () => {
     expect(location.pathname).toBe('/')
   })
 
-  it('can be tried out in one browser through localStorage, without changing the app', async () => {
-    vi.stubGlobal('localStorage', { getItem: (key: string) => (key === 'prisme:navigation' ? 'swap' : null) })
+  it('is on by default, and can be turned off in one browser through localStorage', async () => {
+    const mountWithoutOption = () => {
+      document.body.innerHTML = new DOMParser().parseFromString(pageHtml('Accueil', '<a id="to-users" href="/users">Benevoles</a>'), 'text/html').body.innerHTML
+      const app = createApp({})
+      app.component('ShellCounter', ShellCounter)
+      registerPrisme(app, { prefetch: false, preload: false, transitions: false, measure: false })
+      app.mount('#app')
+      mountedApp = app
+    }
     stubServer({ '/users': { html: pageHtml('Benevoles', '<h1>Liste</h1>') } })
-    document.body.innerHTML = new DOMParser().parseFromString(pageHtml('Accueil', '<a id="to-users" href="/users">Benevoles</a>'), 'text/html').body.innerHTML
-    const app = createApp({})
-    app.component('ShellCounter', ShellCounter)
-    registerPrisme(app, { prefetch: false, preload: false, transitions: false, measure: false })
-    app.mount('#app')
-    mountedApp = app
 
+    mountWithoutOption()
     expect(click('#to-users').defaultPrevented).toBe(true)
     await settle()
     expect(document.querySelector('main h1')?.textContent).toBe('Liste')
+
+    mountedApp?.unmount()
+    vi.stubGlobal('localStorage', { getItem: (key: string) => (key === 'prisme:navigation' ? 'off' : null) })
+    mountWithoutOption()
+    const event = click('#to-users')
+    expect(event.defaultPrevented).toBe(false)
+    event.preventDefault()
+  })
+
+  it('rebuilds the content of a layout whose content is not a <main>', async () => {
+    let mountedFields = 0
+    const layout = (content: string) => `<!doctype html><html><head><title>Forge</title></head><body>
+      <div id="app"><div class="pr-shell-grid"><shell-counter></shell-counter>
+      <div class="pr-shell-grid__content">${content}</div></div></div></body></html>`
+    stubServer({ '/next': { html: layout('<page-field></page-field>') } })
+    document.body.innerHTML = new DOMParser().parseFromString(layout('<page-field></page-field><a id="next" href="/next">Suite</a>'), 'text/html').body.innerHTML
+    const app = createApp({})
+    app.component('ShellCounter', ShellCounter)
+    app.component('PageField', defineComponent({ setup: () => { mountedFields++; return () => h('input') } }))
+    registerPrisme(app, { navigation: 'swap', prefetch: false, preload: false, transitions: false, measure: false })
+    app.mount('#app')
+    mountedApp = app
+
+    click('#next')
+    await settle()
+
+    expect(mountedFields).toBe(2)
+    expect(mountedShells).toBe(1)
   })
 
   it('announces the new page and moves focus to its content', async () => {

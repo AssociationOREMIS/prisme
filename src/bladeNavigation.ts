@@ -5,12 +5,16 @@ import { compile, nextTick, shallowRef, type App, type RenderFunction, type VNod
  * `registerPrisme`). The server still answers every link with a full HTML page: a click fetches it,
  * and the app's root template is replaced by the new page's `#app`. Vue patches the difference, so
  * the navbar and sidebar keep their DOM and state (only their props change, the active item for
- * instance) while `<main class="pr-shell-grid__content">`, keyed per page, is rebuilt from scratch.
+ * instance) while the content (`.pr-shell-grid__content`), keyed per page, is rebuilt from scratch.
+ * A layout without that element is rebuilt whole: nothing kept, but nothing carried over either.
  *
  * Anything a swap could not reproduce falls back to a normal page load: another layout or other
  * scripts and stylesheets (a page with its own `@push('scripts')`), a non-HTML answer (a download),
  * a network error, a redirect to another site (an expired session sent to the SSO).
  */
+
+/** The part of the layout that changes from one page to the next. */
+const CONTENT = '.pr-shell-grid__content'
 
 /** Marker on the elements Prisme adds, shared with blade.ts. */
 export const MARKER = 'data-prisme'
@@ -110,7 +114,8 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
 
   let pageKey = 0
   const keyMain = (appElement: Element): void => {
-    appElement.querySelector('main.pr-shell-grid__content')?.setAttribute('key', `prisme-page-${pageKey++}`)
+    const content = appElement.querySelector(CONTENT) ?? appElement.firstElementChild
+    content?.setAttribute('key', `prisme-page-${pageKey++}`)
   }
 
   // Without hoisting: static content compiled to a single HTML string is never patched in production.
@@ -288,7 +293,7 @@ function restoreScroll(scrollY: number, hash: string): void {
 
 /** Screen readers hear the new page's title, and keyboard focus restarts at the content. */
 function announce(container: Element, title: string): void {
-  const main = container.querySelector<HTMLElement>('main.pr-shell-grid__content')
+  const main = container.querySelector<HTMLElement>(CONTENT)
   if (main) {
     if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1')
     main.focus({ preventScroll: true })

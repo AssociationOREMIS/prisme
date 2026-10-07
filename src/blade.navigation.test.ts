@@ -11,7 +11,8 @@ function mountApp(options: RegisterPrismeOptions = {}) {
   const root = document.createElement('div')
   document.body.append(root)
   const app = createApp({ template: '<p>page</p>' })
-  registerPrisme(app, options)
+  // Swap navigation fetches pages itself, without Speculation Rules: tested in bladeNavigation.test.ts.
+  registerPrisme(app, { navigation: false, ...options })
   app.mount(root)
   return app
 }
@@ -65,7 +66,7 @@ describe('registerPrisme after mount', () => {
 
   it('opts into view transitions only once mounted, keeping the navbar and sidebar still', () => {
     const app = createApp({})
-    registerPrisme(app)
+    registerPrisme(app, { navigation: false })
     expect(transitionsStyle()).toBeNull()
 
     app.mount(document.body.appendChild(document.createElement('div')))

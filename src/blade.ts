@@ -38,8 +38,8 @@ export interface RegisterPrismeOptions {
    * `'swap'` shows the next page without reloading: links are fetched and only the page's `#app` is
    * patched, so the navbar and sidebar stay in place in every browser (see bladeNavigation.ts). Pages
    * with other scripts or stylesheets, downloads and `data-prisme-reload` links still load normally.
-   * Default false while it is being tried out: `localStorage['prisme:navigation'] = 'swap'` turns it
-   * on in one browser, without changing the app.
+   * On by default; `false` turns it off for the app, and `localStorage['prisme:navigation'] = 'off'`
+   * in one browser (to compare, or to rule it out when something looks wrong).
    */
   navigation?: 'swap' | false
 }
@@ -85,7 +85,7 @@ export function registerPrisme(app: App, options: RegisterPrismeOptions = {}): v
   const mount = app.mount
 
   app.mount = (...args: Parameters<App['mount']>) => {
-    const swap = (options.navigation ?? triedNavigation()) === 'swap'
+    const swap = options.navigation === undefined ? navigationInThisBrowser() !== 'off' : options.navigation === 'swap'
     const container = typeof args[0] === 'string' ? document.querySelector(args[0]) : args[0]
     if (swap && container instanceof Element) enableSwapNavigation(app, container, { prefetch: Boolean(prefetch) })
 
@@ -165,8 +165,8 @@ function measureMount(): void {
   console.debug(`[prisme] Vue monte en ${Math.round(entry.duration)} ms${prerendered ? ' (page prechargee, avant son ouverture)' : ''}`)
 }
 
-/** The navigation someone is trying out in their own browser, if any. */
-function triedNavigation(): string | null {
+/** The navigation chosen in this browser, if any (`'off'` to load every page in full). */
+function navigationInThisBrowser(): string | null {
   try {
     return localStorage.getItem('prisme:navigation')
   } catch {
