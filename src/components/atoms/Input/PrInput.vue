@@ -5,6 +5,8 @@ import { useErrorText, type PrFieldError } from '../../fieldError'
 export interface PrInputProps {
   modelValue?: string | number
   label?: string
+  /** Keeps the label for screen readers only: a compact form on one line (a search, a filter). */
+  hideLabel?: boolean
   hint?: string
   error?: PrFieldError
   disabled?: boolean
@@ -18,6 +20,7 @@ export interface PrInputProps {
 const props = withDefaults(defineProps<PrInputProps>(), {
   modelValue: undefined,
   label: undefined,
+  hideLabel: false,
   hint: undefined,
   error: undefined,
   disabled: false,
@@ -79,7 +82,8 @@ defineOptions({ inheritAttrs: false })
   <div :class="inputClass">
     <label
       v-if="label"
-      class="pr-input__label inline-flex w-fit items-baseline gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)]"
+      class="pr-input__label"
+      :class="hideLabel ? 'sr-only' : 'inline-flex w-fit items-baseline gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)]'"
       :for="inputId"
     >
       <span>{{ label }}</span>
