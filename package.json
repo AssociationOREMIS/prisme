@@ -52,6 +52,7 @@
     "type-check": "vue-tsc -p tsconfig.build.json --noEmit",
     "prebuild": "npm run generate:paths",
     "build": "node scripts/build.mjs && vue-tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build",
     "pretest": "npm run generate:paths",
     "test": "vitest run",
     "preview": "vite preview",
