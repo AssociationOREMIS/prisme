@@ -1,23 +1,15 @@
-/* Same layer order as Tailwind v4, declared first so it holds whichever stylesheet the browser
-   reads first (the app's or Prisme's). Prisme's own classes (Tailwind utilities generated from its
-   components, the shell, RTL and editor content) go in `components`: an app's utilities, in
-   `utilities`, always win over them (`hidden md:flex` on an app element, `class="w-full"` on a
-   Prisme component), and Prisme's still win over the app's reset in `base`. Unlayered CSS from an
-   app beats every layer. Tokens and themes only declare custom properties: they stay unlayered. */
-@layer theme, base, components, utilities;
-
 @import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(components) source(none);
+@import "tailwindcss/utilities.css" source(none);
 @import "./tokens.css";
 @import "./themes.css";
-@import "./reset.css" layer(base);
+@import "./reset.css";
 @import "./animations.css";
-@import "./layout.css" layer(components);
-@import "./rtl.css" layer(components);
+@import "./layout.css";
+@import "./rtl.css";
 /* PrRichTextEditor lives in the separate `@oremis/prisme/editor` JS entry (so the
    main entry doesn't require tiptap), but its CSS still ships here: consumers keep
    importing a single `styles.css`, whichever entry their components come from. */
-@import "./editor-content.css" layer(components);
-@import "../components/molecules/RichTextEditor/rich-text-editor.css" layer(components);
+@import "./editor-content.css";
+@import "../components/molecules/RichTextEditor/rich-text-editor.css";
 
 @source "../components";

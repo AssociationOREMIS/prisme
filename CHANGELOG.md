@@ -6,7 +6,6 @@ Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement 
 
 ### Changements visibles
 
-- **Les classes de Prisme passent dans la couche CSS `components`** (et son reset dans `base`), dans l'ordre de Tailwind v4 (`theme, base, components, utilities`). Elles etaient hors couche et gagnaient contre tous les utilitaires de l'app : `hidden md:flex` ou `hidden peer-checked:flex` ne fonctionnaient pas. Desormais les utilitaires de l'app gagnent, y compris une classe posee sur un composant Prisme (`class="w-full"`). A verifier dans une app : du CSS ecrit hors couche passe maintenant devant les composants Prisme (`styles-scoped.css`, pour les pages Bootstrap, ne change pas).
 - `PrButton` sans `variant` reste `primary`, sauf avec `action` (`ghost`).
 
 ### Ajouts
@@ -23,11 +22,11 @@ Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement 
 ### Corrections
 
 - **Plus d'erreur « Transition was aborted because of invalid state » a l'envoi d'un formulaire.** Avec la navigation sans rechargement, Prisme n'active plus les transitions entre documents (ses transitions restent dans la page) ; sans elle, la transition est annulee avant de partir quand un formulaire est envoye.
-- `PrRichTextEditor` n'importe plus une seconde fois ses styles (hors couche) : ils sont dans `styles.css`.
+- `PrRichTextEditor` n'importe plus une seconde fois ses styles : ils sont dans `styles.css`.
 
 ### Tests
 
-- Utilitaires d'app contre classes Prisme, actions et boutons a icone (infobulle, carre, ton), valeur decochee envoyee, libelle cache, contenu replie envoye, transitions apres un envoi de formulaire.
+- Les notifications restent en bas a droite quand l'app genere les memes classes que Prisme (`top-0`, `w-full`...). Actions et boutons a icone (infobulle, carre, ton), valeur decochee envoyee, libelle cache, contenu replie envoye, transitions apres un envoi de formulaire.
 
 ## 0.16.1 (2026-10-07)
 
