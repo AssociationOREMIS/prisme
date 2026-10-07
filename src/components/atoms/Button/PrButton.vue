@@ -46,7 +46,7 @@ const buttonVariantClass: Record<NonNullable<PrButtonProps['variant']>, string> 
   ghost:
     'bg-transparent text-[color:var(--pr-color-text)] [&:not(:disabled):hover]:bg-[var(--pr-color-surface-subtle)]',
   danger:
-    'bg-[var(--pr-color-danger)] text-[color:var(--pr-neutral-0)] shadow-[var(--pr-shadow-xs)] [&:not(:disabled):hover]:bg-[var(--pr-color-danger-hover)]',
+    'bg-[var(--pr-color-danger-solid)] text-[color:var(--pr-neutral-0)] shadow-[var(--pr-shadow-xs)] [&:not(:disabled):hover]:bg-[var(--pr-color-danger-solid-hover)]',
 }
 
 const buttonClass = computed(() => [

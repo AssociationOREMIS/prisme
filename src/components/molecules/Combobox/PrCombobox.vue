@@ -11,7 +11,7 @@ import {
   ComboboxRoot,
   ComboboxViewport,
 } from 'reka-ui'
-import { computed, useId } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 
 export interface PrComboboxOption {
@@ -22,6 +22,7 @@ export interface PrComboboxOption {
 
 export interface PrComboboxProps {
   modelValue?: string | string[]
+  defaultValue?: string | string[]
   options?: PrComboboxOption[]
   placeholder?: string
   searchPlaceholder?: string
@@ -37,6 +38,7 @@ export interface PrComboboxProps {
 
 const props = withDefaults(defineProps<PrComboboxProps>(), {
   modelValue: undefined,
+  defaultValue: undefined,
   options: () => [],
   placeholder: 'Sélectionner',
   searchPlaceholder: 'Rechercher...',
@@ -58,12 +60,26 @@ const generatedId = useId()
 const inputId = computed(() => props.id ?? `pr-combobox-${generatedId}`)
 const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids: string[] = []
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
+
+// Without a v-model (a plain Blade form), keep the selection locally so it shows and gets
+// submitted through the hidden inputs; a real v-model still takes priority.
+const internalValue = ref(props.modelValue ?? props.defaultValue ?? (props.multiple ? [] : undefined))
+
+watch(() => props.modelValue, (value) => {
+  if (value !== undefined) internalValue.value = value
+})
+
+const currentValue = computed(() => props.modelValue ?? internalValue.value)
+
+function setValue(value: string | string[]) {
+  internalValue.value = value
+  emit('update:modelValue', value)
+}
 
 const displayValue = computed(() => (val: string | string[]) => {
   if (Array.isArray(val)) {
@@ -73,17 +89,17 @@ const displayValue = computed(() => (val: string | string[]) => {
 })
 
 const hasValue = computed(() => {
-  if (Array.isArray(props.modelValue)) return props.modelValue.length > 0
-  return Boolean(props.modelValue)
+  if (Array.isArray(currentValue.value)) return currentValue.value.length > 0
+  return Boolean(currentValue.value)
 })
 
 function clearValue() {
-  emit('update:modelValue', props.multiple ? [] : '')
+  setValue(props.multiple ? [] : '')
 }
 
 function removeValue(value: string) {
-  if (!Array.isArray(props.modelValue)) return
-  emit('update:modelValue', props.modelValue.filter(v => v !== value))
+  if (!Array.isArray(currentValue.value)) return
+  setValue(currentValue.value.filter(v => v !== value))
 }
 
 function labelFor(value: string) {
@@ -96,17 +112,17 @@ function labelFor(value: string) {
     <PrLabel v-if="label" :for="inputId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <ComboboxRoot
       class="relative"
-      :model-value="modelValue"
+      :model-value="currentValue"
       :multiple="multiple"
       :disabled="disabled"
-      @update:model-value="emit('update:modelValue', $event)"
+      @update:model-value="setValue($event as string | string[])"
     >
       <ComboboxAnchor
         class="pr-combobox__anchor inline-flex min-h-[2.375rem] w-full flex-wrap items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] py-[var(--pr-space-1)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
         :class="{ 'border-[var(--pr-color-danger)]': Boolean(error) }"
       >
         <span
-          v-for="value in multiple && Array.isArray(modelValue) ? modelValue : []"
+          v-for="value in multiple && Array.isArray(currentValue) ? currentValue : []"
           :key="value"
           class="pr-combobox__tag inline-flex items-center gap-[var(--pr-space-1)] rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] px-[var(--pr-space-2)] py-0.5 text-[length:var(--pr-font-size-xs)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)]"
         >
@@ -126,7 +142,7 @@ function labelFor(value: string) {
           class="pr-combobox__input min-w-0 grow bg-transparent py-[var(--pr-space-2)] text-[length:var(--pr-font-size-md)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed"
           :display-value="multiple ? undefined : displayValue"
           :placeholder="hasValue ? undefined : placeholder"
-          :required="required"
+          :required="required && !hasValue"
           :aria-required="required || undefined"
           :aria-invalid="error ? 'true' : undefined"
           :aria-describedby="describedBy"
@@ -175,8 +191,8 @@ function labelFor(value: string) {
     <!-- ComboboxInput only ever carries the search text, not the selected
          value(s), so native form submission goes through these hidden inputs. -->
     <template v-if="name">
-      <input v-if="!multiple" type="hidden" :name="name" :value="typeof modelValue === 'string' ? modelValue : ''">
-      <input v-for="value in Array.isArray(modelValue) ? modelValue : []" v-else :key="value" type="hidden" :name="name" :value="value">
+      <input v-if="!multiple" type="hidden" :name="name" :value="typeof currentValue === 'string' ? currentValue : ''">
+      <input v-for="value in Array.isArray(currentValue) ? currentValue : []" v-else :key="value" type="hidden" :name="name" :value="value">
     </template>
     <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>

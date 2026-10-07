@@ -336,6 +336,16 @@ Build du Storybook statique :
 npm run build-storybook
 ```
 
+## Publier une version
+
+On travaille sur `develop`. Pour publier :
+
+1. Sur `develop`, un commit `chore(release): X.Y.Z` qui change `version` dans `package.json` (et `package-lock.json`, via `npm version X.Y.Z --no-git-tag-version`) et renomme la section `## Non publie` de `CHANGELOG.md` en `## X.Y.Z (AAAA-MM-JJ)`. Sans cette section, la publication echoue.
+2. PR de `develop` vers `main`, puis merge.
+3. Le workflow `npm-publish.yml` teste, construit et publie `X.Y.Z` sur npm, puis cree le tag `vX.Y.Z` et une release GitHub avec la section du changelog.
+
+Un merge qui ne change pas la version ne publie rien. Ne creez pas le tag a la main : le workflow s'en charge. Une version de test (`1.0.0-beta.1`) est publiee sous le tag npm `next`, pas `latest`. Le workflow `ci.yml` lance les memes verifications sur chaque PR et sur `develop`.
+
 ## License
 
 Prisme est distribue sous licence MIT. Voir [LICENSE](./LICENSE).

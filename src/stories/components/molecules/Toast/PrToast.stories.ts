@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, waitFor } from 'storybook/test'
 import { ref } from 'vue'
 import { PrButton } from '../../../../components/atoms/Button'
 import { PrToast, PrToastProvider } from '../../../../components/molecules/Toast'
@@ -172,4 +173,89 @@ export const WithAction: Story = {
       </div>
     `,
   }),
+}
+
+// The bar follows Reka's close timer: it stops while the toast is hovered or focused, then resumes.
+// noinspection JSUnusedGlobalSymbols
+export const PausesWithTimer: Story = {
+  args: {
+    duration: 60000,
+  },
+  render: (args) => ({
+    components: { PrToast },
+    setup() {
+      return { args }
+    },
+    template: `
+      <div class="story-toast-demo">
+        <PrToast default-open variant="success" :title="args.title" :description="args.description" :duration="args.duration" />
+      </div>
+    `,
+  }),
+  play: async () => {
+    const toast = await waitFor(() => {
+      const element = document.querySelector<HTMLElement>('.pr-toast')
+      expect(element).not.toBeNull()
+      return element as HTMLElement
+    })
+    const bar = toast.querySelector<HTMLElement>('.pr-toast__progress') as HTMLElement
+    const playState = () => getComputedStyle(bar).animationPlayState
+
+    await expect(playState()).toBe('running')
+
+    await userEvent.hover(toast)
+    await waitFor(() => expect(playState()).toBe('paused'))
+
+    await userEvent.unhover(toast)
+    await waitFor(() => expect(playState()).toBe('running'))
+
+    // Clicking in the toast focuses it: still paused once the pointer has left, as Reka's timer.
+    await userEvent.click(toast.querySelector('.pr-toast__title') as HTMLElement)
+    await userEvent.unhover(toast)
+    await waitFor(() => expect(playState()).toBe('paused'))
+
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    await waitFor(() => expect(playState()).toBe('running'))
+  },
+}
+
+// Icon, action and close button are each optional: every combination stays on one line, and a
+// short text sits right after the icon instead of being pushed to the right.
+// noinspection JSUnusedGlobalSymbols
+export const LayoutCombinations: Story = {
+  render: () => ({
+    components: { PrToast },
+    template: `
+      <div class="story-toast-demo">
+        <PrToast default-open :duration="60000" variant="success" description="Note ajoutee." />
+        <PrToast default-open :duration="60000" variant="success" description="Note ajoutee." action-label="Voir" />
+        <PrToast default-open :duration="60000" description="Note ajoutee." action-label="Voir" />
+        <PrToast default-open :duration="60000" description="Note ajoutee." />
+      </div>
+    `,
+  }),
+  play: async () => {
+    const toasts = await waitFor(() => {
+      const elements = [...document.querySelectorAll<HTMLElement>('.pr-toast')]
+      expect(elements).toHaveLength(4)
+      return elements
+    })
+
+    for (const toast of toasts) {
+      const box = (selector: string) => toast.querySelector(selector)?.getBoundingClientRect()
+      const content = box('.pr-toast__content') as DOMRect
+      const close = box('.pr-toast__close') as DOMRect
+      const icon = box('.pr-toast__icon')
+      const action = box('.pr-toast__action')
+
+      // One line: nothing wraps under the text.
+      await expect(close.top).toBeLessThan(content.bottom)
+      if (action) await expect(action.top).toBeLessThan(content.bottom)
+      if (icon) {
+        await expect(icon.top).toBeLessThan(content.bottom)
+        await expect(content.left - icon.right).toBeLessThanOrEqual(16)
+      }
+      await expect(close.right).toBeGreaterThan(content.right)
+    }
+  },
 }

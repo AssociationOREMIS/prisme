@@ -18,7 +18,7 @@ export interface PrCommandProps {
 const props = withDefaults(defineProps<PrCommandProps>(), {
   items: () => [],
   placeholder: 'Rechercher',
-  emptyText: 'Aucun resultat',
+  emptyText: 'Aucun résultat',
 })
 
 const emit = defineEmits<{

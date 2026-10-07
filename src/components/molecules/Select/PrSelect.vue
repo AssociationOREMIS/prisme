@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<PrSelectProps>(), {
   defaultValue: undefined,
   options: () => [],
   label: undefined,
-  placeholder: 'Selectionner',
+  placeholder: 'Sélectionner',
   hint: undefined,
   error: undefined,
   disabled: false,

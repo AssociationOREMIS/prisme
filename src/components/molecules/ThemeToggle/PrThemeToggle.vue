@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<PrThemeToggleProps>(), {
 const { resolvedTheme, toggleTheme } = usePrTheme()
 
 const nextThemeLabel = computed(() => (
-  resolvedTheme.value === 'light' ? 'Passer en theme sombre' : 'Passer en theme clair'
+  resolvedTheme.value === 'light' ? 'Passer en thème sombre' : 'Passer en thème clair'
 ))
 const accessibleLabel = computed(() => props.label ?? nextThemeLabel.value)
 const icon = computed(() => (resolvedTheme.value === 'light' ? Moon : Sun))

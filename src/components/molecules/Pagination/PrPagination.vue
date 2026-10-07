@@ -49,7 +49,7 @@ function go(nextPage: number) {
 
 <template>
   <nav class="pr-pagination inline-flex flex-wrap items-center gap-(--pr-space-2)" aria-label="Pagination">
-    <button class="pr-pagination__prev" :class="paginationButtonClass" type="button" :disabled="isDisabled || currentPage <= 1" aria-label="Page precedente" @click="go(currentPage - 1)">
+    <button class="pr-pagination__prev" :class="paginationButtonClass" type="button" :disabled="isDisabled || currentPage <= 1" aria-label="Page précédente" @click="go(currentPage - 1)">
       <ChevronLeft :size="16" aria-hidden="true" />
     </button>
     <template v-for="(item, index) in pages" :key="`${item}-${index}`">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AlertCircle, CheckCircle2, Info, TriangleAlert, X } from '@lucide/vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { ToastAction, ToastClose, ToastDescription, ToastRoot, ToastTitle } from 'reka-ui'
 
 interface PrToastContentProps {
@@ -38,6 +38,8 @@ const variantIcon = computed(() => ({
   danger: AlertCircle,
 })[props.variant])
 
+// Laid out with flex, not a fixed grid: icon, action and close button are each optional,
+// and the text always takes the remaining width.
 // A neutral surface with a colored accent (left border, icon, progress bar) reads better
 // for a transient toast than a fully tinted background, which is closer to `PrAlert`'s
 // look and works fine for a message that stays on screen.
@@ -68,19 +70,26 @@ const variantProgressClass = computed(() => ({
 // `Infinity` (or any non-finite/non-positive value) means "don't auto-dismiss" —
 // showing a depleting bar for a toast that never closes would be misleading.
 const showProgress = computed(() => Number.isFinite(props.duration) && props.duration > 0)
+
+// Reka pauses the close timer while the toast is hovered or focused, or the window is in the
+// background, then resumes it with the time left: the bar must stop and restart with it, or it
+// runs out while the toast stays open.
+const paused = ref(false)
 </script>
 
 <template>
   <ToastRoot
-    class="pr-toast pointer-events-auto relative grid w-full grid-cols-[1fr_auto_auto] items-start gap-[var(--pr-space-3)] overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-4)] pr-[var(--pr-space-6)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] transition-all duration-200 ease-[var(--pr-ease-standard)] data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[swipe=cancel]:translate-x-0 data-[swipe=end]:animate-[pr-toast-swipe-out-x_150ms_ease-out_forwards]"
+    class="pr-toast pointer-events-auto relative flex w-full items-start gap-[var(--pr-space-3)] overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-4)] pr-[var(--pr-space-6)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] transition-all duration-200 ease-[var(--pr-ease-standard)] data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[swipe=cancel]:translate-x-0 data-[swipe=end]:animate-[pr-toast-swipe-out-x_150ms_ease-out_forwards]"
     :class="variantAccentClass"
     :open="open"
     :default-open="defaultOpen"
     :duration="duration"
     @update:open="emit('update:open', $event)"
+    @pause="paused = true"
+    @resume="paused = false"
   >
     <component :is="variantIcon" v-if="variantIcon" class="pr-toast__icon mt-[0.0625rem] shrink-0" :class="variantIconClass" :size="18" aria-hidden="true" />
-    <div class="pr-toast__content grid min-w-0 gap-[var(--pr-space-1)]">
+    <div class="pr-toast__content grid min-w-0 flex-1 gap-[var(--pr-space-1)]">
       <ToastTitle v-if="title" class="pr-toast__title m-0 text-[length:var(--pr-font-size-sm)] font-[750] leading-[var(--pr-line-height-tight)]">{{ title }}</ToastTitle>
       <ToastDescription v-if="description" class="pr-toast__description m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text-muted)]">
         {{ description }}
@@ -89,20 +98,20 @@ const showProgress = computed(() => Number.isFinite(props.duration) && props.dur
     </div>
     <ToastAction
       v-if="actionLabel"
-      class="pr-toast__action min-h-8 cursor-pointer rounded-[var(--pr-radius-md)] border-0 bg-transparent px-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-bold text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+      class="pr-toast__action min-h-8 shrink-0 cursor-pointer rounded-[var(--pr-radius-md)] border-0 bg-transparent px-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-bold text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
       alt-text="Action"
       @click="emit('action')"
     >
       {{ actionLabel }}
     </ToastAction>
-    <ToastClose class="pr-toast__close inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border-0 bg-transparent text-[color:var(--pr-color-text-muted)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
+    <ToastClose class="pr-toast__close inline-grid size-8 shrink-0 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border-0 bg-transparent text-[color:var(--pr-color-text-muted)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
       <X :size="16" aria-hidden="true" />
     </ToastClose>
     <div
       v-if="showProgress"
       class="pr-toast__progress absolute inset-x-0 bottom-0 h-[3px] origin-left [animation-fill-mode:forwards] [animation-name:pr-toast-progress] [animation-timing-function:linear]"
       :class="variantProgressClass"
-      :style="{ animationDuration: `${duration}ms` }"
+      :style="{ animationDuration: `${duration}ms`, animationPlayState: paused ? 'paused' : 'running' }"
       aria-hidden="true"
     />
   </ToastRoot>

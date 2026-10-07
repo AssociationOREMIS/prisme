@@ -33,7 +33,7 @@ export const Default: Story = {
     await userEvent.keyboard('{ArrowLeft}')
     await expect(canvas.getByText('Etape 1')).toBeVisible()
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Element suivant' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Élément suivant' }))
     await expect(canvas.getByText('Etape 2')).toBeVisible()
   },
 }

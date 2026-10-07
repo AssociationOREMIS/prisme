@@ -7,7 +7,7 @@ export const sidebarIconBaseClass = [
 export const sidebarIconBadgeCountClass = [
   'pr-sidebar-item__badge absolute -top-1 -right-1 z-[1] inline-flex h-[1.125rem] min-w-[1.125rem]',
   'items-center justify-center rounded-[var(--pr-radius-full)] border-2 border-[var(--pr-color-background)]',
-  'bg-[var(--pr-color-danger)] px-[0.1875rem] text-[9px] font-[750] leading-none text-[color:var(--pr-neutral-0)]',
+  'bg-[var(--pr-color-danger-solid)] px-[0.1875rem] text-[9px] font-[750] leading-none text-[color:var(--pr-neutral-0)]',
 ].join(' ')
 
 export const sidebarIconBadgeDotClass = [

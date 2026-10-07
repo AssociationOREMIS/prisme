@@ -185,6 +185,10 @@ async function handleImageUpload(file: File): Promise<string | null> {
   }
 }
 
+// What the hidden input submits. Without a v-model (a plain Blade form passing the initial
+// HTML once), `modelValue` never follows the edits, so the form would post the original text.
+const html = ref(props.modelValue)
+
 const editor = useEditor({
   content: props.modelValue,
   editable: !props.disabled,
@@ -227,11 +231,13 @@ const editor = useEditor({
     },
   },
   onUpdate: ({ editor: instance }) => {
-    emit('update:modelValue', instance.getHTML())
+    html.value = instance.getHTML()
+    emit('update:modelValue', html.value)
   },
 })
 
 watch(() => props.modelValue, (value) => {
+  html.value = value
   if (editor.value && value !== editor.value.getHTML()) {
     editor.value.commands.setContent(value, { emitUpdate: false })
   }
@@ -564,7 +570,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
         {{ editor.storage.characterCount.characters() }} caractères · {{ editor.storage.characterCount.words() }} mots
       </p>
     </div>
-    <input v-if="name" type="hidden" :name="name" :value="modelValue">
+    <input v-if="name" type="hidden" :name="name" :value="html">
     <p v-if="error" :id="errorId" class="pr-rich-text-editor__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">
       {{ error }}
     </p>
