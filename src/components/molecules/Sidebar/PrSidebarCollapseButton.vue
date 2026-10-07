@@ -24,13 +24,13 @@ const ariaLabel = computed(() => (
        on top announced a contradictory "pressed" state. -->
   <button
     v-if="sidebar"
-    class="pr-sidebar__collapse inline-grid w-full grid-flow-col cursor-pointer place-items-center justify-center gap-[var(--pr-space-2)] border-t border-[var(--pr-color-border)] bg-[var(--pr-color-surface-subtle)] p-[0.875rem] text-[length:var(--pr-font-size-sm)] font-[650] text-[color:var(--pr-color-text-subtle)] transition-[background-color,color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:bg-[var(--pr-color-border)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+    class="pr-sidebar__collapse pr:inline-grid pr:w-full pr:grid-flow-col pr:cursor-pointer pr:place-items-center pr:justify-center pr:gap-[var(--pr-space-2)] pr:border-t pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface-subtle)] pr:p-[0.875rem] pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:text-[color:var(--pr-color-text-subtle)] pr:transition-[background-color,color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:bg-[var(--pr-color-border)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:-outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
     type="button"
     :aria-label="ariaLabel"
     @click="sidebar.toggle"
   >
     <ChevronRight v-if="sidebar.isNarrow.value" aria-hidden="true" :size="18" />
     <ChevronLeft v-else aria-hidden="true" :size="18" />
-    <span class="pr-sidebar__collapse-label overflow-hidden text-ellipsis whitespace-nowrap">{{ collapseLabel }}</span>
+    <span class="pr-sidebar__collapse-label pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap">{{ collapseLabel }}</span>
   </button>
 </template>

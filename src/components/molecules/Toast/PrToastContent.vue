@@ -46,26 +46,26 @@ const variantIcon = computed(() => ({
 // look and works fine for a message that stays on screen.
 const variantAccentClass = computed(() => ({
   default: '',
-  info: 'border-l-4 border-l-[var(--pr-color-info)]',
-  success: 'border-l-4 border-l-[var(--pr-color-success)]',
-  warning: 'border-l-4 border-l-[var(--pr-color-warning)]',
-  danger: 'border-l-4 border-l-[var(--pr-color-danger)]',
+  info: 'pr:border-l-4 pr:border-l-[var(--pr-color-info)]',
+  success: 'pr:border-l-4 pr:border-l-[var(--pr-color-success)]',
+  warning: 'pr:border-l-4 pr:border-l-[var(--pr-color-warning)]',
+  danger: 'pr:border-l-4 pr:border-l-[var(--pr-color-danger)]',
 })[props.variant])
 
 const variantIconClass = computed(() => ({
   default: '',
-  info: 'text-[color:var(--pr-color-info)]',
-  success: 'text-[color:var(--pr-color-success)]',
-  warning: 'text-[color:var(--pr-color-warning)]',
-  danger: 'text-[color:var(--pr-color-danger)]',
+  info: 'pr:text-[color:var(--pr-color-info)]',
+  success: 'pr:text-[color:var(--pr-color-success)]',
+  warning: 'pr:text-[color:var(--pr-color-warning)]',
+  danger: 'pr:text-[color:var(--pr-color-danger)]',
 })[props.variant])
 
 const variantProgressClass = computed(() => ({
-  default: 'bg-[var(--pr-color-text-subtle)]',
-  info: 'bg-[var(--pr-color-info)]',
-  success: 'bg-[var(--pr-color-success)]',
-  warning: 'bg-[var(--pr-color-warning)]',
-  danger: 'bg-[var(--pr-color-danger)]',
+  default: 'pr:bg-[var(--pr-color-text-subtle)]',
+  info: 'pr:bg-[var(--pr-color-info)]',
+  success: 'pr:bg-[var(--pr-color-success)]',
+  warning: 'pr:bg-[var(--pr-color-warning)]',
+  danger: 'pr:bg-[var(--pr-color-danger)]',
 })[props.variant])
 
 // `Infinity` (or any non-finite/non-positive value) means "don't auto-dismiss" —
@@ -83,7 +83,7 @@ const paused = ref(false)
 
 <template>
   <ToastRoot
-    class="pr-toast pointer-events-auto relative flex w-full items-start gap-[var(--pr-space-3)] overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-4)] pr-[var(--pr-space-6)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] transition-all duration-200 ease-[var(--pr-ease-standard)] data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[swipe=cancel]:translate-x-0 data-[swipe=end]:animate-[pr-toast-swipe-out-x_150ms_ease-out_forwards]"
+    class="pr-toast pr:pointer-events-auto pr:relative pr:flex pr:w-full pr:items-start pr:gap-[var(--pr-space-3)] pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)] pr:pr-[var(--pr-space-6)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:transition-all pr:duration-200 pr:ease-[var(--pr-ease-standard)] pr:data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)] pr:data-[swipe=move]:transition-none pr:data-[swipe=cancel]:translate-x-0 pr:data-[swipe=end]:animate-[pr-toast-swipe-out-x_150ms_ease-out_forwards]"
     :class="variantAccentClass"
     :open="open"
     :default-open="defaultOpen"
@@ -92,28 +92,28 @@ const paused = ref(false)
     @pause="paused = true"
     @resume="paused = false"
   >
-    <component :is="variantIcon" v-if="variantIcon" class="pr-toast__icon mt-[0.0625rem] shrink-0" :class="variantIconClass" :size="18" aria-hidden="true" />
-    <div class="pr-toast__content grid min-w-0 flex-1 gap-[var(--pr-space-1)]">
-      <ToastTitle v-if="title" class="pr-toast__title m-0 text-[length:var(--pr-font-size-sm)] font-[750] leading-[var(--pr-line-height-tight)]">{{ title }}</ToastTitle>
-      <ToastDescription v-if="description" class="pr-toast__description m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text-muted)]">
+    <component :is="variantIcon" v-if="variantIcon" class="pr-toast__icon pr:mt-[0.0625rem] pr:shrink-0" :class="variantIconClass" :size="18" aria-hidden="true" />
+    <div class="pr-toast__content pr:grid pr:min-w-0 pr:flex-1 pr:gap-[var(--pr-space-1)]">
+      <ToastTitle v-if="title" class="pr-toast__title pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:font-[750] pr:leading-[var(--pr-line-height-tight)]">{{ title }}</ToastTitle>
+      <ToastDescription v-if="description" class="pr-toast__description pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text-muted)]">
         {{ description }}
       </ToastDescription>
       <slot />
     </div>
     <ToastAction
       v-if="actionLabel"
-      class="pr-toast__action min-h-8 shrink-0 cursor-pointer rounded-[var(--pr-radius-md)] border-0 bg-transparent px-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-bold text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+      class="pr-toast__action pr:min-h-8 pr:shrink-0 pr:cursor-pointer pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-bold pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
       :alt-text="actionLabel"
       @click="emit('action')"
     >
       {{ actionLabel }}
     </ToastAction>
-    <ToastClose class="pr-toast__close inline-grid size-8 shrink-0 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border-0 bg-transparent text-[color:var(--pr-color-text-muted)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
+    <ToastClose class="pr-toast__close pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
       <X :size="16" aria-hidden="true" />
     </ToastClose>
     <div
       v-if="showProgress"
-      class="pr-toast__progress absolute inset-x-0 bottom-0 h-[3px] origin-left [animation-fill-mode:forwards] [animation-name:pr-toast-progress] [animation-timing-function:linear]"
+      class="pr-toast__progress pr:absolute pr:inset-x-0 pr:bottom-0 pr:h-[3px] pr:origin-left pr:[animation-fill-mode:forwards] pr:[animation-name:pr-toast-progress] pr:[animation-timing-function:linear]"
       :class="variantProgressClass"
       :style="{ animationDuration: `${effectiveDuration}ms`, animationPlayState: paused ? 'paused' : 'running' }"
       aria-hidden="true"

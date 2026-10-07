@@ -12,7 +12,7 @@
    element styles can still reach Prisme components; full isolation is mountPrismeIsolated().
    Not `@scope`: inside it a plain `.flex` only matches descendants of the scope root, never
    the root itself, where Prisme puts most of its classes. */
-@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/theme.css" layer(theme) prefix(pr);
 @import "./tokens.css";
 @import "./themes.css";
 @import "./animations.css";

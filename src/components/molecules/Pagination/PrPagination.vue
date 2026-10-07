@@ -43,8 +43,8 @@ const isDisabled = computed(() => props.disabled ?? false)
 // unusable and unbounded (e.g. a server-paginated table with a large total).
 // Show first/last plus a window around the current page, with ellipses.
 const pages = computed(() => buildPaginationItems(currentPageCount.value, currentPage.value))
-const paginationButtonClass = 'pr-pagination__button inline-grid min-h-[2.375rem] min-w-[2.375rem] cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] font-[650] text-[color:var(--pr-color-text)] transition-[background-color,border-color,color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:not-disabled:bg-[var(--pr-color-surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] disabled:cursor-not-allowed disabled:opacity-[0.58]'
-const paginationActiveClass = 'pr-pagination__button--active border-[var(--pr-color-primary)] bg-[var(--pr-color-primary)] text-[color:var(--pr-color-primary-contrast)] hover:not-disabled:border-[var(--pr-color-primary-hover)] hover:not-disabled:bg-[var(--pr-color-primary-hover)]'
+const paginationButtonClass = 'pr-pagination__button pr:inline-grid pr:min-h-[2.375rem] pr:min-w-[2.375rem] pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:font-[650] pr:text-[color:var(--pr-color-text)] pr:transition-[background-color,border-color,color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:not-disabled:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:opacity-[0.58]'
+const paginationActiveClass = 'pr-pagination__button--active pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-primary)] pr:text-[color:var(--pr-color-primary-contrast)] pr:hover:not-disabled:border-[var(--pr-color-primary-hover)] pr:hover:not-disabled:bg-[var(--pr-color-primary-hover)]'
 
 function go(nextPage: number) {
   if (!isDisabled.value && nextPage >= 1 && nextPage <= currentPageCount.value) {
@@ -55,12 +55,12 @@ function go(nextPage: number) {
 </script>
 
 <template>
-  <nav class="pr-pagination inline-flex flex-wrap items-center gap-(--pr-space-2)" aria-label="Pagination">
+  <nav class="pr-pagination pr:inline-flex pr:flex-wrap pr:items-center pr:gap-(--pr-space-2)" aria-label="Pagination">
     <button class="pr-pagination__prev" :class="paginationButtonClass" type="button" :disabled="isDisabled || currentPage <= 1" aria-label="Page précédente" @click="go(currentPage - 1)">
       <ChevronLeft :size="16" aria-hidden="true" />
     </button>
     <template v-for="(item, index) in pages" :key="`${item}-${index}`">
-      <span v-if="item === 'ellipsis'" class="pr-pagination__ellipsis inline-grid min-h-[2.375rem] min-w-[2.375rem] place-items-center text-[color:var(--pr-color-text-muted)]" aria-hidden="true">&hellip;</span>
+      <span v-if="item === 'ellipsis'" class="pr-pagination__ellipsis pr:inline-grid pr:min-h-[2.375rem] pr:min-w-[2.375rem] pr:place-items-center pr:text-[color:var(--pr-color-text-muted)]" aria-hidden="true">&hellip;</span>
       <button
         v-else
         :class="[paginationButtonClass, item === currentPage ? paginationActiveClass : '']"

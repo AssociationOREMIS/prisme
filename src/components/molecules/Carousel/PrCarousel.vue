@@ -30,18 +30,18 @@ function move(delta: number) {
 
 <template>
   <section
-    class="pr-carousel grid grid-cols-[auto_1fr_auto] items-center gap-[var(--pr-space-3)] rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-4)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+    class="pr-carousel pr:grid pr:grid-cols-[auto_1fr_auto] pr:items-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
     aria-roledescription="carousel"
     :aria-label="ariaLabel"
     tabindex="0"
     @keydown.left.prevent="move(-1)"
     @keydown.right.prevent="move(1)"
   >
-    <button class="pr-carousel__button inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Élément précédent" @click="move(-1)">
+    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Élément précédent" @click="move(-1)">
       <ChevronLeft :size="16" />
     </button>
     <div
-      class="pr-carousel__item grid min-w-0 gap-[var(--pr-space-1)] text-center [&_span]:text-[length:var(--pr-font-size-sm)] [&_span]:text-[color:var(--pr-color-text-muted)]"
+      class="pr-carousel__item pr:grid pr:min-w-0 pr:gap-[var(--pr-space-1)] pr:text-center pr:[&_span]:text-[length:var(--pr-font-size-sm)] pr:[&_span]:text-[color:var(--pr-color-text-muted)]"
       role="group"
       aria-roledescription="slide"
       :aria-label="positionLabel"
@@ -51,7 +51,7 @@ function move(delta: number) {
       <strong>{{ current?.title }}</strong>
       <span v-if="current?.description">{{ current.description }}</span>
     </div>
-    <button class="pr-carousel__button inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Élément suivant" @click="move(1)">
+    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Élément suivant" @click="move(1)">
       <ChevronRight :size="16" />
     </button>
   </section>

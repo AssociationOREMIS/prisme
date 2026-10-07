@@ -20,17 +20,17 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="pr-data-table__pagination flex flex-wrap items-center gap-[var(--pr-space-4)] px-[var(--pr-space-2)]">
-    <p v-if="selectedRowsCount > 0 && !hideSelectedRowsCount" class="m-0 flex-1 text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text-muted)]">
+  <div class="pr-data-table__pagination pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-4)] pr:px-[var(--pr-space-2)]">
+    <p v-if="selectedRowsCount > 0 && !hideSelectedRowsCount" class="pr:m-0 pr:flex-1 pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]">
       {{ selectedRowsCount }} sur {{ filteredRowsCount }} ligne(s) sélectionnée(s).
     </p>
-    <span v-else class="flex-1" />
+    <span v-else class="pr:flex-1" />
 
-    <div class="flex flex-wrap items-center gap-[var(--pr-space-3)] sm:gap-[var(--pr-space-6)]">
-      <div class="flex items-center gap-[var(--pr-space-2)]">
-        <p class="m-0 text-[length:var(--pr-font-size-sm)] font-semibold">Lignes par page</p>
+    <div class="pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-3)] pr:sm:gap-[var(--pr-space-6)]">
+      <div class="pr:flex pr:items-center pr:gap-[var(--pr-space-2)]">
+        <p class="pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold">Lignes par page</p>
         <PrSelect
-          class="w-max min-w-[4.75rem]"
+          class="pr:w-max pr:min-w-[4.75rem]"
           aria-label="Lignes par page"
           :model-value="String(pageSize)"
           :options="pageSizeOptions.map((size) => ({ label: String(size), value: String(size) }))"
@@ -38,21 +38,21 @@ const emit = defineEmits<{
         />
       </div>
 
-      <div class="flex min-w-[7rem] items-center justify-center text-[length:var(--pr-font-size-sm)] font-semibold">
+      <div class="pr:flex pr:min-w-[7rem] pr:items-center pr:justify-center pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold">
         Page {{ page }} sur {{ pageCount }}
       </div>
 
-      <div class="flex items-center gap-[var(--pr-space-2)]">
-        <PrButton class="hidden size-8 p-0 lg:inline-flex" variant="secondary" size="sm" :disabled="page <= 1" aria-label="Première page" @click="emit('update:page', 1)">
+      <div class="pr:flex pr:items-center pr:gap-[var(--pr-space-2)]">
+        <PrButton class="pr:hidden pr:size-8 pr:p-0 pr:lg:inline-flex" variant="secondary" size="sm" :disabled="page <= 1" aria-label="Première page" @click="emit('update:page', 1)">
           <ChevronsLeft :size="16" aria-hidden="true" />
         </PrButton>
-        <PrButton class="size-8 p-0" variant="secondary" size="sm" :disabled="page <= 1" aria-label="Page précédente" @click="emit('update:page', page - 1)">
+        <PrButton class="pr:size-8 pr:p-0" variant="secondary" size="sm" :disabled="page <= 1" aria-label="Page précédente" @click="emit('update:page', page - 1)">
           <ChevronLeft :size="16" aria-hidden="true" />
         </PrButton>
-        <PrButton class="size-8 p-0" variant="secondary" size="sm" :disabled="page >= pageCount" aria-label="Page suivante" @click="emit('update:page', page + 1)">
+        <PrButton class="pr:size-8 pr:p-0" variant="secondary" size="sm" :disabled="page >= pageCount" aria-label="Page suivante" @click="emit('update:page', page + 1)">
           <ChevronRight :size="16" aria-hidden="true" />
         </PrButton>
-        <PrButton class="hidden size-8 p-0 lg:inline-flex" variant="secondary" size="sm" :disabled="page >= pageCount" aria-label="Dernière page" @click="emit('update:page', pageCount)">
+        <PrButton class="pr:hidden pr:size-8 pr:p-0 pr:lg:inline-flex" variant="secondary" size="sm" :disabled="page >= pageCount" aria-label="Dernière page" @click="emit('update:page', pageCount)">
           <ChevronsRight :size="16" aria-hidden="true" />
         </PrButton>
       </div>

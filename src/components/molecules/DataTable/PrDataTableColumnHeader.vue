@@ -19,7 +19,7 @@ const emit = defineEmits<{
 <template>
   <PrDropdownMenu v-if="column.sortable || column.hideable !== false" align="start">
     <template #trigger>
-      <PrButton class="-ml-3 h-8" variant="ghost" size="sm">
+      <PrButton class="pr:-ml-3 pr:h-8" variant="ghost" size="sm">
         <span>{{ column.label }}</span>
         <ArrowDown v-if="sortKey === column.key && sortDirection === 'desc'" :size="16" aria-hidden="true" />
         <ArrowUp v-else-if="sortKey === column.key" :size="16" aria-hidden="true" />

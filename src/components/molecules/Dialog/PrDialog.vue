@@ -38,24 +38,24 @@ const emit = defineEmits<{
       <slot name="trigger" />
     </DialogTrigger>
     <DialogPortal>
-      <DialogOverlay class="pr-dialog__overlay fixed inset-0 z-[80] bg-[var(--pr-color-overlay)] data-[state=open]:animate-[pr-fade-in_150ms_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-fade-out_150ms_var(--pr-ease-standard)]" />
-      <DialogContent class="pr-dialog fixed left-1/2 top-1/2 z-[90] grid max-h-[calc(100vh-var(--pr-space-8))] w-[min(34rem,calc(100vw-var(--pr-space-6)))] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] data-[state=open]:animate-[pr-dialog-in_200ms_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-dialog-out_200ms_var(--pr-ease-standard)]">
-        <div class="pr-dialog__header flex items-start justify-between gap-[var(--pr-space-4)] border-b border-[var(--pr-color-border)] p-[var(--pr-space-5)]">
+      <DialogOverlay class="pr-dialog__overlay pr:fixed pr:inset-0 pr:z-[80] pr:bg-[var(--pr-color-overlay)] pr:data-[state=open]:animate-[pr-fade-in_150ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-fade-out_150ms_var(--pr-ease-standard)]" />
+      <DialogContent class="pr-dialog pr:fixed pr:left-1/2 pr:top-1/2 pr:z-[90] pr:grid pr:max-h-[calc(100vh-var(--pr-space-8))] pr:w-[min(34rem,calc(100vw-var(--pr-space-6)))] pr:-translate-x-1/2 pr:-translate-y-1/2 pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-dialog-in_200ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-dialog-out_200ms_var(--pr-ease-standard)]">
+        <div class="pr-dialog__header pr:flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-4)] pr:border-b pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-5)]">
           <!-- min-w-0: a long title wraps instead of pushing the close button out. -->
-          <div class="min-w-0 [overflow-wrap:anywhere]">
-            <DialogTitle v-if="title" class="pr-dialog__title m-0 text-[length:var(--pr-font-size-xl)] font-[750] leading-[var(--pr-line-height-tight)]">{{ title }}</DialogTitle>
-            <DialogDescription v-if="description" class="pr-dialog__description mt-[var(--pr-space-2)] mb-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text-muted)]">
+          <div class="pr:min-w-0 pr:[overflow-wrap:anywhere]">
+            <DialogTitle v-if="title" class="pr-dialog__title pr:m-0 pr:text-[length:var(--pr-font-size-xl)] pr:font-[750] pr:leading-[var(--pr-line-height-tight)]">{{ title }}</DialogTitle>
+            <DialogDescription v-if="description" class="pr-dialog__description pr:mt-[var(--pr-space-2)] pr:mb-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text-muted)]">
               {{ description }}
             </DialogDescription>
           </div>
-          <DialogClose class="pr-dialog__close inline-grid size-8 shrink-0 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border-0 bg-transparent text-[color:var(--pr-color-text-muted)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
+          <DialogClose class="pr-dialog__close pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
             <X :size="18" aria-hidden="true" />
           </DialogClose>
         </div>
-        <div class="pr-dialog__body min-h-0 overflow-y-auto p-[var(--pr-space-5)]">
+        <div class="pr-dialog__body pr:min-h-0 pr:overflow-y-auto pr:p-[var(--pr-space-5)]">
           <slot />
         </div>
-        <div v-if="$slots.footer" class="pr-dialog__footer flex flex-wrap justify-end gap-[var(--pr-space-3)] border-t border-[var(--pr-color-border)] p-[var(--pr-space-5)]">
+        <div v-if="$slots.footer" class="pr-dialog__footer pr:flex pr:flex-wrap pr:justify-end pr:gap-[var(--pr-space-3)] pr:border-t pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-5)]">
           <slot name="footer" />
         </div>
       </DialogContent>

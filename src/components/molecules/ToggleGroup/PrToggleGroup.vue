@@ -88,16 +88,16 @@ const toggleGroupStyle = computed(() => ({
 // Single mode keeps one row (the sliding indicator assumes equal columns): on a narrow screen it
 // scrolls sideways instead of overflowing the page. The indicator scrolls with the items.
 const toggleGroupClass = computed(() => [
-  'pr-toggle-group inline-flex flex-wrap items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] p-[var(--pr-space-1)]',
+  'pr-toggle-group pr:inline-flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-1)]',
   props.type === 'single'
-    ? "pr-toggle-group--single relative inline-grid auto-cols-[minmax(max-content,1fr)] grid-flow-col gap-0 max-w-full overflow-x-auto before:pointer-events-none before:absolute before:top-[var(--pr-space-1)] before:bottom-[var(--pr-space-1)] before:left-[var(--pr-space-1)] before:w-[calc((100%-(var(--pr-space-1)*2))/var(--pr-toggle-group-count))] before:rounded-[var(--pr-radius-md)] before:bg-[var(--pr-color-primary)] before:opacity-[var(--pr-toggle-group-indicator-opacity)] before:translate-x-[calc(var(--pr-toggle-group-active-index)*100%)] before:transition-[transform,opacity,background-color] before:duration-[var(--pr-duration-fast)] before:ease-[var(--pr-ease-standard)] has-[.pr-toggle-group__item[data-state=on]:hover]:before:bg-[var(--pr-color-primary-hover)]"
+    ? "pr-toggle-group--single pr:relative pr:inline-grid pr:auto-cols-[minmax(max-content,1fr)] pr:grid-flow-col pr:gap-0 pr:max-w-full pr:overflow-x-auto pr:before:pointer-events-none pr:before:absolute pr:before:top-[var(--pr-space-1)] pr:before:bottom-[var(--pr-space-1)] pr:before:left-[var(--pr-space-1)] pr:before:w-[calc((100%-(var(--pr-space-1)*2))/var(--pr-toggle-group-count))] pr:before:rounded-[var(--pr-radius-md)] pr:before:bg-[var(--pr-color-primary)] pr:before:opacity-[var(--pr-toggle-group-indicator-opacity)] pr:before:translate-x-[calc(var(--pr-toggle-group-active-index)*100%)] pr:before:transition-[transform,opacity,background-color] pr:before:duration-[var(--pr-duration-fast)] pr:before:ease-[var(--pr-ease-standard)] pr:has-[.pr-toggle-group__item[data-state=on]:hover]:before:bg-[var(--pr-color-primary-hover)]"
     : '',
 ])
 
 const toggleGroupItemClass = [
-  'pr-toggle-group__item relative z-[1] inline-grid min-h-[2.375rem] min-w-[2.375rem] cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-transparent bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] font-[650] text-[color:var(--pr-color-text)] transition-[background-color,border-color,color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:not-disabled:bg-[var(--pr-color-surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] disabled:cursor-not-allowed disabled:opacity-[0.58] data-[state=on]:border-[var(--pr-color-primary)] data-[state=on]:bg-[var(--pr-color-primary)] data-[state=on]:text-[color:var(--pr-color-primary-contrast)] data-[state=on]:hover:not-disabled:border-[var(--pr-color-primary-hover)] data-[state=on]:hover:not-disabled:bg-[var(--pr-color-primary-hover)]',
+  'pr-toggle-group__item pr:relative pr:z-[1] pr:inline-grid pr:min-h-[2.375rem] pr:min-w-[2.375rem] pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-transparent pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:font-[650] pr:text-[color:var(--pr-color-text)] pr:transition-[background-color,border-color,color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:not-disabled:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:opacity-[0.58] pr:data-[state=on]:border-[var(--pr-color-primary)] pr:data-[state=on]:bg-[var(--pr-color-primary)] pr:data-[state=on]:text-[color:var(--pr-color-primary-contrast)] pr:data-[state=on]:hover:not-disabled:border-[var(--pr-color-primary-hover)] pr:data-[state=on]:hover:not-disabled:bg-[var(--pr-color-primary-hover)]',
   props.type === 'single'
-    ? 'data-[state=on]:border-transparent data-[state=on]:bg-transparent data-[state=on]:hover:not-disabled:border-transparent data-[state=on]:hover:not-disabled:bg-transparent'
+    ? 'pr:data-[state=on]:border-transparent pr:data-[state=on]:bg-transparent pr:data-[state=on]:hover:not-disabled:border-transparent pr:data-[state=on]:hover:not-disabled:bg-transparent'
     : '',
 ]
 </script>
@@ -126,6 +126,6 @@ const toggleGroupItemClass = [
       {{ item.label }}
     </ToggleGroupItem>
   </ToggleGroupRoot>
-  <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-  <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 mt-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
+  <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:mt-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
+  <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:mt-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>

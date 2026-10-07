@@ -112,29 +112,29 @@ function onKeydown(event: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="pr-calendar grid w-[min(21rem,100%)] gap-[var(--pr-space-3)] rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-4)]">
-    <div class="pr-calendar__header flex items-center justify-between gap-[var(--pr-space-3)]">
-      <button type="button" class="pr-calendar__nav inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]" aria-label="Mois précédent" @click="move(-1)">
+  <div class="pr-calendar pr:grid pr:w-[min(21rem,100%)] pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)]">
+    <div class="pr-calendar__header pr:flex pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)]">
+      <button type="button" class="pr-calendar__nav pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" aria-label="Mois précédent" @click="move(-1)">
         <ChevronLeft :size="16" aria-hidden="true" />
       </button>
-      <strong :id="labelId" class="pr-calendar__label capitalize" aria-live="polite">{{ label }}</strong>
-      <button type="button" class="pr-calendar__nav inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]" aria-label="Mois suivant" @click="move(1)">
+      <strong :id="labelId" class="pr-calendar__label pr:capitalize" aria-live="polite">{{ label }}</strong>
+      <button type="button" class="pr-calendar__nav pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" aria-label="Mois suivant" @click="move(1)">
         <ChevronRight :size="16" aria-hidden="true" />
       </button>
     </div>
-    <table ref="gridRef" class="pr-calendar__grid w-full border-separate border-spacing-[var(--pr-space-1)]" role="grid" :aria-labelledby="labelId" @keydown="onKeydown">
+    <table ref="gridRef" class="pr-calendar__grid pr:w-full pr:border-separate pr:border-spacing-[var(--pr-space-1)]" role="grid" :aria-labelledby="labelId" @keydown="onKeydown">
       <thead>
         <tr>
-          <th v-for="[short, long] in weekdays" :key="short" scope="col" :abbr="long" class="pr-calendar__weekday p-0 text-center text-[length:var(--pr-font-size-xs)] font-[750] text-[color:var(--pr-color-text-muted)]">{{ short }}</th>
+          <th v-for="[short, long] in weekdays" :key="short" scope="col" :abbr="long" class="pr-calendar__weekday pr:p-0 pr:text-center pr:text-[length:var(--pr-font-size-xs)] pr:font-[750] pr:text-[color:var(--pr-color-text-muted)]">{{ short }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(week, weekIndex) in weeks" :key="weekIndex">
-          <td v-for="(day, dayIndex) in week" :key="day?.iso ?? `empty-${weekIndex}-${dayIndex}`" class="p-0" :aria-selected="day ? day.iso === selected : undefined">
+          <td v-for="(day, dayIndex) in week" :key="day?.iso ?? `empty-${weekIndex}-${dayIndex}`" class="pr:p-0" :aria-selected="day ? day.iso === selected : undefined">
             <button
               v-if="day"
               type="button"
-              class="pr-calendar__day inline-grid aspect-square w-full min-w-0 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] aria-[current=date]:border-[var(--pr-color-primary)] aria-[current=date]:font-[750] data-[selected=true]:border-[var(--pr-color-primary)] data-[selected=true]:bg-[var(--pr-color-primary)] data-[selected=true]:text-[color:var(--pr-color-primary-contrast)] data-[selected=true]:hover:bg-[var(--pr-color-primary-hover)]"
+              class="pr-calendar__day pr:inline-grid pr:aspect-square pr:w-full pr:min-w-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:aria-[current=date]:border-[var(--pr-color-primary)] pr:aria-[current=date]:font-[750] pr:data-[selected=true]:border-[var(--pr-color-primary)] pr:data-[selected=true]:bg-[var(--pr-color-primary)] pr:data-[selected=true]:text-[color:var(--pr-color-primary-contrast)] pr:data-[selected=true]:hover:bg-[var(--pr-color-primary-hover)]"
               :data-date="day.iso"
               :data-selected="day.iso === selected"
               :aria-label="dayFormatter.format(day.date)"

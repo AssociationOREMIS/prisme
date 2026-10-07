@@ -13,19 +13,19 @@ const props = withDefaults(defineProps<PrCardProps>(), {
 
 const cardBaseClass = [
   'pr-card',
-  'rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)]',
-  'bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)]',
-  'shadow-[var(--pr-shadow-xs)]',
+  'pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)]',
+  'pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)]',
+  'pr:shadow-[var(--pr-shadow-xs)]',
 ]
 
 const cardElevationClass: Record<NonNullable<PrCardProps['elevation']>, string> = {
-  flat: 'shadow-none',
-  raised: 'shadow-[var(--pr-shadow-sm)]',
+  flat: 'pr:shadow-none',
+  raised: 'pr:shadow-[var(--pr-shadow-sm)]',
 }
 
 const cardClass = computed(() => [
   cardBaseClass,
-  props.padded ? 'p-[var(--pr-space-5)]' : '',
+  props.padded ? 'pr:p-[var(--pr-space-5)]' : '',
   cardElevationClass[props.elevation],
 ])
 </script>

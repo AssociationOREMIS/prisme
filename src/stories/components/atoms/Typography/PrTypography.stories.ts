@@ -59,7 +59,7 @@ export const TableStory: Story = {
   render: () => ({
     components: { PrTypography },
     template: `
-      <div class="overflow-x-auto">
+      <div class="pr:overflow-x-auto">
         <PrTypography variant="table">
           <thead>
             <tr>

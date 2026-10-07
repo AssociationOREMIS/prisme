@@ -44,46 +44,46 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
   <!-- A <header> (banner), not a <nav>: it holds the brand, theme and user menu, while the
        sidebar is the navigation. The app name is a <p>, leaving each page its own <h1>. -->
   <!-- Focus rings sit on the dark navbar here: a light blue (8:1) instead of the default blue-500 (2.35:1). -->
-  <header class="pr-navbar [--pr-color-focus:var(--pr-blue-200)] sticky top-0 col-[1/-1] row-[1] z-[50] flex h-[var(--pr-navbar-height)] w-full items-center justify-between bg-[var(--pr-color-navbar)] px-[var(--pr-space-4)] py-[var(--pr-space-3)] text-[color:var(--pr-color-navbar-text)] max-[780px]:px-[var(--pr-space-3)]">
-    <div class="pr-navbar__brand inline-flex min-w-0 items-center gap-[var(--pr-space-3)]">
+  <header class="pr-navbar pr:[--pr-color-focus:var(--pr-blue-200)] pr:sticky pr:top-0 pr:col-[1/-1] pr:row-[1] pr:z-[50] pr:flex pr:h-[var(--pr-navbar-height)] pr:w-full pr:items-center pr:justify-between pr:bg-[var(--pr-color-navbar)] pr:px-[var(--pr-space-4)] pr:py-[var(--pr-space-3)] pr:text-[color:var(--pr-color-navbar-text)] pr:max-[780px]:px-[var(--pr-space-3)]">
+    <div class="pr-navbar__brand pr:inline-flex pr:min-w-0 pr:items-center pr:gap-[var(--pr-space-3)]">
       <slot name="brand">
         <img
-          class="pr-navbar__logo block h-9 w-auto shrink-0 object-contain object-center"
+          class="pr-navbar__logo pr:block pr:h-9 pr:w-auto pr:shrink-0 pr:object-contain pr:object-center"
           :class="[
-            { 'pr-navbar__logo--icon w-9': logoVariant === 'icon-only' },
-            { 'max-[780px]:hidden': hasMobileLogo },
+            { 'pr-navbar__logo--icon pr:w-9': logoVariant === 'icon-only' },
+            { 'pr:max-[780px]:hidden': hasMobileLogo },
           ]"
           :src="resolvedLogoSrc"
           alt="OREMIS"
         />
         <img
           v-if="hasMobileLogo"
-          class="pr-navbar__logo pr-navbar__logo--mobile hidden h-9 w-9 shrink-0 object-contain object-center max-[780px]:block"
+          class="pr-navbar__logo pr-navbar__logo--mobile pr:hidden pr:h-9 pr:w-9 pr:shrink-0 pr:object-contain pr:object-center pr:max-[780px]:block"
           :src="mobileLogoSrc"
           alt="OREMIS"
         />
         <span
           class="pr-navbar__divider"
           :class="[
-            'h-8 w-0.5 shrink-0 bg-[var(--pr-color-navbar-muted)]',
-            { 'pr-navbar__divider--diagonal rotate-12': diagonalDivider, 'max-[780px]:hidden': hideTitleOnMobile },
+            'pr:h-8 pr:w-0.5 pr:shrink-0 pr:bg-[var(--pr-color-navbar-muted)]',
+            { 'pr-navbar__divider--diagonal pr:rotate-12': diagonalDivider, 'pr:max-[780px]:hidden': hideTitleOnMobile },
           ]"
           aria-hidden="true"
         />
-        <p :class="{ 'max-[780px]:hidden': hideTitleOnMobile }" class="pr-navbar__title m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
+        <p :class="{ 'pr:max-[780px]:hidden': hideTitleOnMobile }" class="pr-navbar__title pr:m-0 pr:min-w-0 pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-lg)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
       </slot>
     </div>
 
     <div
       v-if="$slots.default || $slots.actions"
-      class="pr-navbar__actions ml-auto inline-flex shrink-0 items-center gap-[var(--pr-space-1)]"
-      :class="{ 'max-[780px]:hidden': hideActionsOnMobile }"
+      class="pr-navbar__actions pr:ml-auto pr:inline-flex pr:shrink-0 pr:items-center pr:gap-[var(--pr-space-1)]"
+      :class="{ 'pr:max-[780px]:hidden': hideActionsOnMobile }"
     >
       <slot />
       <slot name="actions" />
     </div>
 
-    <div v-if="$slots.user" class="pr-navbar__user ml-[var(--pr-space-3)] inline-flex shrink-0 items-center gap-[var(--pr-space-1)] border-l border-[var(--pr-color-navbar-border)] pl-[var(--pr-space-3)] max-[780px]:ml-[var(--pr-space-2)] max-[780px]:pl-[var(--pr-space-2)]">
+    <div v-if="$slots.user" class="pr-navbar__user pr:ml-[var(--pr-space-3)] pr:inline-flex pr:shrink-0 pr:items-center pr:gap-[var(--pr-space-1)] pr:border-l pr:border-[var(--pr-color-navbar-border)] pr:pl-[var(--pr-space-3)] pr:max-[780px]:ml-[var(--pr-space-2)] pr:max-[780px]:pl-[var(--pr-space-2)]">
       <slot name="user" />
     </div>
   </header>

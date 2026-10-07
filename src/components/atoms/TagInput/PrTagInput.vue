@@ -131,21 +131,21 @@ defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
-  <div class="pr-tag-input grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
+  <div class="pr-tag-input pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <label
       v-if="label"
-      class="pr-tag-input__label inline-flex w-fit items-baseline gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)]"
+      class="pr-tag-input__label pr:inline-flex pr:w-fit pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)]"
       :for="inputId"
     >
       <span>{{ label }}</span>
-      <span v-if="required" class="text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
+      <span v-if="required" class="pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
     </label>
     <div
-      class="pr-tag-input__field flex min-h-[2.375rem] w-full flex-wrap items-center gap-[var(--pr-space-1)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-2)] py-[var(--pr-space-1)] transition-[border-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
+      class="pr-tag-input__field pr:flex pr:min-h-[2.375rem] pr:w-full pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-2)] pr:py-[var(--pr-space-1)] pr:transition-[border-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:focus-within:outline-2 pr:focus-within:outline-offset-2 pr:focus-within:outline-[var(--pr-color-focus)]"
       :class="{
-        'border-[var(--pr-color-danger)]': Boolean(errorText),
-        'cursor-text': !disabled,
-        'cursor-not-allowed opacity-60': disabled,
+        'pr:border-[var(--pr-color-danger)]': Boolean(errorText),
+        'pr:cursor-text': !disabled,
+        'pr:cursor-not-allowed pr:opacity-60': disabled,
       }"
       :aria-disabled="disabled || undefined"
       @click="focusInput"
@@ -153,13 +153,13 @@ defineOptions({ inheritAttrs: false })
       <span
         v-for="(tag, index) in tags"
         :key="index"
-        class="pr-tag-input__tag inline-flex items-center gap-[var(--pr-space-1)] rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] px-[var(--pr-space-2)] py-0.5 text-[length:var(--pr-font-size-xs)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)]"
+        class="pr-tag-input__tag pr:inline-flex pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-sm)] pr:bg-[var(--pr-color-surface-subtle)] pr:px-[var(--pr-space-2)] pr:py-0.5 pr:text-[length:var(--pr-font-size-xs)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)]"
       >
         {{ tag }}
         <button
           v-if="!disabled"
           type="button"
-          class="-my-1 -mr-1.5 inline-grid size-6 place-items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+          class="pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="`Supprimer ${tag}`"
           @click.stop="removeTag(index)"
         >
@@ -171,7 +171,7 @@ defineOptions({ inheritAttrs: false })
         ref="inputRef"
         v-bind="$attrs"
         v-model="inputValue"
-        class="pr-tag-input__input min-w-[6rem] grow bg-transparent py-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed"
+        class="pr-tag-input__input pr:min-w-[6rem] pr:grow pr:bg-transparent pr:py-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
         type="text"
         :placeholder="tags.length === 0 ? placeholder : undefined"
         :disabled="disabled || !canAddMore"
@@ -188,7 +188,7 @@ defineOptions({ inheritAttrs: false })
     <template v-if="name">
       <input v-for="(tag, index) in tags" :key="`${inputId}-${index}`" type="hidden" :name="name" :value="tag">
     </template>
-    <p v-if="errorText" :id="errorId" class="pr-tag-input__message pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-tag-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-tag-input__message pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
+    <p v-else-if="hint" :id="hintId" class="pr-tag-input__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

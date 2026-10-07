@@ -22,7 +22,7 @@ const icon = computed(() => (resolvedTheme.value === 'light' ? Moon : Sun))
 
 <template>
   <button
-    class="pr-theme-toggle inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text-muted)] shadow-[var(--pr-shadow-xs)] transition-[background-color,border-color,color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:border-[var(--pr-color-primary-border)] hover:bg-[var(--pr-color-primary-soft)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+    class="pr-theme-toggle pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text-muted)] pr:shadow-[var(--pr-shadow-xs)] pr:transition-[background-color,border-color,color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:border-[var(--pr-color-primary-border)] pr:hover:bg-[var(--pr-color-primary-soft)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
     type="button"
     :aria-label="accessibleLabel"
     :title="accessibleLabel"

@@ -29,13 +29,13 @@ withDefaults(defineProps<PrHoverCardProps>(), {
     </HoverCardTrigger>
     <HoverCardPortal>
       <HoverCardContent
-        class="pr-hover-card z-[95] w-[min(20rem,calc(100vw-var(--pr-space-6)))] rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-4)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] origin-[var(--reka-hover-card-content-transform-origin)] data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[side=top]:origin-bottom data-[side=right]:origin-left data-[side=bottom]:origin-top data-[side=left]:origin-right"
+        class="pr-hover-card pr:z-[95] pr:w-[min(20rem,calc(100vw-var(--pr-space-6)))] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:origin-[var(--reka-hover-card-content-transform-origin)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=right]:origin-left pr:data-[side=bottom]:origin-top pr:data-[side=left]:origin-right"
         :side="side"
         :align="align"
         :side-offset="8"
       >
         <slot />
-        <HoverCardArrow class="pr-hover-card__arrow fill-[var(--pr-color-surface)]" :width="12" :height="6" />
+        <HoverCardArrow class="pr-hover-card__arrow pr:fill-[var(--pr-color-surface)]" :width="12" :height="6" />
       </HoverCardContent>
     </HoverCardPortal>
   </HoverCardRoot>

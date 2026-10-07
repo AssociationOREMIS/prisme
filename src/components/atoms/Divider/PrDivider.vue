@@ -10,12 +10,12 @@ const props = withDefaults(defineProps<PrDividerProps>(), {
 })
 
 const dividerOrientationClass: Record<NonNullable<PrDividerProps['orientation']>, string> = {
-  horizontal: 'my-[var(--pr-space-4)] h-px w-full',
-  vertical: 'mx-[var(--pr-space-4)] min-h-6 w-px self-stretch',
+  horizontal: 'pr:my-[var(--pr-space-4)] pr:h-px pr:w-full',
+  vertical: 'pr:mx-[var(--pr-space-4)] pr:min-h-6 pr:w-px pr:self-stretch',
 }
 
 const dividerClass = computed(() => [
-  'pr-divider shrink-0 border-0 bg-[var(--pr-color-border)]',
+  'pr-divider pr:shrink-0 pr:border-0 pr:bg-[var(--pr-color-border)]',
   dividerOrientationClass[props.orientation],
 ])
 </script>

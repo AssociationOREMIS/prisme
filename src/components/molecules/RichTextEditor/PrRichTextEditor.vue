@@ -126,10 +126,10 @@ const CALLOUT_VARIANTS = [
 // rule Tailwind happens to emit later in the generated stylesheet — not DOM
 // class order — so without `!` these "active" overrides can silently lose.
 const calloutVariantClass: Record<typeof CALLOUT_VARIANTS[number]['variant'], string> = {
-  info: 'border-[var(--pr-color-info-border)]! bg-[var(--pr-color-info-soft)]! text-[color:var(--pr-color-info)]!',
-  success: 'border-[var(--pr-color-success-border)]! bg-[var(--pr-color-success-soft)]! text-[color:var(--pr-color-success)]!',
-  warning: 'border-[var(--pr-color-warning-border)]! bg-[var(--pr-color-warning-soft)]! text-[color:var(--pr-color-warning)]!',
-  danger: 'border-[var(--pr-color-danger-border)]! bg-[var(--pr-color-danger-soft)]! text-[color:var(--pr-color-danger)]!',
+  info: 'pr:border-[var(--pr-color-info-border)]! pr:bg-[var(--pr-color-info-soft)]! pr:text-[color:var(--pr-color-info)]!',
+  success: 'pr:border-[var(--pr-color-success-border)]! pr:bg-[var(--pr-color-success-soft)]! pr:text-[color:var(--pr-color-success)]!',
+  warning: 'pr:border-[var(--pr-color-warning-border)]! pr:bg-[var(--pr-color-warning-soft)]! pr:text-[color:var(--pr-color-warning)]!',
+  danger: 'pr:border-[var(--pr-color-danger-border)]! pr:bg-[var(--pr-color-danger-soft)]! pr:text-[color:var(--pr-color-danger)]!',
 }
 
 const generatedId = useId()
@@ -386,13 +386,13 @@ defineExpose({ editor, insertImageFromFile })
 // element at all, sidestepping the collision instead of fighting it with
 // `!important` (which would have meant marking hover/active important too,
 // risking active losing to hover when both apply at once).
-const toolbarButtonClass = 'pr-rich-text-editor__btn inline-flex h-9 w-9 items-center justify-center rounded-[var(--pr-radius-md)] border! border-transparent! bg-[transparent] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:not-disabled:bg-[var(--pr-color-surface-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] disabled:cursor-not-allowed disabled:opacity-40'
+const toolbarButtonClass = 'pr-rich-text-editor__btn pr:inline-flex pr:h-9 pr:w-9 pr:items-center pr:justify-center pr:rounded-[var(--pr-radius-md)] pr:border! pr:border-transparent! pr:bg-[transparent] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:not-disabled:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:opacity-40'
 // `!` needed: see comment above `calloutVariantClass` — same base-class collision.
-const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(--pr-color-primary-contrast)]!'
+const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[color:var(--pr-color-primary-contrast)]!'
 </script>
 
 <template>
-  <div class="pr-rich-text-editor grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
+  <div class="pr-rich-text-editor pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel
       v-if="label"
       :id="labelId"
@@ -405,8 +405,8 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
     </PrLabel>
     <div
       v-bind="$attrs"
-      class="pr-rich-text-editor__root rounded-[var(--pr-radius-lg)] border! bg-[var(--pr-color-surface)]"
-      :class="[errorText ? 'border-[var(--pr-color-danger)]!' : 'border-[var(--pr-color-border-strong)]!', disabled ? 'opacity-60' : '']"
+      class="pr-rich-text-editor__root pr:rounded-[var(--pr-radius-lg)] pr:border! pr:bg-[var(--pr-color-surface)]"
+      :class="[errorText ? 'pr:border-[var(--pr-color-danger)]!' : 'pr:border-[var(--pr-color-border-strong)]!', disabled ? 'pr:opacity-60' : '']"
       :aria-disabled="disabled || undefined"
     >
       <!--
@@ -429,7 +429,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
         height) on any ancestor of this component to stick the toolbar
         right below it instead; it defaults to `0px` for pages without one.
       -->
-      <div class="pr-rich-text-editor__toolbar sticky top-[var(--pr-rich-text-editor-sticky-offset,0px)] z-10 flex flex-wrap items-center gap-[var(--pr-space-1)] rounded-t-[var(--pr-radius-lg)] border-b border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-2)]" role="toolbar" aria-label="Mise en forme du contenu">
+      <div class="pr-rich-text-editor__toolbar pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-t-[var(--pr-radius-lg)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]" role="toolbar" aria-label="Mise en forme du contenu">
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('heading', { level: 2 }) ? toolbarButtonActiveClass : '']"
                 :disabled="!editor || disabled" title="Titre" aria-label="Titre" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()">
           <Heading2 :size="16" aria-hidden="true" />
@@ -439,13 +439,13 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
           <Heading3 :size="16" aria-hidden="true" />
         </button>
 
-        <span class="pr-rich-text-editor__separator mx-[0.125rem] my-[var(--pr-space-1)] w-px self-stretch bg-[var(--pr-color-border)]" aria-hidden="true" />
+        <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('bold') ? toolbarButtonActiveClass : '']"
                 :disabled="!editor || disabled" title="Gras" aria-label="Gras" @click="editor?.chain().focus().toggleBold().run()">
           <Bold :size="16" aria-hidden="true" />
         </button>
-        <button type="button" :class="[toolbarButtonClass, editor?.isActive('italic') ? toolbarButtonActiveClass : '']"
+        <button type="button" :class="[toolbarButtonClass, editor?.isActive('pr:italic') ? toolbarButtonActiveClass : '']"
                 :disabled="!editor || disabled" title="Italique" aria-label="Italique" @click="editor?.chain().focus().toggleItalic().run()">
           <Italic :size="16" aria-hidden="true" />
         </button>
@@ -465,9 +465,9 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
                 :disabled="!editor || disabled" title="Surligner" aria-label="Surligner" @click="editor?.chain().focus().toggleHighlight().run()">
           <Highlighter :size="16" aria-hidden="true" />
         </button>
-        <label class="pr-rich-text-editor__color relative inline-flex h-9 w-9 items-center justify-center rounded-[var(--pr-radius-md)] text-[color:var(--pr-color-text-muted)] hover:bg-[var(--pr-color-surface-subtle)]" title="Couleur du texte">
+        <label class="pr-rich-text-editor__color pr:relative pr:inline-flex pr:h-9 pr:w-9 pr:items-center pr:justify-center pr:rounded-[var(--pr-radius-md)] pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)]" title="Couleur du texte">
           <Palette :size="16" aria-hidden="true" />
-          <input type="color" class="absolute inset-0 h-full w-full cursor-pointer opacity-0" aria-label="Couleur du texte" :disabled="!editor || disabled"
+          <input type="color" class="pr:absolute pr:inset-0 pr:h-full pr:w-full pr:cursor-pointer pr:opacity-0" aria-label="Couleur du texte" :disabled="!editor || disabled"
                  :value="editor?.getAttributes('textStyle').color || '#000000'" @input="setTextColor">
         </label>
         <button type="button" :class="toolbarButtonClass" :disabled="!editor || disabled"
@@ -475,7 +475,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
           <Eraser :size="16" aria-hidden="true" />
         </button>
 
-        <span class="pr-rich-text-editor__separator mx-[0.125rem] my-[var(--pr-space-1)] w-px self-stretch bg-[var(--pr-color-border)]" aria-hidden="true" />
+        <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button v-for="alignment in TEXT_ALIGNMENTS" :key="alignment.align" type="button"
                 :class="[toolbarButtonClass, editor?.isActive({ textAlign: alignment.align }) ? toolbarButtonActiveClass : '']"
@@ -484,7 +484,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
           <component :is="alignment.icon" :size="16" aria-hidden="true" />
         </button>
 
-        <span class="pr-rich-text-editor__separator mx-[0.125rem] my-[var(--pr-space-1)] w-px self-stretch bg-[var(--pr-color-border)]" aria-hidden="true" />
+        <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('bulletList') ? toolbarButtonActiveClass : '']"
                 :disabled="!editor || disabled" title="Liste à puces" aria-label="Liste à puces" @click="editor?.chain().focus().toggleBulletList().run()">
@@ -511,7 +511,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
           <ChevronsDownUp :size="16" aria-hidden="true" />
         </button>
 
-        <span class="pr-rich-text-editor__separator mx-[0.125rem] my-[var(--pr-space-1)] w-px self-stretch bg-[var(--pr-color-border)]" aria-hidden="true" />
+        <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button v-for="callout in CALLOUT_VARIANTS" :key="callout.variant" type="button"
                 :class="[toolbarButtonClass, editor?.isActive('callout', { variant: callout.variant }) ? calloutVariantClass[callout.variant] : '']"
@@ -520,7 +520,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
           <component :is="callout.icon" :size="16" aria-hidden="true" />
         </button>
 
-        <span class="pr-rich-text-editor__separator mx-[0.125rem] my-[var(--pr-space-1)] w-px self-stretch bg-[var(--pr-color-border)]" aria-hidden="true" />
+        <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button type="button" :class="toolbarButtonClass" :disabled="!editor || disabled || isUploadingImage"
                 title="Insérer une image" aria-label="Insérer une image" @click="pickAndUploadImage">
@@ -535,7 +535,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
                 title="Insérer un tableau" aria-label="Insérer un tableau" @click="insertTable">
           <Table2 :size="16" aria-hidden="true" />
         </button>
-        <div ref="emojiPickerRef" class="pr-rich-text-editor__emoji-picker relative inline-flex">
+        <div ref="emojiPickerRef" class="pr-rich-text-editor__emoji-picker pr:relative pr:inline-flex">
           <button type="button" :class="toolbarButtonClass" :disabled="!editor || disabled"
                   title="Insérer un emoji" aria-label="Insérer un emoji"
                   :aria-expanded="isEmojiPickerOpen" @click="isEmojiPickerOpen = !isEmojiPickerOpen">
@@ -552,16 +552,16 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
             top of each other. Fixed-length tracks aren't relative to the
             container's width, so they size correctly regardless of it.
           -->
-          <div v-if="isEmojiPickerOpen" class="pr-rich-text-editor__emoji-popover absolute left-0 top-[calc(100%+0.25rem)] z-20 grid grid-cols-[repeat(6,2rem)] gap-[0.125rem] rounded-[var(--pr-radius-lg)] border! border-[var(--pr-color-border)]! bg-[var(--pr-color-surface)] p-[var(--pr-space-2)] shadow-[var(--pr-shadow-md)]" role="menu">
+          <div v-if="isEmojiPickerOpen" class="pr-rich-text-editor__emoji-popover pr:absolute pr:left-0 pr:top-[calc(100%+0.25rem)] pr:z-20 pr:grid pr:grid-cols-[repeat(6,2rem)] pr:gap-[0.125rem] pr:rounded-[var(--pr-radius-lg)] pr:border! pr:border-[var(--pr-color-border)]! pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)] pr:shadow-[var(--pr-shadow-md)]" role="menu">
             <button v-for="item in emojiPickerEmojis" :key="item.name" type="button"
-                    class="pr-rich-text-editor__emoji-item inline-flex h-8 w-8 items-center justify-center rounded-[var(--pr-radius-md)] border-none bg-[transparent] text-[length:1.125rem] hover:not-disabled:bg-[var(--pr-color-surface-subtle)]" role="menuitem"
+                    class="pr-rich-text-editor__emoji-item pr:inline-flex pr:h-8 pr:w-8 pr:items-center pr:justify-center pr:rounded-[var(--pr-radius-md)] pr:border-none pr:bg-[transparent] pr:text-[length:1.125rem] pr:hover:not-disabled:bg-[var(--pr-color-surface-subtle)]" role="menuitem"
                     :aria-label="item.name" @click="insertEmoji(item.name)">
               {{ item.emoji }}
             </button>
           </div>
         </div>
 
-        <span class="pr-rich-text-editor__separator mx-[0.125rem] my-[var(--pr-space-1)] w-px self-stretch bg-[var(--pr-color-border)]" aria-hidden="true" />
+        <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button type="button" :class="toolbarButtonClass" :disabled="!editor?.can().undo()"
                 title="Annuler" aria-label="Annuler" @click="editor?.chain().focus().undo().run()">
@@ -579,19 +579,19 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
         class="pr-rich-text-editor__content pr-editor-content"
       />
 
-      <p v-if="uploadError" class="pr-rich-text-editor__upload-error m-0 rounded-b-[var(--pr-radius-lg)] border-t border-[var(--pr-color-border)] px-[var(--pr-space-5)] py-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-danger)]" role="alert">
+      <p v-if="uploadError" class="pr-rich-text-editor__upload-error pr:m-0 pr:rounded-b-[var(--pr-radius-lg)] pr:border-t pr:border-[var(--pr-color-border)] pr:px-[var(--pr-space-5)] pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-danger)]" role="alert">
         {{ uploadError }}
       </p>
 
-      <p v-if="editor" class="pr-rich-text-editor__count m-0 rounded-b-[var(--pr-radius-lg)] border-t border-[var(--pr-color-border)] bg-[var(--pr-color-surface-subtle)] px-[var(--pr-space-5)] py-[var(--pr-space-2)] text-[length:var(--pr-font-size-xs)] text-[color:var(--pr-color-text-muted)]">
+      <p v-if="editor" class="pr-rich-text-editor__count pr:m-0 pr:rounded-b-[var(--pr-radius-lg)] pr:border-t pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface-subtle)] pr:px-[var(--pr-space-5)] pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">
         {{ editor.storage.characterCount.characters() }} caractères · {{ editor.storage.characterCount.words() }} mots
       </p>
     </div>
     <input v-if="name" type="hidden" :name="name" :value="html">
-    <p v-if="errorText" :id="errorId" class="pr-rich-text-editor__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">
+    <p v-if="errorText" :id="errorId" class="pr-rich-text-editor__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">
       {{ errorText }}
     </p>
-    <p v-else-if="hint" :id="hintId" class="pr-rich-text-editor__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">
+    <p v-else-if="hint" :id="hintId" class="pr-rich-text-editor__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">
       {{ hint }}
     </p>
   </div>

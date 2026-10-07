@@ -252,14 +252,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="pr-data-table flex flex-col gap-[var(--pr-space-4)]">
-    <div v-if="$slots.toolbar || filterColumnKey || displayViewOptions" class="pr-data-table__toolbar flex flex-wrap items-center justify-between gap-[var(--pr-space-3)]">
-      <div class="pr-data-table__toolbar-content flex min-w-[min(100%,16rem)] flex-1 items-center gap-[var(--pr-space-2)]">
+  <div class="pr-data-table pr:flex pr:flex-col pr:gap-[var(--pr-space-4)]">
+    <div v-if="$slots.toolbar || filterColumnKey || displayViewOptions" class="pr-data-table__toolbar pr:flex pr:flex-wrap pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)]">
+      <div class="pr-data-table__toolbar-content pr:flex pr:min-w-[min(100%,16rem)] pr:flex-1 pr:items-center pr:gap-[var(--pr-space-2)]">
         <slot name="toolbar" :filter-value="filterValue">
           <PrInput
             v-if="filterColumnKey"
             v-model="filterValue"
-            class="pr-data-table__filter h-8 w-full max-w-[28rem]"
+            class="pr-data-table__filter pr:h-8 pr:w-full pr:max-w-[28rem]"
             :placeholder="filterLabel"
             :aria-label="filterLabel"
           />
@@ -274,12 +274,12 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <div class="pr-data-table__shell overflow-hidden rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)]">
-      <div class="pr-data-table__scroll w-full overflow-auto">
-        <table class="pr-data-table__table w-full caption-bottom border-collapse text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text)]">
-          <thead class="pr-data-table__head border-b border-[var(--pr-color-border)] bg-[var(--pr-color-surface-subtle)]">
-            <tr class="pr-data-table__row border-b border-[var(--pr-color-border)] transition-colors last:border-b-0">
-              <th v-if="selectable" class="pr-data-table__header h-12 w-[1%] px-[var(--pr-space-4)] text-left align-middle font-bold">
+    <div class="pr-data-table__shell pr:overflow-hidden pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)]">
+      <div class="pr-data-table__scroll pr:w-full pr:overflow-auto">
+        <table class="pr-data-table__table pr:w-full pr:caption-bottom pr:border-collapse pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)]">
+          <thead class="pr-data-table__head pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface-subtle)]">
+            <tr class="pr-data-table__row pr:border-b pr:border-[var(--pr-color-border)] pr:transition-colors pr:last:border-b-0">
+              <th v-if="selectable" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
                 <PrCheckbox
                   :checked="selectAllState"
                   aria-label="Sélectionner la page"
@@ -289,7 +289,7 @@ onBeforeUnmount(() => {
               <th
                 v-for="column in visibleColumns"
                 :key="column.key"
-                class="pr-data-table__header h-12 whitespace-nowrap px-[var(--pr-space-4)] text-left align-middle font-bold text-[color:var(--pr-color-text)]"
+                class="pr-data-table__header pr:h-12 pr:whitespace-nowrap pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold pr:text-[color:var(--pr-color-text)]"
                 :class="column.headerClass"
                 :style="columnStyle(column)"
                 :aria-sort="sortKey === column.key ? (sortDirection === 'asc' ? 'ascending' : 'descending') : undefined"
@@ -302,32 +302,32 @@ onBeforeUnmount(() => {
                   @hide="hideColumn"
                 />
               </th>
-              <th v-if="hasRowActions" class="pr-data-table__header h-12 w-[1%] px-[var(--pr-space-4)] text-left align-middle font-bold">
-                <span class="sr-only">Actions</span>
+              <th v-if="hasRowActions" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
+                <span class="pr:sr-only">Actions</span>
               </th>
             </tr>
           </thead>
           <tbody class="pr-data-table__body">
             <template v-if="isLoading">
-              <tr v-for="rowIndex in skeletonRows" :key="rowIndex" class="pr-data-table__row border-b border-[var(--pr-color-border)] last:border-b-0">
-                <td v-if="selectable" class="pr-data-table__cell p-[var(--pr-space-4)] align-middle">
-                  <PrSkeleton class="size-4 rounded-[var(--pr-radius-sm)]" />
+              <tr v-for="rowIndex in skeletonRows" :key="rowIndex" class="pr-data-table__row pr:border-b pr:border-[var(--pr-color-border)] pr:last:border-b-0">
+                <td v-if="selectable" class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle">
+                  <PrSkeleton class="pr:size-4 pr:rounded-[var(--pr-radius-sm)]" />
                 </td>
                 <td
                   v-for="column in visibleColumns"
                   :key="column.key"
-                  class="pr-data-table__cell p-[var(--pr-space-4)] align-middle"
+                  class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle"
                 >
-                  <PrSkeleton class="h-6 w-full rounded-[var(--pr-radius-md)]" />
+                  <PrSkeleton class="pr:h-6 pr:w-full pr:rounded-[var(--pr-radius-md)]" />
                 </td>
-                <td v-if="hasRowActions" class="pr-data-table__cell p-[var(--pr-space-4)] align-middle">
-                  <PrSkeleton class="ml-auto size-8 rounded-[var(--pr-radius-md)]" />
+                <td v-if="hasRowActions" class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle">
+                  <PrSkeleton class="pr:ml-auto pr:size-8 pr:rounded-[var(--pr-radius-md)]" />
                 </td>
               </tr>
             </template>
 
             <tr v-else-if="visibleRows.length === 0" class="pr-data-table__row">
-              <td :colspan="totalColumnCount" class="pr-data-table__cell h-24 p-[var(--pr-space-4)] text-center align-middle text-[color:var(--pr-color-text-muted)]">
+              <td :colspan="totalColumnCount" class="pr-data-table__cell pr:h-24 pr:p-[var(--pr-space-4)] pr:text-center pr:align-middle pr:text-[color:var(--pr-color-text-muted)]">
                 {{ emptyMessage }}
               </td>
             </tr>
@@ -336,10 +336,10 @@ onBeforeUnmount(() => {
               <tr
                 v-for="row in visibleRows"
                 :key="rowId(row)"
-                class="pr-data-table__row border-b border-[var(--pr-color-border)] transition-colors last:border-b-0 hover:bg-[var(--pr-color-surface-subtle)] data-[state=selected]:bg-[var(--pr-color-primary-soft)]"
+                class="pr-data-table__row pr:border-b pr:border-[var(--pr-color-border)] pr:transition-colors pr:last:border-b-0 pr:hover:bg-[var(--pr-color-surface-subtle)] pr:data-[state=selected]:bg-[var(--pr-color-primary-soft)]"
                 :data-state="selectedKeys.has(rowId(row)) ? 'selected' : undefined"
               >
-                <td v-if="selectable" class="pr-data-table__cell p-[var(--pr-space-4)] align-middle">
+                <td v-if="selectable" class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle">
                   <PrCheckbox
                     :checked="selectedKeys.has(rowId(row))"
                     :aria-label="`Sélectionner ${rowLabel(row)}`"
@@ -349,7 +349,7 @@ onBeforeUnmount(() => {
                 <td
                   v-for="column in visibleColumns"
                   :key="column.key"
-                  class="pr-data-table__cell p-[var(--pr-space-4)] align-middle"
+                  class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle"
                   :class="column.class"
                   :style="columnStyle(column)"
                 >
@@ -357,11 +357,11 @@ onBeforeUnmount(() => {
                     {{ cellValue(row, column) }}
                   </slot>
                 </td>
-                <td v-if="hasRowActions" class="pr-data-table__cell p-[var(--pr-space-4)] align-middle">
+                <td v-if="hasRowActions" class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle">
                   <slot name="row-actions" :row="row">
                     <PrDropdownMenu align="end" label="Actions">
                       <template #trigger>
-                        <PrButton class="ml-auto size-8 p-0" variant="ghost" size="sm" aria-label="Actions">
+                        <PrButton class="pr:ml-auto pr:size-8 pr:p-0" variant="ghost" size="sm" aria-label="Actions">
                           <MoreHorizontal :size="16" aria-hidden="true" />
                         </PrButton>
                       </template>

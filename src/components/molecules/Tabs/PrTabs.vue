@@ -34,25 +34,25 @@ const emit = defineEmits<{
 
 <template>
   <TabsRoot
-    class="pr-tabs flex"
-    :class="orientation === 'vertical' ? 'flex-row gap-[var(--pr-space-4)]' : 'flex-col'"
+    class="pr-tabs pr:flex"
+    :class="orientation === 'vertical' ? 'pr:flex-row pr:gap-[var(--pr-space-4)]' : 'pr:flex-col'"
     :model-value="modelValue"
     :default-value="defaultValue"
     :orientation="orientation"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <TabsList
-      class="pr-tabs__list relative flex shrink-0 border-[var(--pr-color-border)]"
-      :class="orientation === 'vertical' ? 'flex-col border-r' : 'flex-row overflow-x-auto border-b'"
+      class="pr-tabs__list pr:relative pr:flex pr:shrink-0 pr:border-[var(--pr-color-border)]"
+      :class="orientation === 'vertical' ? 'pr:flex-col pr:border-r' : 'pr:flex-row pr:overflow-x-auto pr:border-b'"
     >
       <TabsIndicator
-        class="pr-tabs__indicator absolute bg-[var(--pr-color-primary)] transition-all duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]"
-        :class="orientation === 'vertical' ? 'right-0 w-0.5 translate-x-px' : 'bottom-0 h-0.5'"
+        class="pr-tabs__indicator pr:absolute pr:bg-[var(--pr-color-primary)] pr:transition-all pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
+        :class="orientation === 'vertical' ? 'pr:right-0 pr:w-0.5 pr:translate-x-px' : 'pr:bottom-0 pr:h-0.5'"
       />
       <TabsTrigger
         v-for="tab in tabs"
         :key="tab.value"
-        class="pr-tabs__trigger relative inline-flex shrink-0 cursor-pointer items-center gap-[var(--pr-space-2)] px-[var(--pr-space-4)] py-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] hover:text-[color:var(--pr-color-text)] data-[state=active]:text-[color:var(--pr-color-primary)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
+        class="pr-tabs__trigger pr:relative pr:inline-flex pr:shrink-0 pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-2)] pr:px-[var(--pr-space-4)] pr:py-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:hover:text-[color:var(--pr-color-text)] pr:data-[state=active]:text-[color:var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-50"
         :value="tab.value"
         :disabled="tab.disabled"
       >
@@ -62,7 +62,7 @@ const emit = defineEmits<{
     <TabsContent
       v-for="tab in tabs"
       :key="tab.value"
-      class="pr-tabs__content grow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+      class="pr-tabs__content pr:grow pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
       :value="tab.value"
     >
       <slot :name="tab.value" />

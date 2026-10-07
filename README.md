@@ -404,6 +404,10 @@ Build du Storybook statique :
 npm run build-storybook
 ```
 
+### Classes Tailwind des composants : prefixe `pr:`
+
+Depuis la 0.18, les classes Tailwind des composants portent le prefixe `pr:` (`pr:flex`, `pr:sm:top-auto`, `pr:data-[state=open]:bg-[...]`), configure par `prefix(pr)` dans `src/styles/prisme.css`. Prisme ne genere donc aucune classe du meme nom que celles d'une app (`.hidden`, `.top-0`...) : aucune ne peut ecraser l'autre. Les classes BEM (`pr-button`, `pr-data-table__filter`) restent sans prefixe. Une classe sans `pr:` dans un composant n'est pas generee : `node scripts/prefix-classes.mjs` liste celles qui auraient ete oubliees (`--write` les corrige).
+
 ## Publier une version
 
 On travaille sur `develop`. Pour publier :

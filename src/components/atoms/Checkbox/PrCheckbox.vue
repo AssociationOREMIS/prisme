@@ -65,8 +65,8 @@ const describedBy = computed(() => {
 })
 
 const checkboxClass = computed(() => [
-  'pr-checkbox inline-flex items-start gap-[var(--pr-space-3)] text-[color:var(--pr-color-text)] leading-[var(--pr-line-height-tight)]',
-  props.disabled ? 'pr-checkbox--disabled cursor-not-allowed text-[color:var(--pr-color-text-muted)]' : '',
+  'pr-checkbox pr:inline-flex pr:items-start pr:gap-[var(--pr-space-3)] pr:text-[color:var(--pr-color-text)] pr:leading-[var(--pr-line-height-tight)]',
+  props.disabled ? 'pr-checkbox--disabled pr:cursor-not-allowed pr:text-[color:var(--pr-color-text-muted)]' : '',
 ])
 </script>
 
@@ -75,7 +75,7 @@ const checkboxClass = computed(() => [
     <input v-if="name && uncheckedValue !== undefined" type="hidden" :name="name" :value="uncheckedValue" :disabled="disabled">
     <CheckboxRoot
       v-bind="$attrs"
-      class="pr-checkbox__control mt-[0.0625rem] inline-grid size-[1.125rem] shrink-0 cursor-pointer appearance-none place-items-center rounded-[var(--pr-radius-sm)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] p-0 leading-none text-[color:var(--pr-color-primary-contrast)] box-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] data-[state=checked]:border-[var(--pr-color-primary)] data-[state=checked]:bg-[var(--pr-color-primary)] data-[state=indeterminate]:border-[var(--pr-color-primary)] data-[state=indeterminate]:bg-[var(--pr-color-primary)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"
+      class="pr-checkbox__control pr:mt-[0.0625rem] pr:inline-grid pr:size-[1.125rem] pr:shrink-0 pr:cursor-pointer pr:appearance-none pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:p-0 pr:leading-none pr:text-[color:var(--pr-color-primary-contrast)] pr:box-border pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[state=checked]:border-[var(--pr-color-primary)] pr:data-[state=checked]:bg-[var(--pr-color-primary)] pr:data-[state=indeterminate]:border-[var(--pr-color-primary)] pr:data-[state=indeterminate]:bg-[var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
       :model-value="checked"
       :default-value="defaultChecked"
       :disabled="disabled"
@@ -89,7 +89,7 @@ const checkboxClass = computed(() => [
     >
       <template #default="{ state }">
         <CheckboxIndicator
-          class="pr-checkbox__indicator inline-grid size-full place-items-center leading-none opacity-100 scale-100 transition-[opacity,transform] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] data-[state=unchecked]:scale-[0.85] data-[state=unchecked]:opacity-0 [&_svg]:block [&_svg]:stroke-[3]"
+          class="pr-checkbox__indicator pr:inline-grid pr:size-full pr:place-items-center pr:leading-none pr:opacity-100 pr:scale-100 pr:transition-[opacity,transform] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:data-[state=unchecked]:scale-[0.85] pr:data-[state=unchecked]:opacity-0 pr:[&_svg]:block pr:[&_svg]:stroke-[3]"
           force-mount
         >
           <Minus v-if="state === 'indeterminate'" :size="12" aria-hidden="true" />
@@ -97,14 +97,14 @@ const checkboxClass = computed(() => [
         </CheckboxIndicator>
       </template>
     </CheckboxRoot>
-    <span v-if="label || description || $slots.default" class="pr-checkbox__text grid min-w-0 gap-[var(--pr-space-1)]">
-      <span class="pr-checkbox__label inline-flex items-baseline gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] font-[650] leading-[var(--pr-line-height-tight)]">
+    <span v-if="label || description || $slots.default" class="pr-checkbox__text pr:grid pr:min-w-0 pr:gap-[var(--pr-space-1)]">
+      <span class="pr-checkbox__label pr:inline-flex pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:leading-[var(--pr-line-height-tight)]">
         <slot>{{ label }}</slot>
-        <span v-if="required" class="pr-label__required text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
+        <span v-if="required" class="pr-label__required pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
       </span>
-      <span v-if="description" class="pr-checkbox__description text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
+      <span v-if="description" class="pr-checkbox__description pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
     </span>
   </label>
-  <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-  <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
+  <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
+  <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>

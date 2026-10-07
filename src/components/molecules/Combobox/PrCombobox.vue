@@ -112,29 +112,29 @@ function labelFor(value: string) {
 </script>
 
 <template>
-  <div class="pr-combobox grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
+  <div class="pr-combobox pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :for="inputId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <ComboboxRoot
-      class="relative"
+      class="pr:relative"
       :model-value="currentValue"
       :multiple="multiple"
       :disabled="disabled"
       @update:model-value="setValue($event as string | string[])"
     >
       <ComboboxAnchor
-        class="pr-combobox__anchor inline-flex min-h-[2.375rem] w-full flex-wrap items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] py-[var(--pr-space-1)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
-        :class="{ 'border-[var(--pr-color-danger)]': Boolean(errorText) }"
+        class="pr-combobox__anchor pr:inline-flex pr:min-h-[2.375rem] pr:w-full pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:py-[var(--pr-space-1)] pr:focus-within:outline-2 pr:focus-within:outline-offset-2 pr:focus-within:outline-[var(--pr-color-focus)]"
+        :class="{ 'pr:border-[var(--pr-color-danger)]': Boolean(errorText) }"
       >
         <span
           v-for="value in multiple && Array.isArray(currentValue) ? currentValue : []"
           :key="value"
-          class="pr-combobox__tag inline-flex items-center gap-[var(--pr-space-1)] rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] px-[var(--pr-space-2)] py-0.5 text-[length:var(--pr-font-size-xs)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)]"
+          class="pr-combobox__tag pr:inline-flex pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-sm)] pr:bg-[var(--pr-color-surface-subtle)] pr:px-[var(--pr-space-2)] pr:py-0.5 pr:text-[length:var(--pr-font-size-xs)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)]"
         >
           {{ labelFor(value) }}
           <button
             v-if="!disabled"
             type="button"
-            class="-my-1 -mr-1.5 inline-grid size-6 place-items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+            class="pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
             :aria-label="`Retirer ${labelFor(value)}`"
             @click.stop="removeValue(value)"
           >
@@ -143,7 +143,7 @@ function labelFor(value: string) {
         </span>
         <ComboboxInput
           :id="inputId"
-          class="pr-combobox__input min-w-0 grow bg-transparent py-[var(--pr-space-2)] text-[length:var(--pr-font-size-md)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed"
+          class="pr-combobox__input pr:min-w-0 pr:grow pr:bg-transparent pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
           :display-value="multiple ? undefined : displayValue"
           :placeholder="hasValue ? undefined : placeholder"
           :required="required && !hasValue"
@@ -154,37 +154,37 @@ function labelFor(value: string) {
         <button
           v-if="hasValue && !disabled"
           type="button"
-          class="pr-combobox__clear inline-grid size-6 shrink-0 place-items-center rounded-sm text-[color:var(--pr-color-text-muted)] transition-colors hover:text-[color:var(--pr-color-text)]"
+          class="pr-combobox__clear pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)]"
           :aria-label="'Effacer la sélection'"
           @click.stop="clearValue"
         >
           <X :size="14" aria-hidden="true" />
         </button>
         <ChevronDown
-          class="pr-combobox__icon shrink-0 text-[color:var(--pr-color-text-muted)]"
+          class="pr-combobox__icon pr:shrink-0 pr:text-[color:var(--pr-color-text-muted)]"
           :size="16"
           aria-hidden="true"
         />
       </ComboboxAnchor>
       <ComboboxPortal>
         <ComboboxContent
-          class="pr-combobox__content z-[95] max-h-[min(20rem,calc(100vh-var(--pr-space-8)))] w-[var(--reka-combobox-trigger-width)] overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] shadow-[var(--pr-shadow-md)] data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] data-[side=top]:origin-bottom data-[side=bottom]:origin-top"
+          class="pr-combobox__content pr:z-[95] pr:max-h-[min(20rem,calc(100vh-var(--pr-space-8)))] pr:w-[var(--reka-combobox-trigger-width)] pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=bottom]:origin-top"
           position="popper"
           :side-offset="8"
         >
-          <ComboboxViewport class="pr-combobox__viewport p-[var(--pr-space-2)]">
-            <ComboboxEmpty class="pr-combobox__empty py-[var(--pr-space-4)] text-center text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text-muted)]">
+          <ComboboxViewport class="pr-combobox__viewport pr:p-[var(--pr-space-2)]">
+            <ComboboxEmpty class="pr-combobox__empty pr:py-[var(--pr-space-4)] pr:text-center pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]">
               Aucun résultat
             </ComboboxEmpty>
             <ComboboxItem
               v-for="option in options"
               :key="option.value"
-              class="pr-combobox__item relative flex min-h-9 cursor-pointer items-center rounded-[var(--pr-radius-md)] py-0 pr-[var(--pr-space-8)] pl-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)] data-[highlighted]:bg-[var(--pr-color-surface-subtle)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
+              class="pr-combobox__item pr:relative pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-md)] pr:py-0 pr:pr-[var(--pr-space-8)] pr:pl-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-50"
               :value="option.value"
               :disabled="option.disabled"
             >
               {{ option.label }}
-              <ComboboxItemIndicator class="pr-combobox__item-indicator absolute right-[var(--pr-space-3)] inline-flex text-[color:var(--pr-color-primary)]">
+              <ComboboxItemIndicator class="pr-combobox__item-indicator pr:absolute pr:right-[var(--pr-space-3)] pr:inline-flex pr:text-[color:var(--pr-color-primary)]">
                 <Check :size="14" aria-hidden="true" />
               </ComboboxItemIndicator>
             </ComboboxItem>
@@ -198,7 +198,7 @@ function labelFor(value: string) {
       <input v-if="!multiple" type="hidden" :name="name" :value="typeof currentValue === 'string' ? currentValue : ''">
       <input v-for="value in Array.isArray(currentValue) ? currentValue : []" v-else :key="value" type="hidden" :name="name" :value="value">
     </template>
-    <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
+    <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>
