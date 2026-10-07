@@ -2,6 +2,23 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.19.0 (2026-10-07)
+
+### Changements visibles
+
+- **Les formulaires ne rechargent plus la page** (`navigation: 'swap'`, par defaut), comme les liens depuis la 0.16 : la navbar et la sidebar restent en place, seul le contenu change. Rien a modifier dans les controleurs ni les vues : Prisme envoie les memes champs que le navigateur et affiche la page vers laquelle Laravel redirige.
+  - Succes : la page suivante, avec son message flash.
+  - Validation ratee : la meme page avec les erreurs et les anciennes valeurs, sans nouvelle entree dans l'historique, le defilement garde et le focus sur le premier champ en erreur.
+  - Formulaire `GET` (recherche, filtres) : comme un lien vers son adresse.
+  - Un double clic n'envoie le formulaire qu'une fois ; `aria-busy` pendant l'envoi.
+  - Jamais renvoye deux fois : un export est telecharge sans quitter la page, une redirection vers un autre site ou une autre mise en page est suivie normalement, une page d'erreur (419, 500) est affichee telle quelle.
+  - Le navigateur garde les formulaires deja geres par l'app (`@submit.prevent`, `onsubmit` refuse), ceux qui ont une `target`, vont vers un autre site ou un `logout`, et ceux marques `data-prisme-reload`.
+  - A verifier dans une app : un script qui agit apres l'envoi d'un formulaire en comptant sur le rechargement de la page.
+
+### Tests
+
+- Envoi avec redirection (shell garde, message flash), validation ratee (meme page, historique, focus), formulaire `GET`, double clic, formulaires laisses au navigateur, export telecharge, page d'erreur 419. Verifie aussi dans Chromium sur un serveur qui repond comme Laravel.
+
 ## 0.18.1 (2026-10-07)
 
 ### Corrections
