@@ -323,7 +323,7 @@ Un formulaire n'est jamais envoye deux fois. Quand sa reponse ne peut pas rempla
 - une redirection vers un autre site (SSO) ou vers une page d'une autre mise en page est suivie normalement ;
 - une page d'erreur renvoyee par le formulaire lui-meme (session expiree 419, erreur 500) est affichee telle quelle.
 
-Seule exception : si la reponse n'arrive pas du tout (connexion coupee), le navigateur renvoie lui-meme le formulaire et affiche sa propre erreur, comme sans Prisme.
+Seule exception : si la reponse n'arrive pas (connexion coupee, ou redirection vers un autre site que le navigateur refuse de lire), le navigateur renvoie lui-meme le formulaire. Un formulaire qui redirige vers un autre site (connexion OAuth, paiement) doit donc porter `data-prisme-reload`, sinon son action s'execute deux fois.
 
 Le navigateur garde l'envoi des formulaires deja geres par l'app (`@submit.prevent`, un `onsubmit="return confirm(...)"` refuse), de ceux qui ont une `target`, qui vont vers un autre site ou vers une adresse contenant `logout`, et de ceux marques `data-prisme-reload` (sur le formulaire, un parent ou le bouton).
 
