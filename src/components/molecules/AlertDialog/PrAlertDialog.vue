@@ -60,7 +60,7 @@ const emit = defineEmits<{
         <div v-if="$slots.default" class="pr-alert-dialog__body p-[var(--pr-space-5)] pt-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text)]">
           <slot />
         </div>
-        <div class="pr-alert-dialog__footer flex justify-end gap-[var(--pr-space-3)] border-t border-[var(--pr-color-border)] p-[var(--pr-space-5)]">
+        <div class="pr-alert-dialog__footer flex flex-wrap justify-end gap-[var(--pr-space-3)] border-t border-[var(--pr-color-border)] p-[var(--pr-space-5)]">
           <AlertDialogCancel as-child @click="emit('cancel')">
             <PrButton variant="secondary">{{ cancelText }}</PrButton>
           </AlertDialogCancel>

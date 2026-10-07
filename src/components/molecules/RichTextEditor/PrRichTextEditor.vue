@@ -134,14 +134,24 @@ const generatedId = useId()
 const fieldId = computed(() => props.id ?? `pr-rich-text-editor-${generatedId}`)
 const hintId = computed(() => `${fieldId.value}-hint`)
 const errorId = computed(() => `${fieldId.value}-error`)
+const labelId = computed(() => `${fieldId.value}-label`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids: string[] = []
-
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
+
+// Name and state go on ProseMirror's contenteditable itself, the element screen readers
+// announce as the text field (they were on the wrapper <div>, leaving the field unnamed).
+function contentAttributes(): Record<string, string> {
+  const attributes: Record<string, string> = { 'role': 'textbox', 'aria-multiline': 'true' }
+  if (props.label) attributes['aria-labelledby'] = labelId.value
+  if (describedBy.value) attributes['aria-describedby'] = describedBy.value
+  if (props.error) attributes['aria-invalid'] = 'true'
+  if (props.required) attributes['aria-required'] = 'true'
+  if (props.disabled) attributes['aria-disabled'] = 'true'
+  return attributes
+}
 
 const isUploadingImage = ref(false)
 const uploadError = ref<string | null>(null)
@@ -216,6 +226,7 @@ const editor = useEditor({
     Callout,
   ],
   editorProps: {
+    attributes: () => contentAttributes(),
     handleDrop(_view, event) {
       const file = event.dataTransfer?.files?.[0]
 
@@ -241,6 +252,11 @@ watch(() => props.modelValue, (value) => {
   if (editor.value && value !== editor.value.getHTML()) {
     editor.value.commands.setContent(value, { emitUpdate: false })
   }
+})
+
+// ProseMirror reads `attributes` on each update: refresh them when the label or messages change.
+watch(() => [props.label, props.error, props.hint, props.required, props.disabled], () => {
+  editor.value?.view.dispatch(editor.value.state.tr.setMeta('addToHistory', false))
 })
 
 watch(() => props.disabled, (disabled) => {
@@ -377,6 +393,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
   <div class="pr-rich-text-editor grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
     <PrLabel
       v-if="label"
+      :id="labelId"
       :for="fieldId"
       :required="required"
       :disabled="disabled"
@@ -388,6 +405,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
       v-bind="$attrs"
       class="pr-rich-text-editor__root rounded-[var(--pr-radius-lg)] border! bg-[var(--pr-color-surface)]"
       :class="[error ? 'border-[var(--pr-color-danger)]!' : 'border-[var(--pr-color-border-strong)]!', disabled ? 'opacity-60' : '']"
+      :aria-disabled="disabled || undefined"
     >
       <!--
         `rounded-t-[...]` here (rather than `overflow-hidden` on the root
@@ -557,9 +575,6 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
         :id="fieldId"
         :editor="editor"
         class="pr-rich-text-editor__content pr-editor-content"
-        :aria-invalid="error ? 'true' : undefined"
-        :aria-describedby="describedBy"
-        :aria-required="required"
       />
 
       <p v-if="uploadError" class="pr-rich-text-editor__upload-error m-0 rounded-b-[var(--pr-radius-lg)] border-t border-[var(--pr-color-border)] px-[var(--pr-space-5)] py-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-danger)]" role="alert">

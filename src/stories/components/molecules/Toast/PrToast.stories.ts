@@ -15,6 +15,16 @@ const meta = {
       options: ['default', 'info', 'success', 'warning', 'danger'],
     },
   },
+  parameters: {
+    a11y: {
+      config: {
+        // Reka's toast viewport surrounds the toasts with two aria-hidden "focus proxy" spans
+        // (tabindex 0) that send keyboard focus into the region and back out: a deliberate
+        // pattern (inherited from Radix) that axe flags, not a missing name or hidden control.
+        rules: [{ id: 'aria-hidden-focus', enabled: false }],
+      },
+    },
+  },
   args: {
     title: 'Dossier mis a jour',
     description: 'Les changements ont ete sauvegardes.',
@@ -201,7 +211,10 @@ export const PausesWithTimer: Story = {
     const bar = toast.querySelector<HTMLElement>('.pr-toast__progress') as HTMLElement
     const playState = () => getComputedStyle(bar).animationPlayState
 
-    await expect(playState()).toBe('running')
+    // Reka also pauses while the window is in the background, which the test browser may be:
+    // start from a focused window.
+    window.dispatchEvent(new FocusEvent('focus'))
+    await waitFor(() => expect(playState()).toBe('running'))
 
     await userEvent.hover(toast)
     await waitFor(() => expect(playState()).toBe('paused'))
@@ -224,13 +237,15 @@ export const PausesWithTimer: Story = {
 // noinspection JSUnusedGlobalSymbols
 export const LayoutCombinations: Story = {
   render: () => ({
-    components: { PrToast },
+    components: { PrToast, PrToastProvider },
     template: `
       <div class="story-toast-demo">
-        <PrToast default-open :duration="60000" variant="success" description="Note ajoutee." />
-        <PrToast default-open :duration="60000" variant="success" description="Note ajoutee." action-label="Voir" />
-        <PrToast default-open :duration="60000" description="Note ajoutee." action-label="Voir" />
-        <PrToast default-open :duration="60000" description="Note ajoutee." />
+        <PrToastProvider>
+          <PrToast default-open :duration="60000" variant="success" description="Note ajoutee." />
+          <PrToast default-open :duration="60000" variant="success" description="Note ajoutee." action-label="Voir" />
+          <PrToast default-open :duration="60000" description="Note ajoutee." action-label="Voir" />
+          <PrToast default-open :duration="60000" description="Note ajoutee." />
+        </PrToastProvider>
       </div>
     `,
   }),

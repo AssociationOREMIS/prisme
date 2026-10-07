@@ -72,7 +72,7 @@ Le pattern `play` function (Storybook + `storybook/test`) a été introduit sur 
 ## Retours d'intégration OREMIS Chat (2026-09-30, version 0.13.0)
 
 Voir `CHANGELOG.md` § 0.13.0 pour le détail. En bref :
-- `PrRichTextEditor` sorti de l'entrée principale vers `@oremis/prisme/editor` (plus aucun import tiptap dans `dist/prisme.js`/`dist/registry.js`, garanti par `src/entries.test.ts`). Changement cassant ; aucune app connue n'importait l'éditeur depuis l'entrée principale (data l'importe par chemin).
+- `PrRichTextEditor` sorti de l'entrée principale vers `@oremis/prisme/editor` (plus aucun import tiptap dans `dist/prisme.js`/`dist/registry.js`, garanti par `src/entries.test.ts`). Changement cassant. Corrigé le 2026-10-07 : **formation l'importe depuis l'entrée principale** (`editors/lesson-editor.js`, sur 0.12) et cassera en passant à 0.13+ ; data l'importe par chemin.
 - Tokens déclarés aussi sur `:host` et option `theme` de `mountPrismeIsolated()` (story `Composables/mountPrismeIsolated`).
 - README : Roboto auto-hébergée (`@fontsource/roboto`) au lieu de Google Fonts (RGPD).
 

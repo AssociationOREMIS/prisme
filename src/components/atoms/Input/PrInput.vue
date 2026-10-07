@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed, useAttrs, useId } from 'vue'
 
 export interface PrInputProps {
   modelValue?: string | number
@@ -15,7 +15,7 @@ export interface PrInputProps {
 }
 
 const props = withDefaults(defineProps<PrInputProps>(), {
-  modelValue: '',
+  modelValue: undefined,
   label: undefined,
   hint: undefined,
   error: undefined,
@@ -27,6 +27,11 @@ const props = withDefaults(defineProps<PrInputProps>(), {
   name: undefined,
 })
 
+// Without a model-value, a plain Blade `value="{{ old('x') }}"` (in $attrs) fills the field:
+// binding an empty modelValue default after $attrs used to wipe it.
+const attrs = useAttrs()
+const fieldValue = computed(() => props.modelValue ?? (attrs.value as string | number | undefined))
+
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
@@ -35,18 +40,10 @@ const generatedId = useId()
 const inputId = computed(() => props.id ?? `pr-input-${generatedId}`)
 const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids = []
-
-  if (props.hint) {
-    ids.push(hintId.value)
-  }
-
-  if (props.error) {
-    ids.push(errorId.value)
-  }
-
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
 
 const inputClass = computed(() => [
@@ -90,7 +87,7 @@ defineOptions({ inheritAttrs: false })
       v-bind="$attrs"
       :class="inputControlClass"
       :name="name"
-      :value="modelValue"
+      :value="fieldValue"
       :type="type"
       :placeholder="placeholder"
       :disabled="disabled"

@@ -44,11 +44,10 @@ defineOptions({ inheritAttrs: false })
 const generatedId = useId()
 const hintId = computed(() => `pr-checkbox-${generatedId}-hint`)
 const errorId = computed(() => `pr-checkbox-${generatedId}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids: string[] = []
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
 
 const checkboxClass = computed(() => [

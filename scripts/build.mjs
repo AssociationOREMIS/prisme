@@ -8,139 +8,77 @@ const root = path.resolve(dirname, '..')
 const configFile = path.resolve(root, 'vite.config.ts')
 
 /**
- * The main `prisme`/`registry` bundle is a normal multi-entry build (they
- * share nothing, so Rollup can't merge one into the other).
+ * Every public entry point, keyed by its output path (without `.js`), matching the
+ * `exports` map of package.json: `prisme`, `registry`, `editor`, `blade`, `components/<category>/<Name>`,
+ * `composables/<name>` and `tiptap/<name>`.
  */
-async function buildMain() {
-  await build({ configFile, build: { emptyOutDir: true } })
-}
+function entries() {
+  const result = {
+    prisme: path.resolve(root, 'src/index.ts'),
+    registry: path.resolve(root, 'src/registry.ts'),
+    editor: path.resolve(root, 'src/editor.ts'),
+    blade: path.resolve(root, 'src/blade.ts'),
+  }
 
-/**
- * Each component gets its own single-entry build so it comes out as one
- * fully self-contained file at a predictable path. Building them alongside
- * the main bundle in one multi-entry Rollup build would let Rollup merge a
- * component's entry into a shared chunk with a content-hashed name whenever
- * another component imports it internally — which breaks the fixed
- * `./components/*` export paths in package.json.
- */
-async function buildComponentEntries() {
-  const categories = ['atoms', 'molecules', 'layouts']
-
-  for (const category of categories) {
+  for (const category of ['atoms', 'molecules', 'layouts']) {
     const categoryDir = path.resolve(root, 'src/components', category)
     for (const dirent of fs.readdirSync(categoryDir, { withFileTypes: true })) {
-      if (!dirent.isDirectory()) continue
-
-      const outputName = `components/${category}/${dirent.name}`
-      await build({
-        configFile,
-        logLevel: 'warn',
-        build: {
-          emptyOutDir: false,
-          lib: {
-            entry: path.resolve(categoryDir, dirent.name, 'index.ts'),
-            formats: ['es'],
-            fileName: () => `${outputName}.js`,
-            // Without an explicit override here, this inherits vite.config.ts's
-            // `build.lib.cssFileName: 'styles'` — so any component whose SFC
-            // imports a plain CSS file (e.g. PrRichTextEditor's
-            // `editor-content.css`/`rich-text-editor.css`) would emit its own
-            // `dist/styles.css` in THIS single-entry build and silently
-            // clobber the full, correct one `buildMain()` already wrote
-            // (tokens/reset/Tailwind utilities for every component). Giving
-            // each entry its own css file name keeps it out of that shared
-            // path; nothing currently references these per-component css
-            // outputs (nor are they exported), they're a harmless side effect.
-            cssFileName: outputName,
-          },
-        },
-      })
+      if (dirent.isDirectory()) result[`components/${category}/${dirent.name}`] = path.resolve(categoryDir, dirent.name, 'index.ts')
     }
   }
-}
 
-/**
- * Composables get the same single-entry treatment as components: a consumer
- * that only needs `usePrForm` (e.g. a Blade/Vue "island" page with a form)
- * shouldn't have to pull in the whole component registry — and thus every
- * component in the library — just to import it from the main entry.
- */
-async function buildComposableEntries() {
-  const composablesDir = path.resolve(root, 'src/composables')
-
-  for (const dirent of fs.readdirSync(composablesDir, { withFileTypes: true })) {
-    if (!dirent.isFile() || !dirent.name.endsWith('.ts') || dirent.name.endsWith('.test.ts')) continue
-
-    const name = dirent.name.replace(/\.ts$/, '')
-    await build({
-      configFile,
-      logLevel: 'warn',
-      build: {
-        emptyOutDir: false,
-        lib: {
-          entry: path.resolve(composablesDir, dirent.name),
-          formats: ['es'],
-          fileName: () => `composables/${name}.js`,
-          // See the matching comment in buildComponentEntries(): keeps this
-          // entry from inheriting vite.config.ts's shared cssFileName and
-          // clobbering dist/styles.css if a composable ever imports CSS.
-          cssFileName: `composables/${name}`,
-        },
-      },
-    })
+  for (const folder of ['composables', 'tiptap']) {
+    const dir = path.resolve(root, 'src', folder)
+    for (const dirent of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (!dirent.isFile() || !dirent.name.endsWith('.ts') || dirent.name.endsWith('.test.ts')) continue
+      result[`${folder}/${dirent.name.replace(/\.ts$/, '')}`] = path.resolve(dir, dirent.name)
+    }
   }
+
+  return result
 }
 
 /**
- * Same single-entry treatment as composables: `src/tiptap/callout.ts` is a
- * plain (non-Vue) tiptap Node module, exposed under its own `./tiptap/*`
- * export so a consumer mounting its own tiptap editor (rather than using
- * `PrRichTextEditor`) can import just the `Callout` node.
+ * One build for every entry, with `preserveModules`: each source module becomes one file,
+ * shared by all the entries that import it. Building each component on its own (as before
+ * 0.14) copied the modules it imports into its file, so two import paths gave two copies of
+ * the same state (AppShell's injection key, usePrTheme's refs) and the shared code was
+ * shipped dozens of times. Entry files keep fixed names for the `exports` map; every other
+ * module goes under `internal/`, which is not exported.
+ *
+ * The editor entry stays apart from the main one by construction: `dist/prisme.js` only
+ * imports the modules `src/index.ts` reaches, and `src/entries.test.ts` checks none of them
+ * imports tiptap.
  */
-async function buildTiptapEntries() {
-  const tiptapDir = path.resolve(root, 'src/tiptap')
-
-  for (const dirent of fs.readdirSync(tiptapDir, { withFileTypes: true })) {
-    if (!dirent.isFile() || !dirent.name.endsWith('.ts') || dirent.name.endsWith('.test.ts')) continue
-
-    const name = dirent.name.replace(/\.ts$/, '')
-    await build({
-      configFile,
-      logLevel: 'warn',
-      build: {
-        emptyOutDir: false,
-        lib: {
-          entry: path.resolve(tiptapDir, dirent.name),
-          formats: ['es'],
-          fileName: () => `tiptap/${name}.js`,
-          // See the matching comment in buildComponentEntries().
-          cssFileName: `tiptap/${name}`,
-        },
-      },
-    })
-  }
+/**
+ * File name of a non-entry module. Vue SFCs come out as `PrButton.vue` and
+ * `PrButton.vue?vue&type=script&setup=true&lang`: kept as is, an app's own Vue plugin takes
+ * those `.vue` files for SFC sources and fails to compile them. They become `PrButton` and
+ * `PrButton.script`.
+ */
+function internalName(name) {
+  return name
+    .replace(/\.vue\?vue&type=(\w+).*$/, '.$1')
+    .replace(/\.vue$/, '')
+    .replace(/[?&=]/g, '_')
 }
 
-/**
- * `@oremis/prisme/editor` (`src/editor.ts`): `PrRichTextEditor`, `Callout` and
- * the `PrismeEditor` plugin, i.e. everything that imports tiptap/lowlight. A
- * single-entry build of its own (not a third entry of `buildMain()`) so it can
- * never end up in a chunk shared with `dist/prisme.js`: that would make the
- * main entry import tiptap again.
- */
-async function buildEditorEntry() {
+async function buildLibrary() {
   await build({
     configFile,
-    logLevel: 'warn',
     build: {
-      emptyOutDir: false,
+      emptyOutDir: true,
       lib: {
-        entry: path.resolve(root, 'src/editor.ts'),
+        entry: entries(),
         formats: ['es'],
-        fileName: () => 'editor.js',
-        // See the matching comment in buildComponentEntries(). The editor's CSS
-        // already ships in dist/styles.css (src/styles/prisme.css imports it).
-        cssFileName: 'editor',
+        cssFileName: 'styles',
+      },
+      rollupOptions: {
+        output: {
+          preserveModules: true,
+          preserveModulesRoot: path.resolve(root, 'src'),
+          entryFileNames: chunk => (chunk.isEntry ? `${chunk.name}.js` : `internal/${internalName(chunk.name)}.js`),
+        },
       },
     },
   })
@@ -155,15 +93,9 @@ async function buildEditorEntry() {
  * It's PREPENDED with `tokens.css` + `themes.css` rather than plain-copied:
  * `editor-content.css`'s own rules are all `var(--pr-color-*)`/`var(--pr-space-*)`
  * references, and those custom properties are defined in `tokens.css`/
- * `themes.css`, not in this file. A consumer that imports the full
- * `@oremis/prisme/styles.css` (e.g. anything mounting `PrRichTextEditor`)
- * already gets them from there, so this went unnoticed — but a consumer
- * importing ONLY `./styles/editor-content.css` for a read-only render (its
- * documented, intended use — see the comment atop that file) got a
- * stylesheet whose custom properties were never defined anywhere, so every
- * `var(...)` was invalid and silently fell back to nothing (transparent
- * backgrounds, `currentcolor` borders). Concatenating them keeps this file
- * genuinely self-contained, matching what its own doc comment promises.
+ * `themes.css`, not in this file. A consumer importing ONLY
+ * `./styles/editor-content.css` for a read-only render (its documented use)
+ * would otherwise get a stylesheet whose custom properties are never defined.
  */
 function copyStaticStyles() {
   const outDir = path.resolve(root, 'dist/styles')
@@ -179,9 +111,26 @@ function copyStaticStyles() {
   )
 }
 
-await buildMain()
-await buildEditorEntry()
-await buildComponentEntries()
-await buildComposableEntries()
-await buildTiptapEntries()
+/**
+ * `dist/components/<category>/<Name>.js` (the entry) sits next to `<Name>/index.d.ts` (its
+ * types, written by vue-tsc). TypeScript resolves `./atoms/Button` in the emitted .d.ts files
+ * to the .js file first, finds no `Button.d.ts` beside it and falls back to `any`: every type
+ * reached through the main entry was lost (TS7016 in apps checking libraries, silent `any`
+ * with skipLibCheck). A one-line declaration beside each entry points it at its folder.
+ */
+function writeComponentEntryDeclarations() {
+  for (const category of ['atoms', 'molecules', 'layouts']) {
+    const categoryDir = path.resolve(root, 'src/components', category)
+    for (const dirent of fs.readdirSync(categoryDir, { withFileTypes: true })) {
+      if (!dirent.isDirectory()) continue
+      fs.writeFileSync(
+        path.resolve(root, 'dist/components', category, `${dirent.name}.d.ts`),
+        `export * from './${dirent.name}/index'\n`,
+      )
+    }
+  }
+}
+
+await buildLibrary()
+writeComponentEntryDeclarations()
 copyStaticStyles()

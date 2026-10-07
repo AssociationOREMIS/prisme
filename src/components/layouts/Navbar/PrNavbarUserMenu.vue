@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDown, CircleUser } from '@lucide/vue'
-import { computed, ref } from 'vue'
+import { computed, ref, type Component } from 'vue'
 import PrDropdownMenu from '../../molecules/DropdownMenu/PrDropdownMenu.vue'
 
 export interface PrNavbarUserMenuProps {
@@ -22,6 +22,18 @@ const props = withDefaults(defineProps<PrNavbarUserMenuProps>(), {
   roles: () => [],
   rolesFallback: 'Rôle inconnu',
 })
+
+// Declared rather than inferred: the inferred slot type copied reka's whole DropdownMenuItem
+// type into the published .d.ts, which fails type checking in apps with other Vue/TS versions.
+defineSlots<{
+  default?: (props: {
+    item: Component
+    separator: Component
+    itemClass: string
+    dangerItemClass: string
+    separatorClass: string
+  }) => unknown
+}>()
 
 const open = ref(false)
 

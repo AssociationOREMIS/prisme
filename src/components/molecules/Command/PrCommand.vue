@@ -117,6 +117,7 @@ function onKeydown(event: KeyboardEvent) {
         v-model="query"
         class="pr-command__input min-h-11 flex-auto border-0 bg-transparent font-[inherit] text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text)] placeholder:text-[color:var(--pr-color-text-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
         :placeholder="placeholder"
+        :aria-label="placeholder"
         role="combobox"
         aria-autocomplete="list"
         :aria-expanded="true"
@@ -125,7 +126,8 @@ function onKeydown(event: KeyboardEvent) {
         @keydown="onKeydown"
       >
     </label>
-    <div :id="listId" class="pr-command__list grid max-h-72 overflow-y-auto p-[var(--pr-space-2)]" role="listbox">
+    <!-- A listbox must hold options: with no result, the container is a plain region announcing the empty text. -->
+    <div :id="listId" class="pr-command__list grid max-h-72 overflow-y-auto p-[var(--pr-space-2)]" :role="filteredItems.length > 0 ? 'listbox' : undefined">
       <button
         v-for="(item, index) in filteredItems"
         :id="itemId(item)"
@@ -142,7 +144,7 @@ function onKeydown(event: KeyboardEvent) {
         <span class="pr-command__item-label text-[length:var(--pr-font-size-sm)] font-bold leading-[var(--pr-line-height-tight)]">{{ item.label }}</span>
         <span v-if="item.description" class="pr-command__item-description text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ item.description }}</span>
       </button>
-      <p v-if="filteredItems.length === 0" class="pr-command__empty m-0 p-[var(--pr-space-4)] text-center text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ emptyText }}</p>
+      <p v-if="filteredItems.length === 0" role="status" class="pr-command__empty m-0 p-[var(--pr-space-4)] text-center text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ emptyText }}</p>
     </div>
   </div>
 </template>

@@ -19,7 +19,7 @@ const badgeBaseClass = [
 
 const badgeVariantClass: Record<NonNullable<PrBadgeProps['variant']>, string> = {
   neutral:
-    'border-[var(--pr-color-border)] bg-[var(--pr-color-surface-subtle)] text-[color:var(--pr-color-text-muted)]',
+    'border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text-muted)]',
   primary:
     'border-[var(--pr-color-primary-border)] bg-[var(--pr-color-primary-soft)] text-[color:var(--pr-color-primary)]',
   success:

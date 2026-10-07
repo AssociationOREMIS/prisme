@@ -22,7 +22,7 @@ const emit = defineEmits<{
 <template>
   <div class="pr-data-table__pagination flex flex-wrap items-center gap-[var(--pr-space-4)] px-[var(--pr-space-2)]">
     <p v-if="selectedRowsCount > 0 && !hideSelectedRowsCount" class="m-0 flex-1 text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text-muted)]">
-      {{ selectedRowsCount }} sur {{ filteredRowsCount }} ligne(s) selectionnee(s).
+      {{ selectedRowsCount }} sur {{ filteredRowsCount }} ligne(s) sélectionnée(s).
     </p>
     <span v-else class="flex-1" />
 
@@ -31,6 +31,7 @@ const emit = defineEmits<{
         <p class="m-0 text-[length:var(--pr-font-size-sm)] font-semibold">Lignes par page</p>
         <PrSelect
           class="w-[4.75rem]"
+          aria-label="Lignes par page"
           :model-value="String(pageSize)"
           :options="pageSizeOptions.map((size) => ({ label: String(size), value: String(size) }))"
           @update:model-value="emit('update:pageSize', Number($event))"

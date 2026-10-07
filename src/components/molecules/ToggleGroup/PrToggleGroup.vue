@@ -81,10 +81,12 @@ const toggleGroupStyle = computed(() => ({
   '--pr-toggle-group-indicator-opacity': activeIndex.value >= 0 ? '1' : '0',
 }))
 
+// Single mode keeps one row (the sliding indicator assumes equal columns): on a narrow screen it
+// scrolls sideways instead of overflowing the page. The indicator scrolls with the items.
 const toggleGroupClass = computed(() => [
   'pr-toggle-group inline-flex flex-wrap items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] p-[var(--pr-space-1)]',
   props.type === 'single'
-    ? "pr-toggle-group--single relative inline-grid auto-cols-[minmax(max-content,1fr)] grid-flow-col gap-0 overflow-hidden before:pointer-events-none before:absolute before:top-[var(--pr-space-1)] before:bottom-[var(--pr-space-1)] before:left-[var(--pr-space-1)] before:w-[calc((100%-(var(--pr-space-1)*2))/var(--pr-toggle-group-count))] before:rounded-[var(--pr-radius-md)] before:bg-[var(--pr-color-primary)] before:opacity-[var(--pr-toggle-group-indicator-opacity)] before:translate-x-[calc(var(--pr-toggle-group-active-index)*100%)] before:transition-[transform,opacity,background-color] before:duration-[var(--pr-duration-fast)] before:ease-[var(--pr-ease-standard)] has-[.pr-toggle-group__item[data-state=on]:hover]:before:bg-[var(--pr-color-primary-hover)]"
+    ? "pr-toggle-group--single relative inline-grid auto-cols-[minmax(max-content,1fr)] grid-flow-col gap-0 max-w-full overflow-x-auto before:pointer-events-none before:absolute before:top-[var(--pr-space-1)] before:bottom-[var(--pr-space-1)] before:left-[var(--pr-space-1)] before:w-[calc((100%-(var(--pr-space-1)*2))/var(--pr-toggle-group-count))] before:rounded-[var(--pr-radius-md)] before:bg-[var(--pr-color-primary)] before:opacity-[var(--pr-toggle-group-indicator-opacity)] before:translate-x-[calc(var(--pr-toggle-group-active-index)*100%)] before:transition-[transform,opacity,background-color] before:duration-[var(--pr-duration-fast)] before:ease-[var(--pr-ease-standard)] has-[.pr-toggle-group__item[data-state=on]:hover]:before:bg-[var(--pr-color-primary-hover)]"
     : '',
 ])
 

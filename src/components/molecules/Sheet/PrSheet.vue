@@ -54,7 +54,8 @@ const sheetSideClass = computed(() => ({
         :class="sheetSideClass"
       >
         <div class="pr-sheet__header flex items-start justify-between gap-[var(--pr-space-4)] border-b border-[var(--pr-color-border)] p-[var(--pr-space-5)]">
-          <div>
+          <!-- min-w-0: a long title wraps instead of pushing the close button out. -->
+          <div class="min-w-0 [overflow-wrap:anywhere]">
             <DialogTitle v-if="title" class="pr-sheet__title m-0 text-[length:var(--pr-font-size-xl)] font-[750] leading-[var(--pr-line-height-tight)]">{{ title }}</DialogTitle>
             <DialogDescription v-if="description" class="pr-sheet__description mt-[var(--pr-space-2)] mb-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text-muted)]">
               {{ description }}
@@ -67,7 +68,7 @@ const sheetSideClass = computed(() => ({
         <div class="pr-sheet__body min-h-0 overflow-y-auto p-[var(--pr-space-5)]">
           <slot />
         </div>
-        <div v-if="$slots.footer" class="pr-sheet__footer flex justify-end gap-[var(--pr-space-3)] border-t border-[var(--pr-color-border)] p-[var(--pr-space-5)]">
+        <div v-if="$slots.footer" class="pr-sheet__footer flex flex-wrap justify-end gap-[var(--pr-space-3)] border-t border-[var(--pr-color-border)] p-[var(--pr-space-5)]">
           <slot name="footer" />
         </div>
       </DialogContent>
