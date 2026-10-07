@@ -135,6 +135,12 @@ export type { PrToggleProps } from './atoms/Toggle'
 import { PrToggleGroup } from './molecules/ToggleGroup'
 export type { PrToggleGroupItem, PrToggleGroupProps } from './molecules/ToggleGroup'
 
+import { PrPageHeader } from './layouts/PageHeader'
+export type { PrPageHeaderProps } from './layouts/PageHeader'
+
+import { PrDescriptionItem, PrDescriptionList } from './molecules/DescriptionList'
+export type { PrDescriptionItemProps, PrDescriptionListItem, PrDescriptionListProps } from './molecules/DescriptionList'
+
 import { PrTypography } from './atoms/Typography'
 export type { PrTypographyProps } from './atoms/Typography'
 
@@ -226,4 +232,7 @@ export const componentRegistry = {
   PrToggleGroup,
   PrTooltip,
   PrTypography,
+  PrPageHeader,
+  PrDescriptionList,
+  PrDescriptionItem,
 } satisfies Record<string, Component>

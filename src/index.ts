@@ -51,6 +51,8 @@ export { PrToggle } from './components/atoms/Toggle'
 export { PrToggleGroup } from './components/molecules/ToggleGroup'
 export { PrTooltip } from './components/molecules/Tooltip'
 export { PrTypography } from './components/atoms/Typography'
+export { PrPageHeader } from './components/layouts/PageHeader'
+export { PrDescriptionItem, PrDescriptionList } from './components/molecules/DescriptionList'
 
 export type {
   PrAccordionItem,
@@ -121,6 +123,10 @@ export type {
   PrToggleProps,
   PrTooltipProps,
   PrTypographyProps,
+  PrPageHeaderProps,
+  PrDescriptionItemProps,
+  PrDescriptionListItem,
+  PrDescriptionListProps,
 } from './components/registry'
 
 export { fromLaravelPaginator } from './components/registry'
