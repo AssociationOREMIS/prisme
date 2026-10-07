@@ -2,6 +2,18 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.16.1 (2026-10-07)
+
+### Corrections
+
+- **`PrButton` ne coupe plus ses mots** dans une colonne etroite (« Gé / rer ») : `overflow-wrap: break-word` au lieu de `anywhere`, un mot ne se coupe que s'il ne tient vraiment pas. Le libelle passe toujours a la ligne entre deux mots sur un petit ecran. Les apps peuvent retirer leur `.pr-button { white-space: nowrap }`.
+- **`PrDataTable`** : une taille de page absente de `pageSizeOptions` y est ajoutee (le select affichait « Sélectionner », qui debordait sur « Page 1 sur 1 ») ; le select et « Page x sur y » s'elargissent selon leur contenu ; le filtre s'etend jusqu'a 28rem au lieu de 16rem fixes.
+- **Listes a puces et numerotees** dans `PrRichTextEditor` et `.pr-editor-content` : puces, numeros et retrait (seules les listes de taches etaient stylees). Les apps peuvent retirer leur regle provisoire.
+
+### Tests
+
+- Bouton dans une colonne de largeur minimale, taille de page hors options, styles des listes.
+
 ## 0.16.0 (2026-10-07)
 
 ### Changements visibles
