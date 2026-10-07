@@ -13,6 +13,7 @@ import {
 } from 'reka-ui'
 import { computed, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrComboboxOption {
   label: string
@@ -28,7 +29,7 @@ export interface PrComboboxProps {
   searchPlaceholder?: string
   label?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   multiple?: boolean
@@ -52,6 +53,9 @@ const props = withDefaults(defineProps<PrComboboxProps>(), {
   id: undefined,
 })
 
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
+
 const emit = defineEmits<{
   'update:modelValue': [value: string | string[]]
 }>()
@@ -62,7 +66,7 @@ const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -119,7 +123,7 @@ function labelFor(value: string) {
     >
       <ComboboxAnchor
         class="pr-combobox__anchor inline-flex min-h-[2.375rem] w-full flex-wrap items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] py-[var(--pr-space-1)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
-        :class="{ 'border-[var(--pr-color-danger)]': Boolean(error) }"
+        :class="{ 'border-[var(--pr-color-danger)]': Boolean(errorText) }"
       >
         <span
           v-for="value in multiple && Array.isArray(currentValue) ? currentValue : []"
@@ -144,7 +148,7 @@ function labelFor(value: string) {
           :placeholder="hasValue ? undefined : placeholder"
           :required="required && !hasValue"
           :aria-required="required || undefined"
-          :aria-invalid="error ? 'true' : undefined"
+          :aria-invalid="errorText ? 'true' : undefined"
           :aria-describedby="describedBy"
         />
         <button
@@ -194,7 +198,7 @@ function labelFor(value: string) {
       <input v-if="!multiple" type="hidden" :name="name" :value="typeof currentValue === 'string' ? currentValue : ''">
       <input v-for="value in Array.isArray(currentValue) ? currentValue : []" v-else :key="value" type="hidden" :name="name" :value="value">
     </template>
-    <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Check, ChevronDown, ChevronUp } from '@lucide/vue'
-import { computed, useId } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 import {
   SelectContent,
   SelectIcon,
@@ -16,6 +16,7 @@ import {
   SelectViewport,
 } from 'reka-ui'
 import { PrLabel } from '../../atoms/Label'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrSelectOption {
   label: string
@@ -32,7 +33,7 @@ export interface PrSelectProps {
   ariaLabel?: string
   placeholder?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   name?: string
@@ -54,6 +55,9 @@ const props = withDefaults(defineProps<PrSelectProps>(), {
   id: undefined,
 })
 
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
+
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
@@ -62,9 +66,30 @@ const generatedId = useId()
 const triggerId = computed(() => props.id ?? `pr-select-${generatedId}`)
 const hintId = computed(() => `${triggerId.value}-hint`)
 const errorId = computed(() => `${triggerId.value}-error`)
+// reka-ui refuses an empty item value: an option `{ value: '' }` ("Aucun", "Sans type") goes
+// through as an internal value, and comes back out as ''.
+const EMPTY = '__pr-select-empty__'
+const toInternal = (value: string | undefined) => (value === '' ? EMPTY : value)
+const itemValue = (value: string) => (value === '' ? EMPTY : value)
+const toExternal = (value: string) => (value === EMPTY ? '' : value)
+const hasEmptyOption = computed(() => props.options.some((option) => option.value === ''))
+
+// With an empty option, reka's own hidden <select> would post the internal value: the field
+// then posts through its own hidden input, so it needs the current value even without v-model.
+const currentValue = ref(props.modelValue ?? props.defaultValue)
+watch(() => props.modelValue, (value) => {
+  if (value !== undefined) currentValue.value = value
+})
+
+function update(value: unknown) {
+  if (typeof value !== 'string') return
+  currentValue.value = toExternal(value)
+  emit('update:modelValue', toExternal(value))
+}
+
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 </script>
@@ -73,19 +98,19 @@ const describedBy = computed(() => {
   <div class="pr-select grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :for="triggerId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <SelectRoot
-      :model-value="modelValue"
-      :default-value="defaultValue"
+      :model-value="toInternal(modelValue)"
+      :default-value="toInternal(defaultValue)"
       :disabled="disabled"
       :required="required"
-      :name="name"
-      @update:model-value="emit('update:modelValue', $event)"
+      :name="hasEmptyOption ? undefined : name"
+      @update:model-value="update"
     >
       <SelectTrigger
         :id="triggerId"
         :aria-label="label ? undefined : ariaLabel"
         class="pr-select__trigger inline-flex min-h-[2.375rem] w-full cursor-pointer items-center justify-between gap-[var(--pr-space-3)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] text-[length:var(--pr-font-size-md)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] data-[placeholder]:text-[color:var(--pr-color-text-subtle)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"
-        :class="{ 'border-[var(--pr-color-danger)]': Boolean(error) }"
-        :aria-invalid="error ? 'true' : undefined"
+        :class="{ 'border-[var(--pr-color-danger)]': Boolean(errorText) }"
+        :aria-invalid="errorText ? 'true' : undefined"
         :aria-describedby="describedBy"
       >
         <SelectValue :placeholder="placeholder" />
@@ -107,7 +132,7 @@ const describedBy = computed(() => {
               v-for="option in options"
               :key="option.value"
               class="pr-select__item relative flex min-h-9 cursor-pointer items-center rounded-[var(--pr-radius-md)] py-0 pr-[var(--pr-space-8)] pl-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)] data-[highlighted]:bg-[var(--pr-color-surface-subtle)] data-[disabled]:cursor-not-allowed data-[disabled]:text-[color:var(--pr-color-text-subtle)]"
-              :value="option.value"
+              :value="itemValue(option.value)"
               :disabled="option.disabled"
             >
               <SelectItemText>{{ option.label }}</SelectItemText>
@@ -122,7 +147,8 @@ const describedBy = computed(() => {
         </SelectContent>
       </SelectPortal>
     </SelectRoot>
-    <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+    <input v-if="name && hasEmptyOption" type="hidden" :name="name" :value="currentValue ?? ''">
+    <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

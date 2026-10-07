@@ -14,6 +14,8 @@ export interface PrNavbarProps {
   diagonalDivider?: boolean
   /** Hides the default/`#actions` slot content below the mobile breakpoint (780px). Off by default. */
   hideActionsOnMobile?: boolean
+  /** Hides the app title and its divider below 780px, keeping only the logo. */
+  hideTitleOnMobile?: boolean
 }
 
 const props = withDefaults(defineProps<PrNavbarProps>(), {
@@ -25,6 +27,7 @@ const props = withDefaults(defineProps<PrNavbarProps>(), {
   mobileLogoSrc: undefined,
   diagonalDivider: false,
   hideActionsOnMobile: false,
+  hideTitleOnMobile: false,
 })
 
 const navbarTitle = computed(() => props.title ?? props.brandLabel)
@@ -63,11 +66,11 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
           class="pr-navbar__divider"
           :class="[
             'h-8 w-0.5 shrink-0 bg-[var(--pr-color-navbar-muted)]',
-            { 'pr-navbar__divider--diagonal rotate-12': diagonalDivider },
+            { 'pr-navbar__divider--diagonal rotate-12': diagonalDivider, 'max-[780px]:hidden': hideTitleOnMobile },
           ]"
           aria-hidden="true"
         />
-        <p class="pr-navbar__title m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
+        <p :class="{ 'max-[780px]:hidden': hideTitleOnMobile }" class="pr-navbar__title m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
       </slot>
     </div>
 

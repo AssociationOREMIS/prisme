@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, within } from 'storybook/test'
 import { ref } from 'vue'
 import { PrInput } from '../../../../components/atoms/Input'
 import '../../../stories.css'
@@ -65,4 +66,20 @@ export const Playground: Story = {
     },
     template: '<PrInput v-model="value" v-bind="args" />',
   }),
+}
+
+// Laravel's errors for a field are an array: the field shows the first message.
+// noinspection JSUnusedGlobalSymbols
+export const LaravelErrorArray: Story = {
+  render: () => ({
+    components: { PrInput },
+    template: `<PrInput label="Nom" name="name" :error="['Le nom est obligatoire.', 'Le nom est trop court.']" />`,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const input = canvas.getByLabelText('Nom')
+    await expect(input).toHaveAttribute('aria-invalid', 'true')
+    await expect(input).toHaveAccessibleDescription('Le nom est obligatoire.')
+    await expect(canvas.queryByText('Le nom est trop court.')).toBeNull()
+  },
 }

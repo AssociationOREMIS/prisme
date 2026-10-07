@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 import { PrSelect } from '../../../../components/molecules/Select'
 import '../../../stories.css'
@@ -64,4 +65,42 @@ export const Playground: Story = {
     },
     template: '<PrSelect v-model="value" v-bind="args" />',
   }),
+}
+
+// An empty value ("Aucun") works as any other option: v-model and the form both get ''.
+// noinspection JSUnusedGlobalSymbols
+export const EmptyOption: Story = {
+  render: () => ({
+    components: { PrSelect },
+    setup() {
+      const value = ref('a')
+      const options = [
+        { label: 'Aucun type', value: '' },
+        { label: 'Retard', value: 'a' },
+      ]
+      return { options, value }
+    },
+    template: `
+      <form data-testid="form" style="max-width: 20rem;" @submit.prevent>
+        <PrSelect v-model="value" name="type" label="Type" :options="options" />
+        <output data-testid="value">[{{ value }}]</output>
+      </form>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const form = canvas.getByTestId('form') as HTMLFormElement
+    await expect(new FormData(form).get('type')).toBe('a')
+
+    await userEvent.click(canvas.getByLabelText('Type'))
+    await userEvent.click(await within(document.body).findByRole('option', { name: 'Aucun type' }))
+
+    await waitFor(() => expect(canvas.getByTestId('value')).toHaveTextContent('[]'))
+    await expect(new FormData(form).get('type')).toBe('')
+    await expect(canvas.getByLabelText('Type')).toHaveTextContent('Aucun type')
+
+    // Let the list finish closing: until then reka keeps the page aria-hidden.
+    await waitFor(() => expect(document.querySelector('[role="listbox"]')).toBeNull())
+    await waitFor(() => expect(canvasElement.closest('[aria-hidden="true"]')).toBeNull())
+  },
 }

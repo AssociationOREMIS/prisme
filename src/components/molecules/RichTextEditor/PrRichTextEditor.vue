@@ -56,12 +56,13 @@ import { Callout } from '../../../tiptap/callout'
 import '../../../styles/editor-content.css'
 import './rich-text-editor.css'
 import { PrLabel } from '../../atoms/Label'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrRichTextEditorProps {
   modelValue?: string
   label?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   placeholder?: string
@@ -88,6 +89,9 @@ const props = withDefaults(defineProps<PrRichTextEditorProps>(), {
   name: undefined,
   uploadImage: undefined,
 })
+
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -137,7 +141,7 @@ const errorId = computed(() => `${fieldId.value}-error`)
 const labelId = computed(() => `${fieldId.value}-label`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -147,7 +151,7 @@ function contentAttributes(): Record<string, string> {
   const attributes: Record<string, string> = { 'role': 'textbox', 'aria-multiline': 'true' }
   if (props.label) attributes['aria-labelledby'] = labelId.value
   if (describedBy.value) attributes['aria-describedby'] = describedBy.value
-  if (props.error) attributes['aria-invalid'] = 'true'
+  if (errorText.value) attributes['aria-invalid'] = 'true'
   if (props.required) attributes['aria-required'] = 'true'
   if (props.disabled) attributes['aria-disabled'] = 'true'
   return attributes
@@ -255,7 +259,7 @@ watch(() => props.modelValue, (value) => {
 })
 
 // ProseMirror reads `attributes` on each update: refresh them when the label or messages change.
-watch(() => [props.label, props.error, props.hint, props.required, props.disabled], () => {
+watch(() => [props.label, errorText.value, props.hint, props.required, props.disabled], () => {
   editor.value?.view.dispatch(editor.value.state.tr.setMeta('addToHistory', false))
 })
 
@@ -404,7 +408,7 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
     <div
       v-bind="$attrs"
       class="pr-rich-text-editor__root rounded-[var(--pr-radius-lg)] border! bg-[var(--pr-color-surface)]"
-      :class="[error ? 'border-[var(--pr-color-danger)]!' : 'border-[var(--pr-color-border-strong)]!', disabled ? 'opacity-60' : '']"
+      :class="[errorText ? 'border-[var(--pr-color-danger)]!' : 'border-[var(--pr-color-border-strong)]!', disabled ? 'opacity-60' : '']"
       :aria-disabled="disabled || undefined"
     >
       <!--
@@ -586,8 +590,8 @@ const toolbarButtonActiveClass = 'bg-[var(--pr-color-primary)]! text-[color:var(
       </p>
     </div>
     <input v-if="name" type="hidden" :name="name" :value="html">
-    <p v-if="error" :id="errorId" class="pr-rich-text-editor__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">
-      {{ error }}
+    <p v-if="errorText" :id="errorId" class="pr-rich-text-editor__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">
+      {{ errorText }}
     </p>
     <p v-else-if="hint" :id="hintId" class="pr-rich-text-editor__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">
       {{ hint }}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 import { ToggleGroupItem, ToggleGroupRoot } from 'reka-ui'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrToggleGroupItem {
   label: string
@@ -15,7 +16,7 @@ export interface PrToggleGroupProps {
   type?: 'single' | 'multiple'
   disabled?: boolean
   hint?: string
-  error?: string
+  error?: PrFieldError
   ariaLabel?: string
   name?: string
 }
@@ -32,6 +33,9 @@ const props = withDefaults(defineProps<PrToggleGroupProps>(), {
   name: undefined,
 })
 
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
+
 const emit = defineEmits<{
   'update:modelValue': [value: string | string[]]
 }>()
@@ -45,7 +49,7 @@ const hintId = computed(() => `pr-toggle-group-${generatedId}-hint`)
 const errorId = computed(() => `pr-toggle-group-${generatedId}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -108,7 +112,7 @@ const toggleGroupItemClass = [
     :disabled="disabled"
     :name="name"
     :aria-label="ariaLabel"
-    :aria-invalid="error ? 'true' : undefined"
+    :aria-invalid="errorText ? 'true' : undefined"
     :aria-describedby="describedBy"
     @update:model-value="updateValue"
   >
@@ -122,6 +126,6 @@ const toggleGroupItemClass = [
       {{ item.label }}
     </ToggleGroupItem>
   </ToggleGroupRoot>
-  <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+  <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
   <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 mt-[var(--pr-space-2)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>

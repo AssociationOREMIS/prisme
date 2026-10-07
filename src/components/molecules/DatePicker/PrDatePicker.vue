@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { PrInput } from '../../atoms/Input'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrDatePickerProps {
   modelValue?: string
   label?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   min?: string
@@ -27,6 +28,9 @@ const props = withDefaults(defineProps<PrDatePickerProps>(), {
   name: undefined,
   id: undefined,
 })
+
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -75,7 +79,7 @@ function onFocusOut() {
       :model-value="internalValue"
       :label="label"
       :hint="hint"
-      :error="error"
+      :error="errorText"
       type="date"
       :disabled="disabled"
       :required="required"
