@@ -42,16 +42,16 @@ const emit = defineEmits<{
       </div>
 
       <div class="flex items-center gap-[var(--pr-space-2)]">
-        <PrButton class="hidden size-8 p-0 lg:inline-flex" variant="secondary" size="sm" :disabled="page <= 1" aria-label="Premiere page" @click="emit('update:page', 1)">
+        <PrButton class="hidden size-8 p-0 lg:inline-flex" variant="secondary" size="sm" :disabled="page <= 1" aria-label="Première page" @click="emit('update:page', 1)">
           <ChevronsLeft :size="16" aria-hidden="true" />
         </PrButton>
-        <PrButton class="size-8 p-0" variant="secondary" size="sm" :disabled="page <= 1" aria-label="Page precedente" @click="emit('update:page', page - 1)">
+        <PrButton class="size-8 p-0" variant="secondary" size="sm" :disabled="page <= 1" aria-label="Page précédente" @click="emit('update:page', page - 1)">
           <ChevronLeft :size="16" aria-hidden="true" />
         </PrButton>
         <PrButton class="size-8 p-0" variant="secondary" size="sm" :disabled="page >= pageCount" aria-label="Page suivante" @click="emit('update:page', page + 1)">
           <ChevronRight :size="16" aria-hidden="true" />
         </PrButton>
-        <PrButton class="hidden size-8 p-0 lg:inline-flex" variant="secondary" size="sm" :disabled="page >= pageCount" aria-label="Derniere page" @click="emit('update:page', pageCount)">
+        <PrButton class="hidden size-8 p-0 lg:inline-flex" variant="secondary" size="sm" :disabled="page >= pageCount" aria-label="Dernière page" @click="emit('update:page', pageCount)">
           <ChevronsRight :size="16" aria-hidden="true" />
         </PrButton>
       </div>

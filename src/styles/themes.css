@@ -52,6 +52,10 @@
 
   --pr-color-danger: var(--pr-red-600);
   --pr-color-danger-hover: var(--pr-red-700);
+  /* Filled danger surfaces with white text (danger button, counters): red-600/700 in both themes,
+     since the dark theme's --pr-color-danger (red-400) is too light for white text (2.77:1). */
+  --pr-color-danger-solid: var(--pr-red-600);
+  --pr-color-danger-solid-hover: var(--pr-red-700);
   --pr-color-danger-soft: var(--pr-red-50);
   --pr-color-danger-border: var(--pr-red-200);
 
@@ -98,6 +102,8 @@
 
   --pr-color-danger: var(--pr-red-400);
   --pr-color-danger-hover: var(--pr-red-300);
+  --pr-color-danger-solid: var(--pr-red-600);
+  --pr-color-danger-solid-hover: var(--pr-red-700);
   --pr-color-danger-soft: rgb(239 68 68 / 16%);
   --pr-color-danger-border: rgb(252 165 165 / 30%);
 
@@ -145,6 +151,8 @@
 
     --pr-color-danger: var(--pr-red-400);
     --pr-color-danger-hover: var(--pr-red-300);
+    --pr-color-danger-solid: var(--pr-red-600);
+    --pr-color-danger-solid-hover: var(--pr-red-700);
     --pr-color-danger-soft: rgb(239 68 68 / 16%);
     --pr-color-danger-border: rgb(252 165 165 / 30%);
 

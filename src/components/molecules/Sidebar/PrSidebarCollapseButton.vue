@@ -9,8 +9,8 @@ export interface PrSidebarCollapseButtonProps {
 }
 
 const props = withDefaults(defineProps<PrSidebarCollapseButtonProps>(), {
-  collapseLabel: 'Reduire la navigation',
-  expandLabel: 'Etendre la navigation',
+  collapseLabel: 'Réduire la navigation',
+  expandLabel: 'Étendre la navigation',
 })
 
 const sidebar = inject(prSidebarContextKey, null)

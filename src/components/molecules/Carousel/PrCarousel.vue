@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<PrCarouselProps>(), {
 
 const index = ref(0)
 const current = computed(() => props.items[index.value])
-const positionLabel = computed(() => `Element ${index.value + 1} sur ${props.items.length}`)
+const positionLabel = computed(() => `Élément ${index.value + 1} sur ${props.items.length}`)
 
 function move(delta: number) {
   const total = props.items.length
@@ -37,7 +37,7 @@ function move(delta: number) {
     @keydown.left.prevent="move(-1)"
     @keydown.right.prevent="move(1)"
   >
-    <button class="pr-carousel__button inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Element precedent" @click="move(-1)">
+    <button class="pr-carousel__button inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Élément précédent" @click="move(-1)">
       <ChevronLeft :size="16" />
     </button>
     <div
@@ -51,7 +51,7 @@ function move(delta: number) {
       <strong>{{ current?.title }}</strong>
       <span v-if="current?.description">{{ current.description }}</span>
     </div>
-    <button class="pr-carousel__button inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Element suivant" @click="move(1)">
+    <button class="pr-carousel__button inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Élément suivant" @click="move(1)">
       <ChevronRight :size="16" />
     </button>
   </section>

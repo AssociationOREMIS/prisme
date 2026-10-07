@@ -47,7 +47,7 @@ function select(day: string) {
 <template>
   <div class="pr-calendar grid w-[min(21rem,100%)] gap-[var(--pr-space-3)] rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] p-[var(--pr-space-4)]">
     <div class="pr-calendar__header flex items-center justify-between gap-[var(--pr-space-3)]">
-      <button type="button" class="pr-calendar__nav inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" aria-label="Mois precedent" @click="move(-1)">
+      <button type="button" class="pr-calendar__nav inline-grid size-8 cursor-pointer place-items-center rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text)] hover:bg-[var(--pr-color-surface-subtle)]" aria-label="Mois précédent" @click="move(-1)">
         <ChevronLeft :size="16" />
       </button>
       <strong class="pr-calendar__label capitalize">{{ label }}</strong>

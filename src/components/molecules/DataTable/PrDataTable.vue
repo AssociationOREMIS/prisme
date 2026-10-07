@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<PrDataTableProps>(), {
   rowKey: 'id',
   loading: false,
   isLoading: false,
-  emptyText: 'Aucune donnee',
+  emptyText: 'Aucune donnée',
   noResultsMessage: undefined,
   pageSize: 10,
   pageSizeOptions: () => [10, 20, 30, 40, 50],
@@ -268,7 +268,7 @@ onBeforeUnmount(() => {
               <th v-if="selectable" class="pr-data-table__header h-12 w-[1%] px-[var(--pr-space-4)] text-left align-middle font-bold">
                 <PrCheckbox
                   :checked="selectAllState"
-                  aria-label="Selectionner la page"
+                  aria-label="Sélectionner la page"
                   @update:checked="togglePageRows(Boolean($event))"
                 />
               </th>
@@ -327,7 +327,7 @@ onBeforeUnmount(() => {
                 <td v-if="selectable" class="pr-data-table__cell p-[var(--pr-space-4)] align-middle">
                   <PrCheckbox
                     :checked="selectedKeys.has(rowId(row))"
-                    :aria-label="`Selectionner ${rowId(row)}`"
+                    :aria-label="`Sélectionner ${rowId(row)}`"
                     @update:checked="toggleRow(row, Boolean($event))"
                   />
                 </td>
