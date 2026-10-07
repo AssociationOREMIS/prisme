@@ -4,6 +4,7 @@ import { computed, ref, useId, watch } from 'vue'
 
 export interface PrNumberInputProps {
   modelValue?: number
+  defaultValue?: number
   label?: string
   hint?: string
   error?: string
@@ -19,6 +20,7 @@ export interface PrNumberInputProps {
 
 const props = withDefaults(defineProps<PrNumberInputProps>(), {
   modelValue: undefined,
+  defaultValue: undefined,
   label: undefined,
   hint: undefined,
   error: undefined,
@@ -40,23 +42,33 @@ const generatedId = useId()
 const inputId = computed(() => props.id ?? `pr-number-input-${generatedId}`)
 const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids: string[] = []
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
+
+// Without a v-model (a plain Blade form), the +/- buttons and typing must still change the
+// value: keep it locally, while a real v-model still takes priority.
+const internalValue = ref(props.modelValue ?? props.defaultValue)
+const currentValue = computed(() => props.modelValue ?? internalValue.value)
+
+function setValue(value: number) {
+  internalValue.value = value
+  if (!isFocused.value) inputValue.value = String(value)
+  emit('update:modelValue', value)
+}
 
 const canDecrement = computed(() => {
   if (props.disabled) return false
   if (props.min === undefined) return true
-  return (props.modelValue ?? 0) > props.min
+  return (currentValue.value ?? 0) > props.min
 })
 
 const canIncrement = computed(() => {
   if (props.disabled) return false
   if (props.max === undefined) return true
-  return (props.modelValue ?? 0) < props.max
+  return (currentValue.value ?? 0) < props.max
 })
 
 function clamp(value: number): number {
@@ -68,22 +80,23 @@ function clamp(value: number): number {
 
 function decrement() {
   if (!canDecrement.value) return
-  emit('update:modelValue', clamp((props.modelValue ?? 0) - props.step))
+  setValue(clamp((currentValue.value ?? 0) - props.step))
 }
 
 function increment() {
   if (!canIncrement.value) return
-  emit('update:modelValue', clamp((props.modelValue ?? 0) + props.step))
+  setValue(clamp((currentValue.value ?? 0) + props.step))
 }
 
 // Local text buffer so the field can be visually emptied while typing
 // (e.g. to retype a value) without desyncing from modelValue until blur.
 const isFocused = ref(false)
-const inputValue = ref(props.modelValue !== undefined ? String(props.modelValue) : '')
+const inputValue = ref(currentValue.value !== undefined ? String(currentValue.value) : '')
 
 watch(
   () => props.modelValue,
   (val) => {
+    if (val !== undefined) internalValue.value = val
     if (isFocused.value) return
     inputValue.value = val !== undefined ? String(val) : ''
   },
@@ -98,19 +111,19 @@ function onInput(event: Event) {
   inputValue.value = raw
   if (raw.trim() === '') return
   const num = parseFloat(raw)
-  if (!Number.isNaN(num)) emit('update:modelValue', clamp(num))
+  if (!Number.isNaN(num)) setValue(clamp(num))
 }
 
 function onBlur() {
   isFocused.value = false
   const num = parseFloat(inputValue.value)
   if (inputValue.value.trim() === '' || Number.isNaN(num)) {
-    inputValue.value = props.modelValue !== undefined ? String(props.modelValue) : ''
+    inputValue.value = currentValue.value !== undefined ? String(currentValue.value) : ''
     return
   }
   const clamped = clamp(num)
   inputValue.value = String(clamped)
-  if (clamped !== props.modelValue) emit('update:modelValue', clamped)
+  if (clamped !== currentValue.value) setValue(clamped)
 }
 
 // The template root is a wrapper <div>, not the <input> — forward fallthrough

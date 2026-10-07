@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CircleCheck, CircleX, FileUp, RotateCw, X } from '@lucide/vue'
-import { computed, reactive, ref, useId } from 'vue'
+import { computed, reactive, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 import { PrProgress } from '../../atoms/Progress'
 
@@ -19,6 +19,7 @@ export interface PrFileUploadFileState {
 
 export interface PrFileUploadProps {
   modelValue?: File[]
+  defaultValue?: File[]
   multiple?: boolean
   accept?: string
   maxSize?: number
@@ -40,7 +41,8 @@ export interface PrFileUploadProps {
 }
 
 const props = withDefaults(defineProps<PrFileUploadProps>(), {
-  modelValue: () => [],
+  modelValue: undefined,
+  defaultValue: () => [],
   multiple: false,
   accept: undefined,
   maxSize: undefined,
@@ -114,6 +116,36 @@ const describedBy = computed(() => {
 const inputRef = ref<HTMLInputElement | null>(null)
 const isDraggingOver = ref(false)
 
+// The file list, kept locally so it works without a v-model (a real v-model still wins).
+const internalFiles = ref<File[]>([...(props.modelValue ?? props.defaultValue)])
+const currentFiles = computed(() => props.modelValue ?? internalFiles.value)
+
+// A native form only posts what the <input type="file"> holds: mirror the list into it, so
+// dropped files and files added over several picks are submitted (and `required` is met).
+function syncInput(files: File[]) {
+  if (!inputRef.value || typeof DataTransfer === 'undefined') return
+  const transfer = new DataTransfer()
+  for (const file of files) transfer.items.add(file)
+  try {
+    inputRef.value.files = transfer.files
+  }
+  catch {
+    // `files` is read-only in some test environments; the v-model still holds the list.
+  }
+}
+
+function setFiles(files: File[]) {
+  internalFiles.value = files
+  syncInput(files)
+  emit('update:modelValue', files)
+}
+
+watch(() => props.modelValue, (files) => {
+  if (files === undefined) return
+  internalFiles.value = [...files]
+  syncInput(files)
+})
+
 function openFilePicker() {
   if (!props.disabled) inputRef.value?.click()
 }
@@ -127,7 +159,7 @@ function formatSize(bytes: number): string {
 function validateFiles(files: File[]): { accepted: File[]; rejected: PrRejectedFile[] } {
   const accepted: File[] = []
   const rejected: PrRejectedFile[] = []
-  const currentCount = props.modelValue?.length ?? 0
+  const currentCount = currentFiles.value.length
 
   for (const file of files) {
     if (props.maxSize && file.size > props.maxSize) {
@@ -165,15 +197,15 @@ function processFiles(rawFiles: FileList | null) {
   const { accepted, rejected } = validateFiles(Array.from(rawFiles))
   if (rejected.length) emit('reject', rejected)
   if (accepted.length) {
-    const current = props.modelValue ?? []
-    emit('update:modelValue', props.multiple ? [...current, ...accepted] : accepted.slice(0, 1))
+    setFiles(props.multiple ? [...currentFiles.value, ...accepted] : accepted.slice(0, 1))
     for (const file of accepted) startUpload(file)
   }
 }
 
 function onInputChange(event: Event) {
   processFiles((event.target as HTMLInputElement).files)
-  if (inputRef.value) inputRef.value.value = ''
+  // The picker replaced the input's files with the new pick only: put the whole list back.
+  syncInput(currentFiles.value)
 }
 
 function onDragEnter(event: DragEvent) {
@@ -198,13 +230,13 @@ function onDrop(event: DragEvent) {
 }
 
 function removeFile(index: number) {
-  const updated = [...(props.modelValue ?? [])]
+  const updated = [...currentFiles.value]
   const [removed] = updated.splice(index, 1)
   if (removed) uploadStates.delete(removed)
-  emit('update:modelValue', updated)
+  setFiles(updated)
 }
 
-const hasFiles = computed(() => (props.modelValue?.length ?? 0) > 0)
+const hasFiles = computed(() => currentFiles.value.length > 0)
 </script>
 
 <template>
@@ -261,7 +293,7 @@ const hasFiles = computed(() => (props.modelValue?.length ?? 0) > 0)
     </div>
     <ul v-if="hasFiles" class="pr-file-upload__list m-0 grid gap-[var(--pr-space-2)] p-0 list-none">
       <li
-        v-for="(file, index) in modelValue"
+        v-for="(file, index) in currentFiles"
         :key="`${file.name}-${index}`"
         class="pr-file-upload__item flex items-center gap-[var(--pr-space-3)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] py-[var(--pr-space-2)]"
       >

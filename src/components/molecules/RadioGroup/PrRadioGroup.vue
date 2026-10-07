@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 import { Circle } from '@lucide/vue'
 import { RadioGroupIndicator, RadioGroupItem, RadioGroupRoot } from 'reka-ui'
 import { PrLabel } from '../../atoms/Label'
@@ -42,14 +42,24 @@ const emit = defineEmits<{
 }>()
 
 const generatedId = useId()
-const rootValue = computed(() => props.modelValue ?? props.defaultValue)
+
+// Without a v-model (a plain Blade form with only `default-value`), binding the root to
+// `modelValue ?? defaultValue` would keep it controlled at a constant value and freeze the
+// selection. Track the live value locally, as PrSlider does; a real v-model still wins.
+const internalValue = ref(props.modelValue ?? props.defaultValue)
+
+watch(() => props.modelValue, (value) => {
+  if (value !== undefined) internalValue.value = value
+})
+
+const rootValue = computed(() => props.modelValue ?? internalValue.value)
+const labelId = computed(() => `pr-radio-group-${generatedId}-label`)
 const hintId = computed(() => `pr-radio-group-${generatedId}-hint`)
 const errorId = computed(() => `pr-radio-group-${generatedId}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids: string[] = []
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
 
 const radioRootClass = computed(() => [
@@ -61,6 +71,7 @@ const radioRootClass = computed(() => [
 
 function updateValue(value: unknown) {
   if (typeof value === 'string') {
+    internalValue.value = value
     emit('update:modelValue', value)
   }
 }
@@ -68,7 +79,8 @@ function updateValue(value: unknown) {
 
 <template>
   <div class="pr-radio-group grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
-    <PrLabel v-if="label" :required="required" :disabled="disabled">{{ label }}</PrLabel>
+    <!-- A group has no single input for the label to point at: it names the radiogroup through aria-labelledby. -->
+    <PrLabel v-if="label" :id="labelId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <RadioGroupRoot
       :class="radioRootClass"
       :model-value="rootValue"
@@ -77,6 +89,7 @@ function updateValue(value: unknown) {
       :required="required"
       :name="name"
       :aria-invalid="error ? 'true' : undefined"
+      :aria-labelledby="label ? labelId : undefined"
       :aria-describedby="describedBy"
       @update:model-value="updateValue"
     >

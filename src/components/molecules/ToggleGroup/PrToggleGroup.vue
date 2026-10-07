@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 import { ToggleGroupItem, ToggleGroupRoot } from 'reka-ui'
 
 export interface PrToggleGroupItem {
@@ -10,6 +10,7 @@ export interface PrToggleGroupItem {
 
 export interface PrToggleGroupProps {
   modelValue?: string | string[]
+  defaultValue?: string | string[]
   items?: PrToggleGroupItem[]
   type?: 'single' | 'multiple'
   disabled?: boolean
@@ -21,6 +22,7 @@ export interface PrToggleGroupProps {
 
 const props = withDefaults(defineProps<PrToggleGroupProps>(), {
   modelValue: undefined,
+  defaultValue: undefined,
   items: () => [],
   type: 'single',
   disabled: false,
@@ -41,25 +43,36 @@ defineOptions({ inheritAttrs: false })
 const generatedId = useId()
 const hintId = computed(() => `pr-toggle-group-${generatedId}-hint`)
 const errorId = computed(() => `pr-toggle-group-${generatedId}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids: string[] = []
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
+
+// Without a v-model the sliding indicator still has to follow the selection (it read
+// `modelValue` only, leaving the selected item white on transparent): keep the value locally,
+// while a real v-model still takes priority.
+const internalValue = ref(props.modelValue ?? props.defaultValue)
+
+watch(() => props.modelValue, (value) => {
+  if (value !== undefined) internalValue.value = value
+})
+
+const currentValue = computed(() => props.modelValue ?? internalValue.value)
 
 function updateValue(value: unknown) {
   if (typeof value === 'string' || Array.isArray(value)) {
+    internalValue.value = value as string | string[]
     emit('update:modelValue', value as string | string[])
   }
 }
 
 const activeIndex = computed(() => {
-  if (props.type !== 'single' || typeof props.modelValue !== 'string') {
+  if (props.type !== 'single' || typeof currentValue.value !== 'string') {
     return -1
   }
 
-  return props.items.findIndex((item) => item.value === props.modelValue)
+  return props.items.findIndex((item) => item.value === currentValue.value)
 })
 
 const toggleGroupStyle = computed(() => ({
@@ -89,7 +102,7 @@ const toggleGroupItemClass = [
     :class="toggleGroupClass"
     :style="toggleGroupStyle"
     :type="type"
-    :model-value="modelValue"
+    :model-value="currentValue"
     :disabled="disabled"
     :name="name"
     :aria-label="ariaLabel"

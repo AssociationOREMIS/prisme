@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { X } from '@lucide/vue'
-import { computed, ref, useId } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 
 export interface PrTagInputProps {
   modelValue?: string[]
+  defaultValue?: string[]
   label?: string
   hint?: string
   error?: string
@@ -16,7 +17,8 @@ export interface PrTagInputProps {
 }
 
 const props = withDefaults(defineProps<PrTagInputProps>(), {
-  modelValue: () => [],
+  modelValue: undefined,
+  defaultValue: () => [],
   label: undefined,
   hint: undefined,
   error: undefined,
@@ -36,17 +38,31 @@ const generatedId = useId()
 const inputId = computed(() => props.id ?? `pr-tag-input-${generatedId}`)
 const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
+// Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  const ids: string[] = []
-  if (props.hint) ids.push(hintId.value)
-  if (props.error) ids.push(errorId.value)
-  return ids.length > 0 ? ids.join(' ') : undefined
+  if (props.error) return errorId.value
+  return props.hint ? hintId.value : undefined
 })
 const inputRef = ref<HTMLInputElement | null>(null)
 const inputValue = ref('')
 
+// Without a v-model (a plain Blade form), `modelValue` stays undefined: keep the tags locally
+// so they show and get submitted, while a real v-model still takes priority.
+const internalTags = ref<string[]>([...(props.modelValue ?? props.defaultValue)])
+
+watch(() => props.modelValue, (value) => {
+  if (value !== undefined) internalTags.value = [...value]
+})
+
+const tags = computed(() => props.modelValue ?? internalTags.value)
+
+function setTags(next: string[]) {
+  internalTags.value = next
+  emit('update:modelValue', next)
+}
+
 const canAddMore = computed(() =>
-  props.maxTags === undefined || (props.modelValue?.length ?? 0) < props.maxTags,
+  props.maxTags === undefined || tags.value.length < props.maxTags,
 )
 
 function focusInput() {
@@ -56,12 +72,12 @@ function focusInput() {
 function addTag(raw: string) {
   const tag = raw.trim()
   if (!tag || !canAddMore.value) return
-  if (props.modelValue?.some(t => t.toLowerCase() === tag.toLowerCase())) return
-  emit('update:modelValue', [...(props.modelValue ?? []), tag])
+  if (tags.value.some(t => t.toLowerCase() === tag.toLowerCase())) return
+  setTags([...tags.value, tag])
 }
 
 function addTags(rawList: string[]) {
-  let next = [...(props.modelValue ?? [])]
+  let next = [...tags.value]
   for (const raw of rawList) {
     const tag = raw.trim()
     if (!tag) continue
@@ -69,13 +85,13 @@ function addTags(rawList: string[]) {
     if (next.some(t => t.toLowerCase() === tag.toLowerCase())) continue
     next = [...next, tag]
   }
-  emit('update:modelValue', next)
+  setTags(next)
 }
 
 function removeTag(index: number) {
-  const updated = [...(props.modelValue ?? [])]
+  const updated = [...tags.value]
   updated.splice(index, 1)
-  emit('update:modelValue', updated)
+  setTags(updated)
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -85,8 +101,7 @@ function onKeydown(event: KeyboardEvent) {
     inputValue.value = ''
   }
   else if (event.key === 'Backspace' && inputValue.value === '') {
-    const tags = props.modelValue ?? []
-    if (tags.length > 0) removeTag(tags.length - 1)
+    if (tags.value.length > 0) removeTag(tags.value.length - 1)
   }
 }
 
@@ -131,7 +146,7 @@ defineOptions({ inheritAttrs: false })
       @click="focusInput"
     >
       <span
-        v-for="(tag, index) in modelValue"
+        v-for="(tag, index) in tags"
         :key="index"
         class="pr-tag-input__tag inline-flex items-center gap-[var(--pr-space-1)] rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] px-[var(--pr-space-2)] py-0.5 text-[length:var(--pr-font-size-xs)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)]"
       >
@@ -153,9 +168,9 @@ defineOptions({ inheritAttrs: false })
         v-model="inputValue"
         class="pr-tag-input__input min-w-[6rem] grow bg-transparent py-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed"
         type="text"
-        :placeholder="(modelValue?.length ?? 0) === 0 ? placeholder : undefined"
+        :placeholder="tags.length === 0 ? placeholder : undefined"
         :disabled="disabled || !canAddMore"
-        :required="required && (modelValue?.length ?? 0) === 0"
+        :required="required && tags.length === 0"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
         @keydown="onKeydown"
@@ -166,7 +181,7 @@ defineOptions({ inheritAttrs: false })
     <!-- The draft input above only ever holds in-progress text, so the
          committed tags are submitted natively through these hidden inputs. -->
     <template v-if="name">
-      <input v-for="(tag, index) in modelValue" :key="`${inputId}-${index}`" type="hidden" :name="name" :value="tag">
+      <input v-for="(tag, index) in tags" :key="`${inputId}-${index}`" type="hidden" :name="name" :value="tag">
     </template>
     <p v-if="error" :id="errorId" class="pr-tag-input__message pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
     <p v-else-if="hint" :id="hintId" class="pr-tag-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
