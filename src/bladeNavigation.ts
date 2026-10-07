@@ -37,6 +37,13 @@ interface FetchedPage {
 type HistoryState = { prisme: true, scrollY?: number }
 
 /**
+ * Scripts a proxy adds to every response, never the same twice: Cloudflare's bot detection writes the
+ * request's id inline, and Rocket Loader its own loader. They live under Cloudflare's reserved `/cdn-cgi/`.
+ */
+const isInjectedByProxy = (element: Element): boolean =>
+  (element.getAttribute('src') ?? element.textContent ?? '').includes('/cdn-cgi/')
+
+/**
  * The scripts and stylesheets of a document, outside the app. A page that brings one the current
  * document lacks (its own `@push('scripts')`) cannot be swapped. The current document may have more,
  * added while it ran (Vite's dev styles, a script the app loaded): those do not prevent a swap.
@@ -46,7 +53,7 @@ function assetsOf(doc: Document, app: Element | null): string[] {
 
   for (const element of doc.querySelectorAll(`script, link[rel="stylesheet"], link[rel="modulepreload"], style`)) {
     if (element.hasAttribute(MARKER) || (app && app.contains(element))) continue
-    if (element.matches('script[type="speculationrules"]')) continue
+    if (element.matches('script[type="speculationrules"]') || isInjectedByProxy(element)) continue
     assets.push(element.getAttribute('src') ?? element.getAttribute('href') ?? element.textContent ?? '')
   }
 
