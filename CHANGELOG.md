@@ -2,6 +2,26 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## Non publie
+
+### Changements visibles
+
+- **Navigation plus rapide entre les pages Blade**, sans rien changer dans les apps : une fois l'app montee, `registerPrisme` prepare la page suivante (voir README, « Navigation plus rapide entre les pages ») :
+  - `prefetch` (`'prerender'` par defaut) : la page derriere un lien survole est chargee et montee en arriere-plan (Speculation Rules, Chrome et Edge), le clic l'affiche tout de suite. Liens externes, `download`, `target`, adresses contenant `logout` et `data-no-prefetch` exclus ;
+  - `preload` (`'idle'` par defaut) : les composants charges a la demande sont telecharges pendant les temps morts, plus de squelette sur les pages suivantes ;
+  - `transitions` (`true` par defaut) : navbar et sidebar immobiles, fondu du contenu, uniquement quand la nouvelle page est deja montee ;
+  - `measure` (`true` par defaut) : mesure `prisme:mount` dans l'onglet Performance des devtools.
+- Chaque option se coupe avec `false`.
+
+### Ajouts
+
+- **`navigation: 'swap'` (a l'essai, desactive par defaut)** : navigation sans rechargement dans tous les navigateurs. La page suivante est recuperee et seul `#app` est remplace : navbar et sidebar gardent leur etat, le contenu est reconstruit. Retour a un chargement normal pour les pages avec d'autres scripts ou styles, les reponses non HTML, les liens `download`/`target`/`logout`/`data-prisme-reload`. A essayer sans toucher a l'app avec `localStorage.setItem('prisme:navigation', 'swap')` (voir README).
+
+### Tests
+
+- Regles de prechargement et exclusions, transitions ajoutees seulement apres le montage, prechargement des composants pendant les temps morts (sans les `eager`, ni avec Save-Data, et apres l'ouverture d'une page prerendue), mesure du montage.
+- Navigation `swap` : shell conserve avec son etat, contenu reconstruit, bouton Precedent, liens laisses au navigateur, retour au chargement normal, annonce et focus, essai par `localStorage`.
+
 ## 0.15.0 (2026-10-07)
 
 ### Ajouts

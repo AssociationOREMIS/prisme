@@ -248,6 +248,31 @@ app.mount('#app')
 
 Montez Vue sur un noeud qui porte `v-cloak` et cachez-le avec `[v-cloak] { display: none }` pour eviter de voir les balises brutes avant le montage. Tout texte saisi par quelqu'un doit etre place dans un element `v-pre` : Vue compile toute la page, et `{{ ... }}` dans une note serait sinon evalue.
 
+#### Navigation plus rapide entre les pages
+
+En Blade, chaque clic recharge toute la page et Vue la recompile avant de l'afficher. Une fois monte, `registerPrisme` prepare donc la page suivante, sans rien a ajouter dans l'application :
+
+- **`prefetch`** (`'prerender'` par defaut) : quand le pointeur reste sur un lien, le navigateur charge deja la page, et avec `'prerender'` monte meme Vue en arriere-plan : au clic, elle s'affiche tout de suite. `'prefetch'` telecharge seulement le HTML, `false` desactive. Chrome et Edge uniquement (Speculation Rules), les autres navigateurs l'ignorent.
+- **`preload`** (`'idle'` par defaut) : quand la page n'a plus rien a faire, les composants charges a la demande sont telecharges un par un, pour que les pages suivantes les trouvent en cache, sans squelette. Desactive avec Save-Data.
+- **`transitions`** (`true` par defaut) : la navbar et la sidebar restent immobiles, seul le contenu fait un fondu (View Transitions entre documents). Uniquement quand la nouvelle page est deja montee, et jamais avec « reduire les animations ».
+- **`measure`** (`true` par defaut) : la mesure `prisme:mount` (du debut de la navigation au montage de Vue) apparait dans l'onglet Performance des devtools et en `console.debug` (niveau « Verbose »).
+
+Ne sont jamais precharges : les liens vers un autre site, ceux qui ont `download` ou une `target`, ceux dont l'adresse contient `logout`, et ceux qui portent `data-no-prefetch`. Le prechargement envoie une vraie requete GET : un lien qui modifie quelque chose en GET (a eviter) doit porter `data-no-prefetch`.
+
+#### Navigation sans rechargement (`navigation: 'swap'`, a l'essai)
+
+Avec `navigation: 'swap'`, un clic sur un lien ne recharge plus la page, dans tous les navigateurs. Prisme recupere la page suivante (le serveur renvoie toujours sa page Blade complete) et remplace seulement le contenu de `#app` : la navbar et la sidebar restent en place avec leur etat (sidebar repliee, defilement), leurs props sont mises a jour (element actif, badges), et le contenu de `<main class="pr-shell-grid__content">` est reconstruit. Le titre, l'adresse, le token CSRF, les boutons Precedent/Suivant et le defilement suivent ; le focus passe au contenu et les lecteurs d'ecran entendent le titre de la nouvelle page. Le survol d'un lien precharge la page (sans Speculation Rules, inutiles ici).
+
+Rien a changer dans les controleurs ni dans les vues. La page se recharge normalement :
+
+- si la page suivante apporte un script ou une feuille de style que la page actuelle n'a pas (`@push('scripts')`, carte, editeur...) ;
+- si la reponse n'est pas du HTML (un export), vient d'un autre site (session expiree renvoyee au SSO) ou n'arrive pas ;
+- pour les liens `download`, `target`, `logout`, ou marques `data-prisme-reload` (sur le lien ou un parent).
+
+Les formulaires gardent leur envoi normal.
+
+Desactive par defaut tant qu'il est a l'essai. Pour l'essayer dans son navigateur sans toucher a l'app, dans la console : `localStorage.setItem('prisme:navigation', 'swap')` puis recharger (`removeItem` pour revenir). `navigation: false` l'interdit dans une app.
+
 ### `app.use(Prisme)` ou imports nommes ?
 
 - `app.use(Prisme)` enregistre en une seule fois tous les composants Prisme comme composants globaux de l'application. C'est le plus adapte quand les composants sont utilises directement dans du HTML/Blade (pas de `<script setup>` pour les declarer), au prix d'inclure l'integralite de la bibliotheque dans le bundle.
