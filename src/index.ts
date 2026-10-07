@@ -7,7 +7,7 @@ export { PrAlert } from './components/atoms/Alert'
 export { PrAlertDialog } from './components/molecules/AlertDialog'
 export { PrAppShell } from './components/layouts/AppShell'
 export { PrBadge } from './components/atoms/Badge'
-export { PrButton } from './components/atoms/Button'
+export { PrButton, prButtonActions } from './components/atoms/Button'
 export { PrCalendar } from './components/molecules/Calendar'
 export { PrCard } from './components/atoms/Card'
 export { PrCarousel } from './components/molecules/Carousel'
@@ -59,6 +59,8 @@ export type {
   PrAlertProps,
   PrAppShellProps,
   PrBadgeProps,
+  PrButtonAction,
+  PrButtonActionPreset,
   PrButtonProps,
   PrCalendarProps,
   PrCardProps,
