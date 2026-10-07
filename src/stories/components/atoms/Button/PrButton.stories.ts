@@ -123,3 +123,22 @@ export const AsLink: Story = {
     await expect(disabled).toHaveAttribute('aria-disabled', 'true')
   },
 }
+
+// A button in a table column as narrow as possible keeps its words whole (« Gérer », not « Gé / rer »).
+// noinspection JSUnusedGlobalSymbols
+export const InNarrowColumn: Story = {
+  render: () => ({
+    components: { PrButton },
+    template: `
+      <table style="width: 1px; border-collapse: collapse;">
+        <tbody><tr><td style="width: 1px; padding: 0;"><PrButton size="sm">Gérer</PrButton></td></tr></tbody>
+      </table>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Gérer' })
+    const lineHeight = parseFloat(getComputedStyle(button).minHeight)
+    await expect(button.getBoundingClientRect().height).toBeLessThanOrEqual(lineHeight + 1)
+    await expect(button.scrollWidth).toBeLessThanOrEqual(button.clientWidth)
+  },
+}

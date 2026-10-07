@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, within } from 'storybook/test'
 import { reactive } from 'vue'
 import {
   ArrowDown,
@@ -191,4 +192,18 @@ export const ServerSide: Story = {
       />
     `,
   }),
+}
+
+// A page size outside the offered options is added to them: the select shows it, not its placeholder.
+// noinspection JSUnusedGlobalSymbols
+export const PageSizeOutsideOptions: Story = {
+  args: {
+    pageSize: 25,
+  },
+  render: Default.render,
+  play: async ({ canvasElement }) => {
+    const select = within(canvasElement).getByRole('combobox', { name: 'Lignes par page' })
+    await expect(select).toHaveTextContent('25')
+    await expect(select).not.toHaveTextContent('Sélectionner')
+  },
 }

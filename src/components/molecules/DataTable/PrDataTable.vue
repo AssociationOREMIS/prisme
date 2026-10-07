@@ -68,7 +68,10 @@ const emptyMessage = computed(() => props.noResultsMessage ?? props.emptyText)
 const filterColumnKey = computed(() => props.filterKey ?? columns.value.find((column) => column.filterable !== false)?.key ?? '')
 const filterLabel = computed(() => props.filterPlaceholder
   ?? `Filtrer ${columns.value.find((column) => column.key === filterColumnKey.value)?.label.toLocaleLowerCase() ?? 'les lignes'}...`)
-const pageSizeOptions = computed(() => props.pageSizeOptions)
+// The page size in use is always offered, so the select never falls back to its placeholder.
+const pageSizeOptions = computed(() => props.pageSizeOptions.includes(activePageSize.value)
+  ? props.pageSizeOptions
+  : [...props.pageSizeOptions, activePageSize.value].sort((a, b) => a - b))
 const hasRowActions = computed(() => Boolean(props.rowActions.length || 'row-actions' in slots))
 const hideSelectedRowsCount = computed(() => props.hideSelectedRowsCount)
 
@@ -256,7 +259,7 @@ onBeforeUnmount(() => {
           <PrInput
             v-if="filterColumnKey"
             v-model="filterValue"
-            class="pr-data-table__filter h-8 w-[min(100%,16rem)]"
+            class="pr-data-table__filter h-8 w-full max-w-[28rem]"
             :placeholder="filterLabel"
             :aria-label="filterLabel"
           />

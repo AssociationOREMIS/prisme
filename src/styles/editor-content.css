@@ -19,6 +19,30 @@
   color: var(--pr-color-text);
 }
 
+/* Bullet and numbered lists: the reset removes their markers and indent. Task lists are styled below. */
+.pr-editor-content ul:not([data-type="taskList"]),
+.pr-editor-content ol {
+  margin: 0 0 var(--pr-space-3);
+  padding-left: 1.5rem;
+}
+
+.pr-editor-content ul:not([data-type="taskList"]) {
+  list-style: disc;
+}
+
+.pr-editor-content ul:not([data-type="taskList"]) ul:not([data-type="taskList"]) {
+  list-style: circle;
+}
+
+.pr-editor-content ol {
+  list-style: decimal;
+}
+
+.pr-editor-content li > ul,
+.pr-editor-content li > ol {
+  margin-bottom: 0;
+}
+
 /*
  * A host page's own typography reset (e.g. Storybook's docs-mode "sbdocs"
  * stylesheet, or a consumer app's own `p`/`li`/`td` rules) can target these
