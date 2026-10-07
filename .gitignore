@@ -17,6 +17,7 @@ coverage/
 
 # Generated at build time — see scripts/generate-component-paths.mjs
 src/components/paths.generated.ts
+src/components/loaders.generated.ts
 
 # Logs
 logs/
