@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { buildPaginationItems } from './utils'
 
@@ -14,7 +14,7 @@ export interface PrPaginationProps {
 }
 
 const props = withDefaults(defineProps<PrPaginationProps>(), {
-  page: 1,
+  page: undefined,
   pageCount: undefined,
   totalRows: undefined,
   pageSize: 10,
@@ -25,7 +25,13 @@ const emit = defineEmits<{
   'update:page': [value: number]
 }>()
 
-const currentPage = computed(() => props.page ?? 1)
+// Without v-model:page the buttons must still move the current page: keep it locally,
+// while a real v-model still takes priority (as the form fields do).
+const internalPage = ref(props.page ?? 1)
+watch(() => props.page, (value) => {
+  if (value !== undefined) internalPage.value = value
+})
+const currentPage = computed(() => props.page ?? internalPage.value)
 const currentPageCount = computed(() => {
   if (props.pageCount !== undefined) return props.pageCount
   if (props.totalRows !== undefined) return Math.max(1, Math.ceil(props.totalRows / props.pageSize))
@@ -42,6 +48,7 @@ const paginationActiveClass = 'pr-pagination__button--active border-[var(--pr-co
 
 function go(nextPage: number) {
   if (!isDisabled.value && nextPage >= 1 && nextPage <= currentPageCount.value) {
+    internalPage.value = nextPage
     emit('update:page', nextPage)
   }
 }

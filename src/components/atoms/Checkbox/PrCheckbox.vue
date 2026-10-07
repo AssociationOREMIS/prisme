@@ -2,14 +2,18 @@
 import { computed, useId } from 'vue'
 import { Check, Minus } from '@lucide/vue'
 import { CheckboxIndicator, CheckboxRoot, type CheckboxCheckedState } from 'reka-ui'
+import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrCheckboxProps {
-  checked?: CheckboxCheckedState
-  defaultChecked?: CheckboxCheckedState
+  // Written out rather than reka's CheckboxCheckedState: Vue's compiler cannot read an imported
+  // type, so it did not know these are booleans, and a bare Blade `default-checked` attribute
+  // came in as '' (unchecked) instead of true.
+  checked?: boolean | 'indeterminate'
+  defaultChecked?: boolean | 'indeterminate'
   label?: string
   description?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   disabled?: boolean
   required?: boolean
   id?: string
@@ -32,6 +36,9 @@ const props = withDefaults(defineProps<PrCheckboxProps>(), {
   value: undefined,
 })
 
+// One message, or the first of Laravel's array of messages.
+const errorText = useErrorText(() => props.error)
+
 const emit = defineEmits<{
   'update:checked': [value: CheckboxCheckedState]
 }>()
@@ -46,7 +53,7 @@ const hintId = computed(() => `pr-checkbox-${generatedId}-hint`)
 const errorId = computed(() => `pr-checkbox-${generatedId}-error`)
 // Only the message actually shown: the error replaces the hint.
 const describedBy = computed(() => {
-  if (props.error) return errorId.value
+  if (errorText.value) return errorId.value
   return props.hint ? hintId.value : undefined
 })
 
@@ -68,7 +75,7 @@ const checkboxClass = computed(() => [
       :id="id"
       :name="name"
       :value="value"
-      :aria-invalid="error ? 'true' : undefined"
+      :aria-invalid="errorText ? 'true' : undefined"
       :aria-describedby="describedBy"
       @update:model-value="emit('update:checked', $event)"
     >
@@ -90,6 +97,6 @@ const checkboxClass = computed(() => [
       <span v-if="description" class="pr-checkbox__description text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
     </span>
   </label>
-  <p v-if="error" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ error }}</p>
+  <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
   <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>
