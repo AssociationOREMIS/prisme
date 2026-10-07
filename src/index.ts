@@ -1,62 +1,56 @@
 import './styles/prisme.css'
 
-import { componentRegistry } from './components/registry'
-
-export const {
-  PrAccordion,
-  PrAlert,
-  PrAlertDialog,
-  PrAppShell,
-  PrBadge,
-  PrButton,
-  PrCalendar,
-  PrCard,
-  PrCarousel,
-  PrCheckbox,
-  PrCollapsible,
-  PrCombobox,
-  PrCommand,
-  PrDataTable,
-  PrDatePicker,
-  PrDialog,
-  PrDivider,
-  PrDropdownMenu,
-  PrFileUpload,
-  PrHoverCard,
-  PrInput,
-  PrLabel,
-  PrListItem,
-  PrNavbar,
-  PrNavbarUserMenu,
-  PrNavigationMenu,
-  PrNumberInput,
-  PrPagination,
-  PrPopover,
-  PrProgress,
-  PrRadioGroup,
-  PrScrollArea,
-  PrSelect,
-  PrSheet,
-  PrSidebar,
-  PrSidebarItem,
-  PrSidebarSubItem,
-  PrSkeleton,
-  PrSlider,
-  PrSpinner,
-  PrStepper,
-  PrSwitch,
-  PrTable,
-  PrTabs,
-  PrTagInput,
-  PrTextarea,
-  PrThemeToggle,
-  PrToast,
-  PrToastProvider,
-  PrToggle,
-  PrToggleGroup,
-  PrTooltip,
-  PrTypography,
-} = componentRegistry
+// Direct re-exports, not a destructuring of `componentRegistry`: a bundler can drop the
+// components an app does not import (`export const { ... } = componentRegistry` kept them all).
+export { PrAccordion } from './components/molecules/Accordion'
+export { PrAlert } from './components/atoms/Alert'
+export { PrAlertDialog } from './components/molecules/AlertDialog'
+export { PrAppShell } from './components/layouts/AppShell'
+export { PrBadge } from './components/atoms/Badge'
+export { PrButton } from './components/atoms/Button'
+export { PrCalendar } from './components/molecules/Calendar'
+export { PrCard } from './components/atoms/Card'
+export { PrCarousel } from './components/molecules/Carousel'
+export { PrCheckbox } from './components/atoms/Checkbox'
+export { PrCollapsible } from './components/molecules/Collapsible'
+export { PrCombobox } from './components/molecules/Combobox'
+export { PrCommand } from './components/molecules/Command'
+export { PrDataTable } from './components/molecules/DataTable'
+export { PrDatePicker } from './components/molecules/DatePicker'
+export { PrDialog } from './components/molecules/Dialog'
+export { PrDivider } from './components/atoms/Divider'
+export { PrDropdownMenu } from './components/molecules/DropdownMenu'
+export { PrFileUpload } from './components/molecules/FileUpload'
+export { PrHoverCard } from './components/molecules/HoverCard'
+export { PrInput } from './components/atoms/Input'
+export { PrLabel } from './components/atoms/Label'
+export { PrListItem } from './components/molecules/ListItem'
+export { PrNavbar, PrNavbarUserMenu } from './components/layouts/Navbar'
+export { PrNavigationMenu } from './components/molecules/NavigationMenu'
+export { PrNumberInput } from './components/atoms/NumberInput'
+export { PrPagination } from './components/molecules/Pagination'
+export { PrPopover } from './components/molecules/Popover'
+export { PrProgress } from './components/atoms/Progress'
+export { PrRadioGroup } from './components/molecules/RadioGroup'
+export { PrScrollArea } from './components/molecules/ScrollArea'
+export { PrSelect } from './components/molecules/Select'
+export { PrSheet } from './components/molecules/Sheet'
+export { PrSidebar, PrSidebarItem, PrSidebarSubItem } from './components/molecules/Sidebar'
+export { PrSkeleton } from './components/atoms/Skeleton'
+export { PrSlider } from './components/atoms/Slider'
+export { PrSpinner } from './components/atoms/Spinner'
+export { PrStepper } from './components/molecules/Stepper'
+export { PrSwitch } from './components/atoms/Switch'
+export { PrTable } from './components/atoms/Table'
+export { PrTabs } from './components/molecules/Tabs'
+export { PrTagInput } from './components/atoms/TagInput'
+export { PrTextarea } from './components/atoms/Textarea'
+export { PrThemeToggle } from './components/molecules/ThemeToggle'
+export { PrToast, PrToastProvider } from './components/molecules/Toast'
+export { PrToggle } from './components/atoms/Toggle'
+export { PrToggleGroup } from './components/molecules/ToggleGroup'
+export { PrTooltip } from './components/molecules/Tooltip'
+export { PrTypography } from './components/atoms/Typography'
 
 export type {
   PrAccordionItem,

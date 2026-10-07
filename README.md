@@ -230,6 +230,30 @@ import { PrismeEditor } from '@oremis/prisme/editor'
 app.use(Prisme).use(PrismeEditor)
 ```
 
+### Chargement a la demande avec `registerPrisme` (recommande pour Blade)
+
+`app.use(Prisme)` met toute la bibliotheque dans le bundle de chaque page. `registerPrisme` (entree `@oremis/prisme/blade`) enregistre les composants presents sur toutes les pages tels quels, et tous les autres a la demande : chaque composant devient un petit fichier charge seulement quand une page l'utilise. Plus besoin de script qui genere la liste des composants dans l'application.
+
+```ts
+import { createApp } from 'vue'
+import { PrButton, PrNavbar, PrSidebar } from '@oremis/prisme'
+import { registerPrisme } from '@oremis/prisme/blade'
+import '@oremis/prisme/styles.css'
+
+const app = createApp({})
+
+registerPrisme(app, {
+  // Sur toutes les pages : affiches des le premier rendu, sans apparaitre apres coup.
+  eager: { PrButton, PrNavbar, PrSidebar },
+  // Optionnel : un squelette pendant le chargement d'un composant (au-dela de `delay`, 150 ms par defaut).
+  loading: (name) => (name === 'PrSelect' ? SelectSkeleton : undefined),
+})
+
+app.mount('#app')
+```
+
+Montez Vue sur un noeud qui porte `v-cloak` et cachez-le avec `[v-cloak] { display: none }` pour eviter de voir les balises brutes avant le montage. Tout texte saisi par quelqu'un doit etre place dans un element `v-pre` : Vue compile toute la page, et `{{ ... }}` dans une note serait sinon evalue.
+
 ### `app.use(Prisme)` ou imports nommes ?
 
 - `app.use(Prisme)` enregistre en une seule fois tous les composants Prisme comme composants globaux de l'application. C'est le plus adapte quand les composants sont utilises directement dans du HTML/Blade (pas de `<script setup>` pour les declarer), au prix d'inclure l'integralite de la bibliotheque dans le bundle.

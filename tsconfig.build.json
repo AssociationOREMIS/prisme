@@ -11,11 +11,13 @@
     "src/index.ts",
     "src/editor.ts",
     "src/registry.ts",
+    "src/blade.ts",
     "src/components/**/*.ts",
     "src/components/**/*.vue"
   ],
   "exclude": [
     "src/**/*.stories.ts",
+    "src/**/*.test.ts",
     "src/App.vue",
     "src/main.ts"
   ]

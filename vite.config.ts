@@ -35,7 +35,13 @@ export default defineConfig({
       // shipping inside Prisme's own bundle for apps that *do* already depend on
       // tiptap directly — two copies of `@tiptap/pm` in one page break tiptap's
       // internal `instanceof` checks.
-      external: id => id === 'vue' || id.startsWith('@tiptap/') || id === 'lowlight' || id === 'tiptap-extension-resize-image',
+      //
+      // reka-ui and @lucide/vue are regular dependencies, installed with Prisme: bundling
+      // them too gave every app a second copy (and every component file its own one).
+      external: id => id === 'vue'
+        || id === 'reka-ui' || id.startsWith('reka-ui/')
+        || id === '@lucide/vue' || id.startsWith('@lucide/vue/')
+        || id.startsWith('@tiptap/') || id === 'lowlight' || id === 'tiptap-extension-resize-image',
       output: {
         globals: {
           vue: 'Vue',
