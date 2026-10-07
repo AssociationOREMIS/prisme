@@ -2,6 +2,16 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.18.1 (2026-10-07)
+
+### Corrections
+
+- **Navigation sans rechargement derriere Cloudflare** : chaque clic rechargeait toute la page en production. Cloudflare ajoute a chaque reponse un script toujours different (detection des bots, Rocket Loader), que Prisme prenait pour un script propre a la page suivante. Les scripts servis sous `/cdn-cgi/` sont maintenant ignores.
+
+### Tests
+
+- Les scripts injectes par Cloudflare, differents d'une reponse a l'autre, n'empechent plus la navigation sans rechargement.
+
 ## 0.18.0 (2026-10-07)
 
 ### Changements visibles

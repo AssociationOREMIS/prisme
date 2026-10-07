@@ -166,6 +166,21 @@ describe("registerPrisme navigation: 'swap'", () => {
     expect(location.pathname).toBe('/')
   })
 
+  it('ignores the scripts Cloudflare adds to every response, different each time', async () => {
+    const cloudflare = (ray: string) =>
+      `<script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="${ray}-|49" defer></script>`
+      + `<script>(function(){var d="window.__CF$cv$params={r:'${ray}'};a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js'"})();</script>`
+    stubServer({ '/regions': { html: pageHtml('Regions', '<h1>Regions</h1>', cloudflare('a46dfa28ce96e244')) } })
+    mountFirstPage('<h1>Accueil</h1><a id="regions" href="/regions">Regions</a>')
+    document.body.insertAdjacentHTML('beforeend', cloudflare('a46dfa27d93de15a'))
+
+    click('#regions')
+    await settle()
+
+    expect(document.querySelector('main h1')?.textContent).toBe('Regions')
+    expect(location.pathname).toBe('/regions')
+  })
+
   it('is on by default, and can be turned off in one browser through localStorage', async () => {
     const mountWithoutOption = () => {
       document.body.innerHTML = new DOMParser().parseFromString(pageHtml('Accueil', '<a id="to-users" href="/users">Benevoles</a>'), 'text/html').body.innerHTML
