@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
+import { scopeUtilities } from './scope-utilities.mjs'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(dirname, '..')
@@ -112,6 +113,41 @@ function copyStaticStyles() {
 }
 
 /**
+ * `fonts.css` only imports @fontsource/roboto (a dependency of Prisme): copied as is, so the
+ * app's bundler resolves the imports and serves the font files.
+ */
+function copyFonts() {
+  fs.copyFileSync(path.resolve(root, 'src/styles/fonts.css'), path.resolve(root, 'dist/fonts.css'))
+}
+
+/**
+ * `dist/styles-scoped.css` (src/styles/prisme-scoped.css): the stylesheet for pages styled by
+ * another framework. Its own build, since the library build merges every CSS it meets into
+ * `styles.css`; its utilities are then limited to Prisme elements (scope-utilities.mjs). The
+ * tiny JS it also emits is thrown away.
+ */
+async function buildScopedStyles() {
+  const outDir = path.resolve(root, 'dist/.scoped')
+  await build({
+    configFile,
+    logLevel: 'warn',
+    build: {
+      outDir,
+      emptyOutDir: true,
+      lib: {
+        entry: path.resolve(root, 'src/styles/scoped-entry.ts'),
+        formats: ['es'],
+        fileName: () => 'scoped-entry.js',
+        cssFileName: 'styles-scoped',
+      },
+    },
+  })
+  const css = fs.readFileSync(path.resolve(outDir, 'styles-scoped.css'), 'utf-8')
+  fs.writeFileSync(path.resolve(root, 'dist/styles-scoped.css'), scopeUtilities(css))
+  fs.rmSync(outDir, { recursive: true })
+}
+
+/**
  * `dist/components/<category>/<Name>.js` (the entry) sits next to `<Name>/index.d.ts` (its
  * types, written by vue-tsc). TypeScript resolves `./atoms/Button` in the emitted .d.ts files
  * to the .js file first, finds no `Button.d.ts` beside it and falls back to `any`: every type
@@ -132,5 +168,7 @@ function writeComponentEntryDeclarations() {
 }
 
 await buildLibrary()
+await buildScopedStyles()
 writeComponentEntryDeclarations()
 copyStaticStyles()
+copyFonts()

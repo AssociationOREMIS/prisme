@@ -12,19 +12,13 @@ Elle fournit des composants, des styles et des tokens de design pour construire 
 
 ## Typographie
 
-Le token `--pr-font-sans` (utilisé par tous les composants via `reset.css`) declare `Roboto` en premier, pour rester coherent avec les applications OREMIS existantes (`data`, `formation`). Prisme ne charge pas la police lui-meme : sans action de votre part, les navigateurs retombent silencieusement sur la police systeme (`ui-sans-serif`/`system-ui`).
+Le token `--pr-font-sans` (utilisé par tous les composants via `reset.css`) declare `Roboto` en premier, pour rester coherent avec les applications OREMIS existantes (`data`, `formation`). Importez `@oremis/prisme/fonts.css` pour la charger : sans cela, les navigateurs retombent silencieusement sur la police systeme (`ui-sans-serif`/`system-ui`).
 
-Auto-hebergez Roboto plutot que de la charger depuis Google Fonts : avec un `<link>` vers `fonts.googleapis.com`, le navigateur de chaque visiteur transmet son adresse IP a Google, ce qui a deja ete sanctionne en Europe au titre du RGPD (sans consentement prealable). Pour une association dont le public peut etre vulnerable, ce n'est pas acceptable. Le plus simple est [`@fontsource/roboto`](https://fontsource.org/fonts/roboto), dont les fichiers sont ensuite servis par votre application, comme le fait OREMIS Chat :
-
-```bash
-npm install @fontsource/roboto
-```
+Auto-hebergez Roboto plutot que de la charger depuis Google Fonts : avec un `<link>` vers `fonts.googleapis.com`, le navigateur de chaque visiteur transmet son adresse IP a Google, ce qui a deja ete sanctionne en Europe au titre du RGPD (sans consentement prealable). Pour une association dont le public peut etre vulnerable, ce n'est pas acceptable. `@oremis/prisme/fonts.css` s'appuie sur [`@fontsource/roboto`](https://fontsource.org/fonts/roboto) (installe avec Prisme) : les fichiers de police sont servis par votre application.
 
 ```ts
-import '@fontsource/roboto/300.css'
-import '@fontsource/roboto/400.css'
-import '@fontsource/roboto/500.css'
-import '@fontsource/roboto/700.css'
+// Avant styles.css. Prisme fournit Roboto (@fontsource/roboto) : le bundler de l'app sert les fichiers.
+import '@oremis/prisme/fonts.css'
 import '@oremis/prisme/styles.css'
 ```
 
@@ -290,7 +284,17 @@ Sans cette etape, `getPrThemeInitScript()` — bien que fournie a cet effet — 
 
 `@oremis/prisme/styles.css` inclut un reset Tailwind non prefixe (`.flex`, `.p-4`, `.hidden`, `.grid`, etc. sans espace de nom). Importe normalement (import global ou `@vite(...)`) dans une page Blade qui charge deja un autre framework CSS non-Tailwind (Bootstrap par exemple), ce reset s'applique a toute la page, pas seulement au composant monte : il peut silencieusement casser l'apparence ou le comportement d'elements totalement sans rapport ailleurs sur la meme page. Incident reel : la sidebar d'une app consommatrice s'est retrouvee bloquee en position repliee des qu'un composant Prisme etait monte sur la meme page.
 
-Pour une app Blade deja construite sur un autre framework CSS, montez le composant dans un shadow DOM plutot que dans le document courant, avec `mountPrismeIsolated()` : le style de Prisme reste alors entierement confine a l'interieur, sans jamais pouvoir affecter le reste de la page (et inversement, le CSS de l'hote ne peut pas polluer l'interieur du composant).
+Deux solutions, selon le besoin.
+
+**1. `@oremis/prisme/styles-scoped.css` (le plus simple).** La meme feuille, mais qui ne touche jamais la page hote : aucune regle sur `html`, `body` ou les elements nus, et chaque classe utilitaire ne s'applique qu'aux elements Prisme et a leur contenu (`.collapse`, `.container`, `.table`... de Bootstrap restent intacts). Les composants s'ecrivent ensuite normalement dans la page, sans shadow DOM.
+
+```ts
+import '@oremis/prisme/styles-scoped.css' // au lieu de styles.css
+```
+
+Limite : les styles de la page hote (par exemple le `label` ou le `button` de Bootstrap) peuvent encore atteindre l'interieur des composants. Pour un composant complexe (editeur de texte riche), preferez la solution 2.
+
+**2. Shadow DOM.** Montez le composant dans un shadow DOM plutot que dans le document courant, avec `mountPrismeIsolated()` : le style de Prisme reste alors entierement confine a l'interieur, sans jamais pouvoir affecter le reste de la page (et inversement, le CSS de l'hote ne peut pas polluer l'interieur du composant).
 
 ```ts
 import { mountPrismeIsolated } from '@oremis/prisme'

@@ -1,0 +1,48 @@
+/* Variant of prisme.css for a page styled by another framework (Bootstrap...), exposed as
+   `@oremis/prisme/styles-scoped.css`. Nothing here touches the host page:
+   - no rule on html, body or plain elements (prisme.css sets the body background and
+     resets button borders);
+   - Tailwind utilities only apply to Prisme components: prisme.css defines unprefixed
+     `.collapse`, `.container`, `.table`, `.border`... which collide with Bootstrap's
+     classes of the same name (`.collapse { visibility: collapse }` hid Bootstrap's
+     collapsible sidebar). The build (scripts/scope-utilities.mjs) adds
+     `:where([class*=pr-], [class*=pr-] *)` to every utility of the layer below, then
+     removes the layer: the utilities keep their specificity and cascade position.
+   Tokens stay global: they are all prefixed (`--pr-*`, `--tw-*`). The host page's own
+   element styles can still reach Prisme components; full isolation is mountPrismeIsolated().
+   Not `@scope`: inside it a plain `.flex` only matches descendants of the scope root, never
+   the root itself, where Prisme puts most of its classes. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "./tokens.css";
+@import "./themes.css";
+@import "./animations.css";
+@import "./layout.css";
+@import "./rtl.css";
+@import "./editor-content.css";
+@import "../components/molecules/RichTextEditor/rich-text-editor.css";
+
+@source "../components";
+
+/* reset.css, limited to Prisme elements and their content. */
+:where([class*='pr-'], [class*='pr-'] *),
+:where([class*='pr-'], [class*='pr-'] *)::before,
+:where([class*='pr-'], [class*='pr-'] *)::after {
+  box-sizing: border-box;
+}
+
+:where([class*='pr-']) {
+  font-family: var(--pr-font-sans);
+  line-height: var(--pr-line-height-normal);
+}
+
+:where([class*='pr-'], [class*='pr-'] *):where(button, input, textarea, select) {
+  font: inherit;
+}
+
+:where([class*='pr-'], [class*='pr-'] *):where(button) {
+  border: 0;
+}
+
+@layer prisme-scoped-utilities {
+  @tailwind utilities source(none);
+}
