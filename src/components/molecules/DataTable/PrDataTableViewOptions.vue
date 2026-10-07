@@ -17,7 +17,7 @@ const emit = defineEmits<{
 <template>
   <PrDropdownMenu label="Colonnes" align="end">
     <template #trigger>
-      <PrButton class="pr-data-table__view-button ml-auto h-8" variant="secondary" size="sm">
+      <PrButton class="pr-data-table__view-button pr:ml-auto pr:h-8" variant="secondary" size="sm">
         <Settings2 :size="16" aria-hidden="true" />
         Vue
       </PrButton>
@@ -32,10 +32,10 @@ const emit = defineEmits<{
         @select.prevent
         @update:model-value="emit('toggleColumn', column, Boolean($event))"
       >
-        <component :is="itemIndicator" class="absolute left-[var(--pr-space-3)] inline-flex text-[color:var(--pr-color-primary)]">
+        <component :is="itemIndicator" class="pr:absolute pr:left-[var(--pr-space-3)] pr:inline-flex pr:text-[color:var(--pr-color-primary)]">
           <Check :size="14" aria-hidden="true" />
         </component>
-        <span class="capitalize">{{ column.label }}</span>
+        <span class="pr:capitalize">{{ column.label }}</span>
       </component>
     </template>
   </PrDropdownMenu>

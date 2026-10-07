@@ -9,9 +9,9 @@ withDefaults(defineProps<PrTableProps>(), {
 </script>
 
 <template>
-  <div class="pr-table-wrap w-full overflow-x-auto rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)]">
-    <table class="pr-table w-full min-w-[min(36rem,100%)] border-collapse text-[length:var(--pr-font-size-sm)] text-[color:var(--pr-color-text)] [&_td]:border-b [&_td]:border-[var(--pr-color-border)] [&_td]:p-[var(--pr-space-3)] [&_td]:text-left [&_th]:border-b [&_th]:border-[var(--pr-color-border)] [&_th]:bg-[var(--pr-color-surface-subtle)] [&_th]:p-[var(--pr-space-3)] [&_th]:text-left [&_th]:font-[750]">
-      <caption v-if="caption" class="pr-table__caption p-[var(--pr-space-3)] text-left text-[color:var(--pr-color-text-muted)]">{{ caption }}</caption>
+  <div class="pr-table-wrap pr:w-full pr:overflow-x-auto pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)]">
+    <table class="pr-table pr:w-full pr:min-w-[min(36rem,100%)] pr:border-collapse pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:[&_td]:border-b pr:[&_td]:border-[var(--pr-color-border)] pr:[&_td]:p-[var(--pr-space-3)] pr:[&_td]:text-left pr:[&_th]:border-b pr:[&_th]:border-[var(--pr-color-border)] pr:[&_th]:bg-[var(--pr-color-surface-subtle)] pr:[&_th]:p-[var(--pr-space-3)] pr:[&_th]:text-left pr:[&_th]:font-[750]">
+      <caption v-if="caption" class="pr-table__caption pr:p-[var(--pr-space-3)] pr:text-left pr:text-[color:var(--pr-color-text-muted)]">{{ caption }}</caption>
       <slot />
     </table>
   </div>

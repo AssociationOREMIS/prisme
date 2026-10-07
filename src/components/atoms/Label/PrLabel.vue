@@ -14,14 +14,14 @@ const props = withDefaults(defineProps<PrLabelProps>(), {
 })
 
 const labelClass = computed(() => [
-  'pr-label inline-flex w-fit items-baseline gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)]',
-  props.disabled ? 'pr-label--disabled cursor-not-allowed text-[color:var(--pr-color-text-muted)]' : '',
+  'pr-label pr:inline-flex pr:w-fit pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)]',
+  props.disabled ? 'pr-label--disabled pr:cursor-not-allowed pr:text-[color:var(--pr-color-text-muted)]' : '',
 ])
 </script>
 
 <template>
   <label :class="labelClass" :for="for">
     <slot />
-    <span v-if="required" class="pr-label__required text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
+    <span v-if="required" class="pr-label__required pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
   </label>
 </template>

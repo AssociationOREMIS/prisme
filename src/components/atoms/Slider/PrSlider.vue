@@ -64,13 +64,13 @@ function focusThumb() {
 </script>
 
 <template>
-  <div class="pr-slider grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
-    <div v-if="label || showValue" class="pr-slider__header flex items-center justify-between gap-[var(--pr-space-3)]">
+  <div class="pr-slider pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+    <div v-if="label || showValue" class="pr-slider__header pr:flex pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)]">
       <PrLabel v-if="label" :for="sliderId" :disabled="disabled" @click="focusThumb">{{ label }}</PrLabel>
-      <output v-if="showValue" class="pr-slider__value text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)] tabular-nums">{{ sliderValue[0] }}</output>
+      <output v-if="showValue" class="pr-slider__value pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)] pr:tabular-nums">{{ sliderValue[0] }}</output>
     </div>
     <SliderRoot
-      class="pr-slider__root relative flex h-5 touch-none select-none items-center data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"
+      class="pr-slider__root pr:relative pr:flex pr:h-5 pr:touch-none pr:select-none pr:items-center pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
       :model-value="sliderValue"
       :min="min"
       :max="max"
@@ -79,10 +79,10 @@ function focusThumb() {
       :name="name"
       @update:model-value="updateValue"
     >
-      <SliderTrack class="pr-slider__track relative h-1.5 flex-auto overflow-hidden rounded-[var(--pr-radius-full)] bg-[var(--pr-color-surface-subtle)]">
-        <SliderRange class="pr-slider__range absolute h-full rounded-[var(--pr-radius-full)] bg-[var(--pr-color-primary)]" />
+      <SliderTrack class="pr-slider__track pr:relative pr:h-1.5 pr:flex-auto pr:overflow-hidden pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-surface-subtle)]">
+        <SliderRange class="pr-slider__range pr:absolute pr:h-full pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-primary)]" />
       </SliderTrack>
-      <SliderThumb :id="sliderId" class="pr-slider__thumb block size-4 cursor-grab rounded-[var(--pr-radius-full)] border-2 border-[var(--pr-color-primary)] bg-[var(--pr-color-surface)] shadow-[var(--pr-shadow-sm)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] active:cursor-grabbing" :aria-label="label || 'Valeur'" />
+      <SliderThumb :id="sliderId" class="pr-slider__thumb pr:block pr:size-4 pr:cursor-grab pr:rounded-[var(--pr-radius-full)] pr:border-2 pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-sm)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:active:cursor-grabbing" :aria-label="label || 'Valeur'" />
     </SliderRoot>
   </div>
 </template>

@@ -75,7 +75,7 @@ const itemClass = computed(() => [
 
 const linkClass = computed(() => [
   sidebarItemLinkBaseClass,
-  'group/sidebar-item',
+  'pr:group/sidebar-item',
   props.disabled ? sidebarItemLinkDisabledClass : '',
 ])
 
@@ -128,8 +128,8 @@ function handleClick(event: MouseEvent) {
       <PrSidebarItemBody :label="label" :description="description" :active="resolvedActive" />
       <ChevronRight
         v-if="hasSubItems"
-        class="pr-sidebar-item__chevron shrink-0 text-[color:var(--pr-color-text-subtle)] transition-[color,transform] duration-[200ms] ease-[var(--pr-ease-standard)]"
-        :class="{ 'rotate-90': isExpanded }"
+        class="pr-sidebar-item__chevron pr:shrink-0 pr:text-[color:var(--pr-color-text-subtle)] pr:transition-[color,transform] pr:duration-[200ms] pr:ease-[var(--pr-ease-standard)]"
+        :class="{ 'pr:rotate-90': isExpanded }"
         aria-hidden="true"
         :size="16"
       />

@@ -77,13 +77,13 @@ export const WithCheckboxItems: Story = {
           </template>
           <template #default="{ checkboxItem, itemIndicator, checkboxItemClass }">
             <component :is="checkboxItem" v-model="showArchived" :class="checkboxItemClass">
-              <component :is="itemIndicator" class="absolute left-[var(--pr-space-3)] inline-flex">
+              <component :is="itemIndicator" class="pr:absolute pr:left-[var(--pr-space-3)] pr:inline-flex">
                 <Check :size="14" aria-hidden="true" />
               </component>
               Afficher les archives
             </component>
             <component :is="checkboxItem" v-model="showDrafts" :class="checkboxItemClass">
-              <component :is="itemIndicator" class="absolute left-[var(--pr-space-3)] inline-flex">
+              <component :is="itemIndicator" class="pr:absolute pr:left-[var(--pr-space-3)] pr:inline-flex">
                 <Check :size="14" aria-hidden="true" />
               </component>
               Afficher les brouillons

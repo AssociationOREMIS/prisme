@@ -52,7 +52,7 @@ const badgeAriaLabel = computed(() =>
   <span :class="iconBoxClass">
     <component
       :is="icon"
-      class="pr-sidebar-item__icon shrink-0"
+      class="pr-sidebar-item__icon pr:shrink-0"
       :size="size"
       :stroke-width="strokeWidth"
       aria-hidden="true"

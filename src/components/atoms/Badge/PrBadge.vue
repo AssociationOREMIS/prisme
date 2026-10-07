@@ -11,25 +11,25 @@ const props = withDefaults(defineProps<PrBadgeProps>(), {
 
 const badgeBaseClass = [
   'pr-badge',
-  'inline-flex w-fit items-center whitespace-nowrap',
-  'min-h-[1.375rem] rounded-[var(--pr-radius-full)] border border-transparent',
-  'px-[var(--pr-space-2)] py-[0.125rem] text-[length:var(--pr-font-size-xs)]',
-  'font-[650] leading-[var(--pr-line-height-tight)]',
+  'pr:inline-flex pr:w-fit pr:items-center pr:whitespace-nowrap',
+  'pr:min-h-[1.375rem] pr:rounded-[var(--pr-radius-full)] pr:border pr:border-transparent',
+  'pr:px-[var(--pr-space-2)] pr:py-[0.125rem] pr:text-[length:var(--pr-font-size-xs)]',
+  'pr:font-[650] pr:leading-[var(--pr-line-height-tight)]',
 ]
 
 const badgeVariantClass: Record<NonNullable<PrBadgeProps['variant']>, string> = {
   neutral:
-    'border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] text-[color:var(--pr-color-text-muted)]',
+    'pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text-muted)]',
   primary:
-    'border-[var(--pr-color-primary-border)] bg-[var(--pr-color-primary-soft)] text-[color:var(--pr-color-primary)]',
+    'pr:border-[var(--pr-color-primary-border)] pr:bg-[var(--pr-color-primary-soft)] pr:text-[color:var(--pr-color-primary)]',
   success:
-    'border-[var(--pr-color-success-border)] bg-[var(--pr-color-success-soft)] text-[color:var(--pr-color-success)]',
+    'pr:border-[var(--pr-color-success-border)] pr:bg-[var(--pr-color-success-soft)] pr:text-[color:var(--pr-color-success)]',
   warning:
-    'border-[var(--pr-color-warning-border)] bg-[var(--pr-color-warning-soft)] text-[color:var(--pr-color-warning)]',
+    'pr:border-[var(--pr-color-warning-border)] pr:bg-[var(--pr-color-warning-soft)] pr:text-[color:var(--pr-color-warning)]',
   danger:
-    'border-[var(--pr-color-danger-border)] bg-[var(--pr-color-danger-soft)] text-[color:var(--pr-color-danger)]',
+    'pr:border-[var(--pr-color-danger-border)] pr:bg-[var(--pr-color-danger-soft)] pr:text-[color:var(--pr-color-danger)]',
   info:
-    'border-[var(--pr-color-info-border)] bg-[var(--pr-color-info-soft)] text-[color:var(--pr-color-info)]',
+    'pr:border-[var(--pr-color-info-border)] pr:bg-[var(--pr-color-info-soft)] pr:text-[color:var(--pr-color-info)]',
 }
 
 const badgeClass = computed(() => [badgeBaseClass, badgeVariantClass[props.variant]])

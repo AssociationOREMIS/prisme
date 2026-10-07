@@ -51,13 +51,13 @@ const rolesLabel = computed(() => (
     <template #trigger>
       <button
         type="button"
-        class="pr-navbar-user-menu__trigger inline-flex cursor-pointer items-center gap-[var(--pr-space-2)] rounded-[var(--pr-radius-lg)] border-0 bg-transparent px-[var(--pr-space-3)] py-[var(--pr-space-2)] text-[color:var(--pr-color-navbar-text)] transition-[background-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] hover:bg-[var(--pr-color-navbar-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+        class="pr-navbar-user-menu__trigger pr:inline-flex pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-lg)] pr:border-0 pr:bg-transparent pr:px-[var(--pr-space-3)] pr:py-[var(--pr-space-2)] pr:text-[color:var(--pr-color-navbar-text)] pr:transition-[background-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:bg-[var(--pr-color-navbar-muted)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
       >
-        <CircleUser class="shrink-0" :size="22" :stroke-width="1.75" aria-hidden="true" />
-        <span class="hidden max-w-[12rem] overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-sm)] font-medium md:inline">{{ displayName }}</span>
+        <CircleUser class="pr:shrink-0" :size="22" :stroke-width="1.75" aria-hidden="true" />
+        <span class="pr:hidden pr:max-w-[12rem] pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-sm)] pr:font-medium pr:md:inline">{{ displayName }}</span>
         <ChevronDown
-          class="shrink-0 transition-transform duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]"
-          :class="{ 'rotate-180': open }"
+          class="pr:shrink-0 pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
+          :class="{ 'pr:rotate-180': open }"
           :size="14"
           aria-hidden="true"
         />
@@ -65,10 +65,10 @@ const rolesLabel = computed(() => (
     </template>
 
     <template #default="{ item, separator, itemClass, dangerItemClass, separatorClass }">
-      <div class="pr-navbar-user-menu__header mb-[var(--pr-space-1)] border-b border-[var(--pr-color-border)] px-[var(--pr-space-3)] pb-[var(--pr-space-2)]">
-        <div class="overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-sm)] font-semibold text-[color:var(--pr-color-text)]">{{ displayName }}</div>
-        <div v-if="email" class="overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-xs)] text-[color:var(--pr-color-text-muted)]">{{ email }}</div>
-        <div class="overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--pr-font-size-xs)] text-[color:var(--pr-color-text-muted)]">{{ rolesLabel }}</div>
+      <div class="pr-navbar-user-menu__header pr:mb-[var(--pr-space-1)] pr:border-b pr:border-[var(--pr-color-border)] pr:px-[var(--pr-space-3)] pr:pb-[var(--pr-space-2)]">
+        <div class="pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text)]">{{ displayName }}</div>
+        <div v-if="email" class="pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">{{ email }}</div>
+        <div class="pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">{{ rolesLabel }}</div>
         <!-- Extra lines of the header (e.g. the role in the current app), below the roles. -->
         <slot name="header" />
       </div>

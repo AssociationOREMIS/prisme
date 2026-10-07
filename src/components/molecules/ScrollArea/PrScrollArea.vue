@@ -13,24 +13,24 @@ withDefaults(defineProps<PrScrollAreaProps>(), {
 // only ever gets a `max-height` (it grows with content up to that cap, it isn't a fixed
 // size), and a percentage-height Viewport inside an "auto"-height parent is a CSS no-op —
 // the flex/min-h-0 pair below is what actually bounds the viewport so it can scroll.
-const scrollbarClass = 'pr-scroll-area__scrollbar absolute flex touch-none select-none transition-colors duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] data-[orientation=vertical]:right-0 data-[orientation=vertical]:top-0 data-[orientation=vertical]:bottom-0 data-[orientation=vertical]:w-2.5 data-[orientation=vertical]:p-[0.1875rem] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:left-0 data-[orientation=horizontal]:right-0 data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:p-[0.1875rem]'
+const scrollbarClass = 'pr-scroll-area__scrollbar pr:absolute pr:flex pr:touch-none pr:select-none pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:data-[orientation=vertical]:right-0 pr:data-[orientation=vertical]:top-0 pr:data-[orientation=vertical]:bottom-0 pr:data-[orientation=vertical]:w-2.5 pr:data-[orientation=vertical]:p-[0.1875rem] pr:data-[orientation=horizontal]:bottom-0 pr:data-[orientation=horizontal]:left-0 pr:data-[orientation=horizontal]:right-0 pr:data-[orientation=horizontal]:h-2.5 pr:data-[orientation=horizontal]:flex-col pr:data-[orientation=horizontal]:p-[0.1875rem]'
 </script>
 
 <template>
   <ScrollAreaRoot
     type="always"
-    class="pr-scroll-area flex flex-col overflow-hidden rounded-[var(--pr-radius-lg)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)]"
+    class="pr-scroll-area pr:flex pr:flex-col pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)]"
     :style="{ maxHeight }"
   >
-    <ScrollAreaViewport class="pr-scroll-area__viewport min-h-0 min-w-0 flex-1 p-[var(--pr-space-4)]">
+    <ScrollAreaViewport class="pr-scroll-area__viewport pr:min-h-0 pr:min-w-0 pr:flex-1 pr:p-[var(--pr-space-4)]">
       <slot />
     </ScrollAreaViewport>
     <ScrollAreaScrollbar :class="scrollbarClass" orientation="vertical">
-      <ScrollAreaThumb class="pr-scroll-area__thumb relative flex-1 rounded-[var(--pr-radius-full)] bg-[var(--pr-color-border-strong)]" />
+      <ScrollAreaThumb class="pr-scroll-area__thumb pr:relative pr:flex-1 pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-border-strong)]" />
     </ScrollAreaScrollbar>
     <ScrollAreaScrollbar :class="scrollbarClass" orientation="horizontal">
-      <ScrollAreaThumb class="pr-scroll-area__thumb relative flex-1 rounded-[var(--pr-radius-full)] bg-[var(--pr-color-border-strong)]" />
+      <ScrollAreaThumb class="pr-scroll-area__thumb pr:relative pr:flex-1 pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-border-strong)]" />
     </ScrollAreaScrollbar>
-    <ScrollAreaCorner class="pr-scroll-area__corner bg-[var(--pr-color-border)]" />
+    <ScrollAreaCorner class="pr-scroll-area__corner pr:bg-[var(--pr-color-border)]" />
   </ScrollAreaRoot>
 </template>

@@ -10,13 +10,13 @@ const props = withDefaults(defineProps<PrSkeletonProps>(), {
 })
 
 const skeletonVariantClass: Record<NonNullable<PrSkeletonProps['variant']>, string> = {
-  text: 'h-[0.875rem] w-full',
-  block: 'h-16 w-full',
-  circle: 'size-8 rounded-[var(--pr-radius-full)]',
+  text: 'pr:h-[0.875rem] pr:w-full',
+  block: 'pr:h-16 pr:w-full',
+  circle: 'pr:size-8 pr:rounded-[var(--pr-radius-full)]',
 }
 
 const skeletonClass = computed(() => [
-  'pr-skeleton block overflow-hidden rounded-[var(--pr-radius-md)] bg-[linear-gradient(90deg,var(--pr-color-surface-subtle),var(--pr-color-border),var(--pr-color-surface-subtle))] bg-[length:200%_100%] animate-[pr-skeleton_1.4s_ease-in-out_infinite]',
+  'pr-skeleton pr:block pr:overflow-hidden pr:rounded-[var(--pr-radius-md)] pr:bg-[linear-gradient(90deg,var(--pr-color-surface-subtle),var(--pr-color-border),var(--pr-color-surface-subtle))] pr:bg-[length:200%_100%] pr:animate-[pr-skeleton_1.4s_ease-in-out_infinite]',
   skeletonVariantClass[props.variant],
 ])
 </script>

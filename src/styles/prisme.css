@@ -1,4 +1,4 @@
-@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/theme.css" layer(theme) prefix(pr);
 @import "tailwindcss/utilities.css" source(none);
 @import "./tokens.css";
 @import "./themes.css";

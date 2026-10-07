@@ -54,19 +54,19 @@ const describedBy = computed(() => {
 })
 
 const inputClass = computed(() => [
-  'pr-input grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]',
+  'pr-input pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]',
 ])
 
 const inputControlClass = computed(() => [
-  'pr-input__control min-h-[2.375rem] w-full rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] text-[length:var(--pr-font-size-md)] text-[color:var(--pr-color-text)] transition-[background-color,border-color,box-shadow] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] placeholder:text-[color:var(--pr-color-text-subtle)] hover:not-disabled:border-[var(--pr-neutral-400)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] disabled:cursor-not-allowed disabled:bg-[var(--pr-color-surface-subtle)] disabled:text-[color:var(--pr-color-text-muted)]',
-  errorText.value ? 'border-[var(--pr-color-danger)]' : '',
+  'pr-input__control pr:min-h-[2.375rem] pr:w-full pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-md)] pr:text-[color:var(--pr-color-text)] pr:transition-[background-color,border-color,box-shadow] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:hover:not-disabled:border-[var(--pr-neutral-400)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:bg-[var(--pr-color-surface-subtle)] pr:disabled:text-[color:var(--pr-color-text-muted)]',
+  errorText.value ? 'pr:border-[var(--pr-color-danger)]' : '',
 ])
 
 const inputMessageClass = computed(() => [
-  'pr-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)]',
+  'pr-input__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)]',
   errorText.value
-    ? 'pr-input__message--error pr-field-message--error text-[color:var(--pr-color-danger)]'
-    : 'text-[color:var(--pr-color-text-muted)]',
+    ? 'pr-input__message--error pr-field-message--error pr:text-[color:var(--pr-color-danger)]'
+    : 'pr:text-[color:var(--pr-color-text-muted)]',
 ])
 
 function updateValue(event: Event) {
@@ -83,11 +83,11 @@ defineOptions({ inheritAttrs: false })
     <label
       v-if="label"
       class="pr-input__label"
-      :class="hideLabel ? 'sr-only' : 'inline-flex w-fit items-baseline gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)]'"
+      :class="hideLabel ? 'pr:sr-only' : 'pr:inline-flex pr:w-fit pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)]'"
       :for="inputId"
     >
       <span>{{ label }}</span>
-      <span v-if="required" class="pr-input__required text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
+      <span v-if="required" class="pr-input__required pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
     </label>
 
     <input

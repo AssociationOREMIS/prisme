@@ -31,14 +31,14 @@ const labelId = `pr-progress-${useId()}-label`
 </script>
 
 <template>
-  <div class="pr-progress grid gap-[var(--pr-space-2)]">
-    <div v-if="label || showValue" class="pr-progress__header flex items-center justify-between gap-[var(--pr-space-3)]">
-      <span v-if="label" :id="labelId" class="pr-progress__label text-[length:var(--pr-font-size-sm)] font-[650] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)]">{{ label }}</span>
-      <span v-if="showValue" class="pr-progress__value text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)] tabular-nums">{{ percent }}%</span>
+  <div class="pr-progress pr:grid pr:gap-[var(--pr-space-2)]">
+    <div v-if="label || showValue" class="pr-progress__header pr:flex pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)]">
+      <span v-if="label" :id="labelId" class="pr-progress__label pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)]">{{ label }}</span>
+      <span v-if="showValue" class="pr-progress__value pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)] pr:tabular-nums">{{ percent }}%</span>
     </div>
-    <ProgressRoot class="pr-progress__root h-2 overflow-hidden rounded-[var(--pr-radius-full)] bg-[var(--pr-color-surface-subtle)]" :model-value="progressValue" :max="progressMax" :aria-labelledby="label ? labelId : undefined" :aria-label="label ? undefined : ariaLabel">
+    <ProgressRoot class="pr-progress__root pr:h-2 pr:overflow-hidden pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-surface-subtle)]" :model-value="progressValue" :max="progressMax" :aria-labelledby="label ? labelId : undefined" :aria-label="label ? undefined : ariaLabel">
       <ProgressIndicator
-        class="pr-progress__indicator h-full w-full rounded-[inherit] bg-[var(--pr-color-primary)] transition-transform duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]"
+        class="pr-progress__indicator pr:h-full pr:w-full pr:rounded-[inherit] pr:bg-[var(--pr-color-primary)] pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
         :style="{ transform: progressTransform }"
       />
     </ProgressRoot>

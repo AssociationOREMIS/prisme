@@ -52,7 +52,7 @@ const data = [
 
 const columns = [
   { key: 'id', label: 'Task', sortable: true, hideable: false, width: '7rem' },
-  { key: 'title', label: 'Title', sortable: true, filterable: true, class: 'min-w-[24rem]' },
+  { key: 'title', label: 'Title', sortable: true, filterable: true, class: 'pr:min-w-[24rem]' },
   { key: 'status', label: 'Status', sortable: true, width: '10rem' },
   { key: 'priority', label: 'Priority', sortable: true, width: '9rem' },
 ]
@@ -85,22 +85,22 @@ export const Default: Story = {
     template: `
       <PrDataTable v-bind="args">
         <template #cell-title="{ value, row }">
-          <div class="flex items-center gap-[var(--pr-space-2)]">
+          <div class="pr:flex pr:items-center pr:gap-[var(--pr-space-2)]">
             <PrBadge variant="neutral">{{ labels.find((label) => label.value === row.label)?.label }}</PrBadge>
-            <span class="block max-w-[32rem] truncate font-semibold">{{ value }}</span>
+            <span class="pr:block pr:max-w-[32rem] pr:truncate pr:font-semibold">{{ value }}</span>
           </div>
         </template>
 
         <template #cell-status="{ value }">
-          <div class="flex w-[8rem] items-center">
-            <component :is="statuses.find((status) => status.value === value)?.icon" class="mr-[var(--pr-space-2)] size-4 text-[color:var(--pr-color-text-muted)]" aria-hidden="true" />
+          <div class="pr:flex pr:w-[8rem] pr:items-center">
+            <component :is="statuses.find((status) => status.value === value)?.icon" class="pr:mr-[var(--pr-space-2)] pr:size-4 pr:text-[color:var(--pr-color-text-muted)]" aria-hidden="true" />
             <span>{{ statuses.find((status) => status.value === value)?.label }}</span>
           </div>
         </template>
 
         <template #cell-priority="{ value }">
-          <div class="flex items-center">
-            <component :is="priorities.find((priority) => priority.value === value)?.icon" class="mr-[var(--pr-space-2)] size-4 text-[color:var(--pr-color-text-muted)]" aria-hidden="true" />
+          <div class="pr:flex pr:items-center">
+            <component :is="priorities.find((priority) => priority.value === value)?.icon" class="pr:mr-[var(--pr-space-2)] pr:size-4 pr:text-[color:var(--pr-color-text-muted)]" aria-hidden="true" />
             <span>{{ priorities.find((priority) => priority.value === value)?.label }}</span>
           </div>
         </template>

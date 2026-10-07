@@ -27,21 +27,21 @@ const props = withDefaults(defineProps<PrTypographyProps>(), {
 
 const normalizedVariant = computed(() => (props.variant === 'code' ? 'inline-code' : props.variant))
 const typographyVariantClass = computed(() => ({
-  h1: 'text-4xl lg:text-5xl font-extrabold leading-none',
-  h2: 'mt-[var(--pr-space-10)] first:mt-0 pb-[var(--pr-space-3)] text-3xl font-extrabold leading-[1.2]',
-  h3: 'text-2xl font-semibold leading-[var(--pr-line-height-tight)]',
-  h4: 'text-xl font-semibold leading-[var(--pr-line-height-tight)]',
-  p: 'not-first:mt-[var(--pr-space-6)] leading-[var(--pr-line-height-normal)]',
-  blockquote: 'mt-[var(--pr-space-6)] border-l-2 border-[var(--pr-color-border)] pl-[var(--pr-space-6)] italic text-[color:var(--pr-color-text-muted)]',
-  ul: 'my-[var(--pr-space-6)] list-disc pl-[var(--pr-space-6)] text-[color:var(--pr-color-text)] [&>li]:mt-[var(--pr-space-2)] [&>li]:text-inherit',
-  ol: 'my-[var(--pr-space-6)] list-decimal pl-[var(--pr-space-6)] text-[color:var(--pr-color-text)] [&>li]:mt-[var(--pr-space-2)] [&>li]:text-inherit',
-  table: 'my-[var(--pr-space-6)] w-full border-collapse text-left text-[length:var(--pr-font-size-sm)] [&_th]:border-b [&_th]:border-[var(--pr-color-border)] [&_th]:px-[var(--pr-space-3)] [&_th]:py-[var(--pr-space-2)] [&_th]:font-[750] [&_th]:text-[color:var(--pr-color-text-muted)] [&_td]:border-b [&_td]:border-[var(--pr-color-border)] [&_td]:px-[var(--pr-space-3)] [&_td]:py-[var(--pr-space-2)] [&_td]:text-[color:var(--pr-color-text)] [&_tr:last-child>td]:border-b-0',
-  'inline-code': 'rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] px-[var(--pr-space-1)] py-[0.125rem] font-[var(--pr-font-mono)] text-[length:var(--pr-font-size-sm)]',
-  'code-block': 'flex w-full overflow-x-auto rounded-[var(--pr-radius-sm)] bg-[var(--pr-color-surface-subtle)] p-[var(--pr-space-3)] text-[color:var(--pr-color-text)]',
-  lead: 'text-xl leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text-muted)]',
-  large: 'text-[length:var(--pr-font-size-lg)] font-semibold leading-[var(--pr-line-height-normal)]',
-  small: 'text-[length:var(--pr-font-size-sm)] font-medium leading-none',
-  subtle: 'text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-normal)] text-[color:var(--pr-color-text-muted)]',
+  h1: 'pr:text-4xl pr:lg:text-5xl pr:font-extrabold pr:leading-none',
+  h2: 'pr:mt-[var(--pr-space-10)] pr:first:mt-0 pr:pb-[var(--pr-space-3)] pr:text-3xl pr:font-extrabold pr:leading-[1.2]',
+  h3: 'pr:text-2xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)]',
+  h4: 'pr:text-xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)]',
+  p: 'pr:not-first:mt-[var(--pr-space-6)] pr:leading-[var(--pr-line-height-normal)]',
+  blockquote: 'pr:mt-[var(--pr-space-6)] pr:border-l-2 pr:border-[var(--pr-color-border)] pr:pl-[var(--pr-space-6)] pr:italic pr:text-[color:var(--pr-color-text-muted)]',
+  ul: 'pr:my-[var(--pr-space-6)] pr:list-disc pr:pl-[var(--pr-space-6)] pr:text-[color:var(--pr-color-text)] pr:[&>li]:mt-[var(--pr-space-2)] pr:[&>li]:text-inherit',
+  ol: 'pr:my-[var(--pr-space-6)] pr:list-decimal pr:pl-[var(--pr-space-6)] pr:text-[color:var(--pr-color-text)] pr:[&>li]:mt-[var(--pr-space-2)] pr:[&>li]:text-inherit',
+  table: 'pr:my-[var(--pr-space-6)] pr:w-full pr:border-collapse pr:text-left pr:text-[length:var(--pr-font-size-sm)] pr:[&_th]:border-b pr:[&_th]:border-[var(--pr-color-border)] pr:[&_th]:px-[var(--pr-space-3)] pr:[&_th]:py-[var(--pr-space-2)] pr:[&_th]:font-[750] pr:[&_th]:text-[color:var(--pr-color-text-muted)] pr:[&_td]:border-b pr:[&_td]:border-[var(--pr-color-border)] pr:[&_td]:px-[var(--pr-space-3)] pr:[&_td]:py-[var(--pr-space-2)] pr:[&_td]:text-[color:var(--pr-color-text)] pr:[&_tr:last-child>td]:border-b-0',
+  'inline-code': 'pr:rounded-[var(--pr-radius-sm)] pr:bg-[var(--pr-color-surface-subtle)] pr:px-[var(--pr-space-1)] pr:py-[0.125rem] pr:font-[var(--pr-font-mono)] pr:text-[length:var(--pr-font-size-sm)]',
+  'code-block': 'pr:flex pr:w-full pr:overflow-x-auto pr:rounded-[var(--pr-radius-sm)] pr:bg-[var(--pr-color-surface-subtle)] pr:p-[var(--pr-space-3)] pr:text-[color:var(--pr-color-text)]',
+  lead: 'pr:text-xl pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text-muted)]',
+  large: 'pr:text-[length:var(--pr-font-size-lg)] pr:font-semibold pr:leading-[var(--pr-line-height-normal)]',
+  small: 'pr:text-[length:var(--pr-font-size-sm)] pr:font-medium pr:leading-none',
+  subtle: 'pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text-muted)]',
 })[normalizedVariant.value])
 const tag = computed(() => {
   switch (normalizedVariant.value) {
@@ -63,8 +63,8 @@ const tag = computed(() => {
 </script>
 
 <template>
-  <component :is="tag" class="pr-typography m-0 text-[color:var(--pr-color-text)]" :class="typographyVariantClass">
-    <code v-if="normalizedVariant === 'code-block'" class="pr-typography__code-block-content whitespace-pre font-[var(--pr-font-mono)] text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-normal)] text-inherit">
+  <component :is="tag" class="pr-typography pr:m-0 pr:text-[color:var(--pr-color-text)]" :class="typographyVariantClass">
+    <code v-if="normalizedVariant === 'code-block'" class="pr-typography__code-block-content pr:whitespace-pre pr:font-[var(--pr-font-mono)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-inherit">
       <slot />
     </code>
     <slot v-else />

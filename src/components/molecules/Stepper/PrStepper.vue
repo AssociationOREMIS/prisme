@@ -41,8 +41,8 @@ const emit = defineEmits<{
   <!-- Horizontal steps keep one row and scroll sideways on a narrow screen instead of overflowing
        (p-1 keeps the focus rings inside the scroll area). -->
   <StepperRoot
-    class="pr-stepper flex max-w-full"
-    :class="orientation === 'vertical' ? 'flex-col gap-0' : 'flex-row items-start overflow-x-auto p-1'"
+    class="pr-stepper pr:flex pr:max-w-full"
+    :class="orientation === 'vertical' ? 'pr:flex-col pr:gap-0' : 'pr:flex-row pr:items-start pr:overflow-x-auto pr:p-1'"
     :model-value="modelValue"
     :default-value="defaultValue"
     :linear="linear"
@@ -52,46 +52,46 @@ const emit = defineEmits<{
     <StepperItem
       v-for="(step, index) in steps"
       :key="index"
-      class="pr-stepper__item group/item flex items-center"
-      :class="orientation === 'vertical' ? 'flex-row gap-[var(--pr-space-3)]' : 'flex-col'"
+      class="pr-stepper__item pr:group/item pr:flex pr:items-center"
+      :class="orientation === 'vertical' ? 'pr:flex-row pr:gap-[var(--pr-space-3)]' : 'pr:flex-col'"
       :step="index + 1"
       :disabled="step.disabled"
     >
       <div
-        class="flex items-center"
-        :class="orientation === 'vertical' ? 'flex-col' : 'flex-row'"
+        class="pr:flex pr:items-center"
+        :class="orientation === 'vertical' ? 'pr:flex-col' : 'pr:flex-row'"
       >
         <!-- A real <button> around the indicator (as-child made the indicator a focusable <span>
              with no role). Indicator text uses primary-contrast: white was invisible on the
              dark theme's near-white primary. -->
         <StepperTrigger
-          class="pr-stepper__trigger flex cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] group-data-[disabled]/item:cursor-not-allowed group-data-[disabled]/item:opacity-50"
+          class="pr-stepper__trigger pr:flex pr:cursor-pointer pr:items-center pr:justify-center pr:rounded-full pr:border-0 pr:bg-transparent pr:p-0 pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:group-data-[disabled]/item:cursor-not-allowed pr:group-data-[disabled]/item:opacity-50"
         >
           <StepperIndicator
-            class="pr-stepper__indicator flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-[length:var(--pr-font-size-sm)] font-semibold transition-colors duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] group-data-[state=active]/item:border-[var(--pr-color-primary)] group-data-[state=active]/item:bg-[var(--pr-color-primary)] group-data-[state=active]/item:text-[color:var(--pr-color-primary-contrast)] group-data-[state=completed]/item:border-[var(--pr-color-primary)] group-data-[state=completed]/item:bg-[var(--pr-color-primary)] group-data-[state=completed]/item:text-[color:var(--pr-color-primary-contrast)] group-data-[state=incomplete]/item:border-[var(--pr-color-border-strong)] group-data-[state=incomplete]/item:bg-[var(--pr-color-surface)] group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
+            class="pr-stepper__indicator pr:flex pr:h-8 pr:w-8 pr:shrink-0 pr:items-center pr:justify-center pr:rounded-full pr:border-2 pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:group-data-[state=active]/item:border-[var(--pr-color-primary)] pr:group-data-[state=active]/item:bg-[var(--pr-color-primary)] pr:group-data-[state=active]/item:text-[color:var(--pr-color-primary-contrast)] pr:group-data-[state=completed]/item:border-[var(--pr-color-primary)] pr:group-data-[state=completed]/item:bg-[var(--pr-color-primary)] pr:group-data-[state=completed]/item:text-[color:var(--pr-color-primary-contrast)] pr:group-data-[state=incomplete]/item:border-[var(--pr-color-border-strong)] pr:group-data-[state=incomplete]/item:bg-[var(--pr-color-surface)] pr:group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
           >
-            <Check :size="14" aria-hidden="true" class="hidden group-data-[state=completed]/item:block" />
-            <span class="group-data-[state=completed]/item:hidden">{{ index + 1 }}</span>
+            <Check :size="14" aria-hidden="true" class="pr:hidden pr:group-data-[state=completed]/item:block" />
+            <span class="pr:group-data-[state=completed]/item:hidden">{{ index + 1 }}</span>
           </StepperIndicator>
         </StepperTrigger>
         <StepperSeparator
           v-if="index < steps.length - 1"
-          class="pr-stepper__separator block bg-[var(--pr-color-border)] transition-colors duration-[var(--pr-duration-fast)] group-data-[state=completed]/item:bg-[var(--pr-color-primary)]"
-          :class="orientation === 'vertical' ? 'ms-[calc(1rem-1px)] mt-1 h-8 w-0.5' : 'ms-1 h-0.5 w-12'"
+          class="pr-stepper__separator pr:block pr:bg-[var(--pr-color-border)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:group-data-[state=completed]/item:bg-[var(--pr-color-primary)]"
+          :class="orientation === 'vertical' ? 'pr:ms-[calc(1rem-1px)] pr:mt-1 pr:h-8 pr:w-0.5' : 'pr:ms-1 pr:h-0.5 pr:w-12'"
         />
       </div>
       <div
         class="pr-stepper__content"
-        :class="orientation === 'vertical' ? 'py-[var(--pr-space-2)]' : 'mt-[var(--pr-space-2)] text-center'"
+        :class="orientation === 'vertical' ? 'pr:py-[var(--pr-space-2)]' : 'pr:mt-[var(--pr-space-2)] pr:text-center'"
       >
         <StepperTitle
-          class="pr-stepper__title text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)] group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
+          class="pr-stepper__title pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
         >
           {{ step.label }}
         </StepperTitle>
         <StepperDescription
           v-if="step.description"
-          class="pr-stepper__description mt-0.5 text-[length:var(--pr-font-size-xs)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]"
+          class="pr-stepper__description pr:mt-0.5 pr:text-[length:var(--pr-font-size-xs)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]"
         >
           {{ step.description }}
         </StepperDescription>

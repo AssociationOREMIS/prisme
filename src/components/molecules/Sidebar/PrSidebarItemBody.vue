@@ -19,7 +19,7 @@ const labelClass = computed(() => [
 </script>
 
 <template>
-  <span class="pr-sidebar-item__body grid min-w-0 flex-auto gap-0.5">
+  <span class="pr-sidebar-item__body pr:grid pr:min-w-0 pr:flex-auto pr:gap-0.5">
     <span :class="labelClass">
       {{ label }}
     </span>

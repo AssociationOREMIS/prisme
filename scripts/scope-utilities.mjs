@@ -3,11 +3,11 @@ import selectorParser from 'postcss-selector-parser'
 
 /**
  * Limits the Tailwind utilities of `styles-scoped.css` to Prisme elements: every selector of
- * the `prisme-scoped-utilities` layer gets `:where([class*=pr-], [class*=pr-] *)` on its
+ * the `prisme-scoped-utilities` layer gets `:where([class*=pr-], [class*="pr:"], ... *)` on its
  * subject (before any pseudo-element), then the layer is unwrapped so the utilities keep
  * their place in the cascade. `:where()` adds no specificity.
  */
-const SCOPE = ':where([class*=pr-],[class*=pr-] *)'
+const SCOPE = ':where([class*=pr-],[class*="pr:"],[class*=pr-] *,[class*="pr:"] *)'
 const LAYER = 'prisme-scoped-utilities'
 
 // Minifiers write ::before as the legacy :before, which is still a pseudo-element.

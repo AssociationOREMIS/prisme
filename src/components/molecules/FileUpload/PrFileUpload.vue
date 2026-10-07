@@ -245,7 +245,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
 </script>
 
 <template>
-  <div class="pr-file-upload grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
+  <div class="pr-file-upload pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :id="labelId" :for="fieldId" :disabled="disabled">{{ label }}</PrLabel>
     <!-- Outside the dropzone (a role="button" cannot hold another control) and out of the tab
          order: the dropzone is the keyboard target, this input only opens the picker and posts. -->
@@ -253,7 +253,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       :id="fieldId"
       ref="inputRef"
       type="file"
-      class="sr-only"
+      class="pr:sr-only"
       tabindex="-1"
       :multiple="multiple"
       :accept="accept"
@@ -263,12 +263,12 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       @change="onInputChange"
     />
     <div
-      class="pr-file-upload__dropzone flex cursor-pointer flex-col items-center justify-center gap-[var(--pr-space-3)] rounded-[var(--pr-radius-lg)] border-2 border-dashed border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] px-[var(--pr-space-6)] py-[var(--pr-space-8)] text-center transition-colors duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]"
+      class="pr-file-upload__dropzone pr:flex pr:cursor-pointer pr:flex-col pr:items-center pr:justify-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border-2 pr:border-dashed pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-6)] pr:py-[var(--pr-space-8)] pr:text-center pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
       :class="{
-        'border-[var(--pr-color-primary)] bg-[var(--pr-color-surface-subtle)]': isDraggingOver,
-        'cursor-not-allowed opacity-60': disabled,
-        'border-[var(--pr-color-danger)]': Boolean(errorText) && !isDraggingOver,
-        'hover:border-[var(--pr-color-primary)] hover:bg-[var(--pr-color-surface-subtle)]': !disabled,
+        'pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-surface-subtle)]': isDraggingOver,
+        'pr:cursor-not-allowed pr:opacity-60': disabled,
+        'pr:border-[var(--pr-color-danger)]': Boolean(errorText) && !isDraggingOver,
+        'pr:hover:border-[var(--pr-color-primary)] pr:hover:bg-[var(--pr-color-surface-subtle)]': !disabled,
       }"
       :aria-disabled="disabled"
       :aria-invalid="errorText ? 'true' : undefined"
@@ -285,55 +285,55 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       @drop="onDrop"
     >
       <FileUp
-        class="text-[color:var(--pr-color-text-muted)]"
+        class="pr:text-[color:var(--pr-color-text-muted)]"
         :size="32"
         aria-hidden="true"
       />
       <div>
-        <p :id="instructionsId" class="m-0 text-[length:var(--pr-font-size-sm)] font-semibold text-[color:var(--pr-color-text)]">
-          Glisser-déposer ou <span class="text-[color:var(--pr-color-primary)]">choisir un fichier</span>
+        <p :id="instructionsId" class="pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text)]">
+          Glisser-déposer ou <span class="pr:text-[color:var(--pr-color-primary)]">choisir un fichier</span>
         </p>
-        <p v-if="accept || maxSize" class="m-0 mt-[var(--pr-space-1)] text-[length:var(--pr-font-size-xs)] text-[color:var(--pr-color-text-muted)]">
+        <p v-if="accept || maxSize" class="pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">
           <span v-if="accept">{{ accept }}</span>
           <span v-if="accept && maxSize"> · </span>
           <span v-if="maxSize">Max {{ formatSize(maxSize) }}</span>
         </p>
       </div>
     </div>
-    <ul v-if="hasFiles" class="pr-file-upload__list m-0 grid gap-[var(--pr-space-2)] p-0 list-none">
+    <ul v-if="hasFiles" class="pr-file-upload__list pr:m-0 pr:grid pr:gap-[var(--pr-space-2)] pr:p-0 pr:list-none">
       <li
         v-for="(file, index) in currentFiles"
         :key="`${file.name}-${index}`"
-        class="pr-file-upload__item flex items-center gap-[var(--pr-space-3)] rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border)] bg-[var(--pr-color-surface)] px-[var(--pr-space-3)] py-[var(--pr-space-2)]"
+        class="pr-file-upload__item pr:flex pr:items-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:py-[var(--pr-space-2)]"
       >
-        <div class="min-w-0 grow">
-          <p class="m-0 truncate text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text)]">
+        <div class="pr:min-w-0 pr:grow">
+          <p class="pr:m-0 pr:truncate pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)]">
             {{ file.name }}
           </p>
-          <p class="m-0 text-[length:var(--pr-font-size-xs)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">
+          <p class="pr:m-0 pr:text-[length:var(--pr-font-size-xs)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">
             {{ formatSize(file.size) }}
           </p>
           <PrProgress
             :aria-label="`Envoi de ${file.name}`"
             v-if="upload && stateFor(file).status === 'uploading'"
-            class="pr-file-upload__progress mt-[var(--pr-space-1)]"
+            class="pr-file-upload__progress pr:mt-[var(--pr-space-1)]"
             :model-value="stateFor(file).progress"
           />
-          <p v-else-if="upload && stateFor(file).status === 'error'" class="pr-file-upload__item-error m-0 mt-[var(--pr-space-1)] flex items-center gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-xs)] text-[color:var(--pr-color-danger)]">
+          <p v-else-if="upload && stateFor(file).status === 'error'" class="pr-file-upload__item-error pr:m-0 pr:mt-[var(--pr-space-1)] pr:flex pr:items-center pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-danger)]">
             <CircleX :size="12" aria-hidden="true" />
             {{ stateFor(file).error }}
           </p>
         </div>
         <CircleCheck
           v-if="upload && stateFor(file).status === 'success'"
-          class="shrink-0 text-[color:var(--pr-color-success)]"
+          class="pr:shrink-0 pr:text-[color:var(--pr-color-success)]"
           :size="16"
           aria-hidden="true"
         />
         <button
           v-if="upload && stateFor(file).status === 'error'"
           type="button"
-          class="inline-grid size-6 shrink-0 place-items-center rounded-[var(--pr-radius-sm)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+          class="pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="`Réessayer l'envoi de ${file.name}`"
           @click="startUpload(file)"
         >
@@ -341,7 +341,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         </button>
         <button
           type="button"
-          class="inline-grid size-6 shrink-0 place-items-center rounded-[var(--pr-radius-sm)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
+          class="pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="`Supprimer ${file.name}`"
           @click="removeFile(index)"
         >
@@ -349,7 +349,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         </button>
       </li>
     </ul>
-    <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
+    <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

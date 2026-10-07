@@ -31,12 +31,12 @@ function isActive(item: PrNavigationMenuItem): boolean {
 </script>
 
 <template>
-  <nav class="pr-navigation-menu inline-flex flex-wrap items-center gap-[var(--pr-space-1)]" :aria-label="label">
+  <nav class="pr-navigation-menu pr:inline-flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)]" :aria-label="label">
     <a
       v-for="item in items"
       :key="item.href"
-      class="pr-navigation-menu__link inline-flex min-h-[2.375rem] items-center rounded-[var(--pr-radius-md)] px-[var(--pr-space-3)] text-[length:var(--pr-font-size-sm)] font-[650] text-[color:var(--pr-color-text-muted)] no-underline hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]"
-      :class="{ 'pr-navigation-menu__link--active bg-[var(--pr-color-primary-soft)] text-[color:var(--pr-color-primary)]': isActive(item) }"
+      class="pr-navigation-menu__link pr:inline-flex pr:min-h-[2.375rem] pr:items-center pr:rounded-[var(--pr-radius-md)] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:text-[color:var(--pr-color-text-muted)] pr:no-underline pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+      :class="{ 'pr-navigation-menu__link--active pr:bg-[var(--pr-color-primary-soft)] pr:text-[color:var(--pr-color-primary)]': isActive(item) }"
       :href="item.href"
       :aria-current="isActive(item) ? 'page' : undefined"
     >

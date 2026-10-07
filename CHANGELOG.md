@@ -2,6 +2,27 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.18.0 (2026-10-07)
+
+### Changements visibles
+
+- **Les classes Tailwind de Prisme sont prefixees : `pr:flex`, `pr:sm:top-auto`...** (`prefix(pr)`). Prisme et les apps generaient les memes noms de classes (`.hidden`, `.flex`, `.top-0`...) et l'un ecrasait toujours l'autre : `hidden md:flex` sur un element de l'app ne fonctionnait pas, et en 0.17 en essai les notifications de Superviseur passaient en haut. Plus aucune collision : `hidden md:flex`, `hidden peer-checked:flex` fonctionnent. Les 180 stories, en clair et en sombre, rendent a l'identique.
+  - A verifier dans une app : son propre HTML ne peut plus compter sur une classe generee par Prisme ; il doit etre couvert par le Tailwind de l'app (c'est le cas de Superviseur, data et Forge).
+  - Les classes BEM (`pr-button`...) ne changent pas. Une classe ajoutee a un composant Prisme (`class="w-full"`) reste une classe de l'app.
+  - data peut retirer ses contournements (`!`).
+
+### Ajouts
+
+- **`PrPageHeader`** : lien retour, titre `h1`, description et actions a droite.
+- **`PrDescriptionList`** (et `PrDescriptionItem`) : paires libelle / valeur d'une fiche, valeurs riches (badge, lien), « Non renseigné » pour une valeur vide, deux colonnes ou une selon la largeur de la liste.
+- **En-tete de `PrCard`** : `title`, `description`, slot `actions` a droite (dessous sur une carte etroite), `heading-level`.
+- **Recherche cote serveur dans `PrCombobox`** : `search-url` depuis Blade ou `search` en Vue, avec delai de frappe, nombre minimal de caracteres, chargement, annulation de la requete precedente et messages d'etat annonces aux lecteurs d'ecran. Remplace les composants de recherche ecrits dans data.
+- `scripts/prefix-classes.mjs` : liste les classes sans `pr:` oubliees dans un composant (`--write` les corrige).
+
+### Tests
+
+- Aucune classe Tailwind sans prefixe dans les styles de Prisme ; en-tetes de page et de carte (titres, actions a droite puis dessous) ; liste de description (deux colonnes, une colonne etroite, valeur vide) ; recherche serveur (minimum de caracteres, une requete pour une frappe rapide, valeur envoyee, `search-url` et collection Laravel).
+
 ## 0.17.0 (2026-10-07)
 
 ### Changements visibles

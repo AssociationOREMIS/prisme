@@ -12,13 +12,13 @@ const props = withDefaults(defineProps<PrSpinnerProps>(), {
 })
 
 const spinnerSizeClass: Record<NonNullable<PrSpinnerProps['size']>, string> = {
-  sm: 'size-[0.875rem]',
-  md: 'size-5',
-  lg: 'size-7 border-[3px]',
+  sm: 'pr:size-[0.875rem]',
+  md: 'pr:size-5',
+  lg: 'pr:size-7 pr:border-[3px]',
 }
 
 const spinnerClass = computed(() => [
-  'pr-spinner inline-block size-4 rounded-[var(--pr-radius-full)] border-2 border-current border-r-transparent align-[-0.125em] animate-spin [animation-duration:720ms]',
+  'pr-spinner pr:inline-block pr:size-4 pr:rounded-[var(--pr-radius-full)] pr:border-2 pr:border-current pr:border-r-transparent pr:align-[-0.125em] pr:animate-spin pr:[animation-duration:720ms]',
   spinnerSizeClass[props.size],
 ])
 </script>

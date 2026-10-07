@@ -136,22 +136,22 @@ defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
-  <div class="pr-number-input grid gap-[var(--pr-space-2)] text-[color:var(--pr-color-text)]">
+  <div class="pr-number-input pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <label
       v-if="label"
-      class="pr-number-input__label inline-flex w-fit items-baseline gap-[var(--pr-space-1)] text-[length:var(--pr-font-size-sm)] font-semibold leading-[var(--pr-line-height-tight)]"
+      class="pr-number-input__label pr:inline-flex pr:w-fit pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)]"
       :for="inputId"
     >
       <span>{{ label }}</span>
-      <span v-if="required" class="text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
+      <span v-if="required" class="pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
     </label>
     <div
-      class="pr-number-input__control inline-flex min-h-[2.375rem] w-full overflow-hidden rounded-[var(--pr-radius-md)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface)] transition-[border-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--pr-color-focus)]"
-      :class="{ 'border-[var(--pr-color-danger)]': Boolean(errorText) }"
+      class="pr-number-input__control pr:inline-flex pr:min-h-[2.375rem] pr:w-full pr:overflow-hidden pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:transition-[border-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:focus-within:outline-2 pr:focus-within:outline-offset-2 pr:focus-within:outline-[var(--pr-color-focus)]"
+      :class="{ 'pr:border-[var(--pr-color-danger)]': Boolean(errorText) }"
     >
       <button
         type="button"
-        class="pr-number-input__btn flex h-full min-w-[2.375rem] cursor-pointer items-center justify-center border-r border-[var(--pr-color-border-strong)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] disabled:cursor-not-allowed disabled:opacity-50"
+        class="pr-number-input__btn pr:flex pr:h-full pr:min-w-[2.375rem] pr:cursor-pointer pr:items-center pr:justify-center pr:border-r pr:border-[var(--pr-color-border-strong)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:disabled:cursor-not-allowed pr:disabled:opacity-50"
         :disabled="!canDecrement"
         aria-label="Décrémenter"
         tabindex="-1"
@@ -162,7 +162,7 @@ defineOptions({ inheritAttrs: false })
       <input
         :id="inputId"
         v-bind="$attrs"
-        class="pr-number-input__field min-w-0 grow bg-transparent px-[var(--pr-space-3)] text-center text-[length:var(--pr-font-size-md)] text-[color:var(--pr-color-text)] outline-none placeholder:text-[color:var(--pr-color-text-subtle)] disabled:cursor-not-allowed disabled:text-[color:var(--pr-color-text-muted)] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        class="pr-number-input__field pr:min-w-0 pr:grow pr:bg-transparent pr:px-[var(--pr-space-3)] pr:text-center pr:text-[length:var(--pr-font-size-md)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed pr:disabled:text-[color:var(--pr-color-text-muted)] pr:[appearance:textfield] pr:[&::-webkit-inner-spin-button]:appearance-none pr:[&::-webkit-outer-spin-button]:appearance-none"
         type="number"
         :value="inputValue"
         :min="min"
@@ -180,7 +180,7 @@ defineOptions({ inheritAttrs: false })
       />
       <button
         type="button"
-        class="pr-number-input__btn flex h-full min-w-[2.375rem] cursor-pointer items-center justify-center border-l border-[var(--pr-color-border-strong)] text-[color:var(--pr-color-text-muted)] transition-colors duration-[var(--pr-duration-fast)] hover:bg-[var(--pr-color-surface-subtle)] hover:text-[color:var(--pr-color-text)] disabled:cursor-not-allowed disabled:opacity-50"
+        class="pr-number-input__btn pr:flex pr:h-full pr:min-w-[2.375rem] pr:cursor-pointer pr:items-center pr:justify-center pr:border-l pr:border-[var(--pr-color-border-strong)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:disabled:cursor-not-allowed pr:disabled:opacity-50"
         :disabled="!canIncrement"
         aria-label="Incrémenter"
         tabindex="-1"
@@ -189,7 +189,7 @@ defineOptions({ inheritAttrs: false })
         <Plus :size="14" aria-hidden="true" />
       </button>
     </div>
-    <p v-if="errorText" :id="errorId" class="pr-number-input__message pr-field-message pr-field-message--error m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-number-input__message pr-field-message m-0 text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
+    <p v-if="errorText" :id="errorId" class="pr-number-input__message pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
+    <p v-else-if="hint" :id="hintId" class="pr-number-input__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

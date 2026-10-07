@@ -143,6 +143,39 @@ Pour les actions courantes, `action` regle l'icone, le libelle et le ton en une 
 
 Actions disponibles (`prButtonActions`) : `view`, `edit`, `delete`, `remove`, `reject`, `approve`, `add`, `duplicate`, `copy`, `download`, `upload`, `search`, `history`, `back`, `more`. `delete`, `remove` et `reject` sont rouges (`tone="danger"`). `label`, `icon`, `tone` et `variant` remplacent ceux de l'action ; un texte dans le bouton s'affiche apres l'icone. Sans `action`, `icon` ajoute une icone Lucide et `label` nomme un bouton qui n'a qu'une icone.
 
+### En-tetes de page et de carte, fiches
+
+```blade
+<pr-page-header title="{{ $user->full_name }}" description="Benevole depuis {{ $since }}" back-href="{{ route('users.index') }}" back-label="Retour aux benevoles">
+    <template #actions>
+        <pr-button action="edit" variant="secondary" href="{{ route('users.edit', $user) }}">Modifier</pr-button>
+    </template>
+</pr-page-header>
+
+<pr-card title="Sanctions en cours" description="Suspensions et avertissements actifs.">
+    <template #actions><pr-button action="add" size="sm" variant="secondary">Ajouter</pr-button></template>
+    ...
+</pr-card>
+
+<pr-description-list :items="@js([['label' => 'Type', 'value' => $type], ['label' => 'Fin prevue', 'value' => $endsAt]])">
+    <pr-description-item label="Statut"><pr-badge variant="warning">En cours</pr-badge></pr-description-item>
+</pr-description-list>
+```
+
+- `PrPageHeader` : lien retour, `h1`, description, actions a droite (dessous quand la place manque).
+- `PrCard` : `title`, `description` (props ou slots) et slot `actions` ; `heading-level` (2 par defaut). Sans `padded`, l'en-tete garde sa marge et un trait le separe du contenu.
+- `PrDescriptionList` : paires libelle / valeur d'une fiche, sur deux colonnes, une seule quand la liste est etroite (requete de conteneur). Une valeur vide affiche « Non renseigné » (`empty-text`).
+
+### Recherche cote serveur (`PrCombobox`)
+
+```blade
+<pr-combobox label="Ville" name="city_id" search-url="{{ route('cities.search') }}"
+    :options="@js($city ? [['value' => (string) $city->id, 'label' => $city->name]] : [])"
+    default-value="{{ old('city_id', $city?->id) }}"></pr-combobox>
+```
+
+La route recoit `?q=...` (`search-param`) et renvoie un tableau de `{ label, value }` ou une collection de ressources Laravel (`{ data: [...] }`). La recherche part apres `debounce` ms sans frappe (250) et a partir de `min-chars` caracteres (2) ; la requete precedente est annulee. `options` ne sert plus qu'a donner le libelle des valeurs deja choisies. En Vue, `:search="(query, signal) => ..."` remplace `search-url`.
+
 ### Empiler plusieurs composants Prisme verticalement
 
 `PrDataTable` et les autres composants larges (formulaires avec beaucoup de champs) utilisent `flex flex-col` en interne, pas `display: grid`. Un wrapper consommateur en `display: grid` sans `grid-template-columns` explicite autour d'un tel composant produit un debordement (CSS Grid blowout) : la piste implicite se dimensionne sur le contenu le plus large, meme si le conteneur a `min-width: 0` (qui ne protege que sa propre boite, pas sa piste interne).
@@ -403,6 +436,10 @@ Build du Storybook statique :
 ```bash
 npm run build-storybook
 ```
+
+### Classes Tailwind des composants : prefixe `pr:`
+
+Depuis la 0.18, les classes Tailwind des composants portent le prefixe `pr:` (`pr:flex`, `pr:sm:top-auto`, `pr:data-[state=open]:bg-[...]`), configure par `prefix(pr)` dans `src/styles/prisme.css`. Prisme ne genere donc aucune classe du meme nom que celles d'une app (`.hidden`, `.top-0`...) : aucune ne peut ecraser l'autre. Les classes BEM (`pr-button`, `pr-data-table__filter`) restent sans prefixe. Une classe sans `pr:` dans un composant n'est pas generee : `node scripts/prefix-classes.mjs` liste celles qui auraient ete oubliees (`--write` les corrige).
 
 ## Publier une version
 

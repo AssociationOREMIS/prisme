@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 // @ts-expect-error plain .mjs build script, no type declarations
 import { scopeUtilities } from '../../scripts/scope-utilities.mjs'
 
-const SCOPE = ':where([class*=pr-],[class*=pr-] *)'
+const SCOPE = ':where([class*=pr-],[class*="pr:"],[class*=pr-] *,[class*="pr:"] *)'
 const wrap = (css: string) => `:root{--a:1}@layer prisme-scoped-utilities{${css}}`
 
 describe('scopeUtilities (styles-scoped.css)', () => {
