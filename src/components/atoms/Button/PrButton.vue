@@ -25,10 +25,12 @@ const isUnavailable = computed(() => props.disabled || props.loading)
 
 const buttonBaseClass = [
   'pr-button',
-  // Fits its label on one line when there is room, wraps instead of overflowing on a narrow screen.
+  // Fits its label on one line when there is room, wraps between words instead of overflowing on a
+  // narrow screen. `break-word`, not `anywhere`: a word only breaks when it cannot fit at all, so a
+  // table column never shrinks the button down to « Gé / rer ».
   'relative inline-flex max-w-full items-center justify-center text-center',
   'border border-transparent rounded-[var(--pr-radius-md)]',
-  'font-semibold leading-[var(--pr-line-height-tight)] no-underline [overflow-wrap:anywhere]',
+  'font-semibold leading-[var(--pr-line-height-tight)] no-underline [overflow-wrap:break-word]',
   'cursor-pointer transition-[background-color,border-color,color,box-shadow]',
   'duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)]',
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)]',

@@ -136,3 +136,24 @@ export const Playground: Story = {
     template: '<div class="story-column"><PrRichTextEditor v-model="value" v-bind="args" /></div>',
   }),
 }
+
+// Bullet and numbered lists keep their markers and indent, in the editor as in a read-only render.
+// noinspection JSUnusedGlobalSymbols
+export const Lists: Story = {
+  render: () => ({
+    template: `
+      <div class="pr-editor-content">
+        <ul><li>Premier point<ul><li>Sous-point</li></ul></li><li>Second point</li></ul>
+        <ol><li>Etape un</li><li>Etape deux</li></ol>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const [bullets, nested] = canvasElement.querySelectorAll('ul')
+    const numbers = canvasElement.querySelector('ol')!
+    await expect(getComputedStyle(bullets).listStyleType).toBe('disc')
+    await expect(getComputedStyle(nested).listStyleType).toBe('circle')
+    await expect(getComputedStyle(numbers).listStyleType).toBe('decimal')
+    await expect(parseFloat(getComputedStyle(bullets).paddingLeft)).toBeGreaterThan(0)
+  },
+}

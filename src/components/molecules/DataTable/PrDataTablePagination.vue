@@ -30,7 +30,7 @@ const emit = defineEmits<{
       <div class="flex items-center gap-[var(--pr-space-2)]">
         <p class="m-0 text-[length:var(--pr-font-size-sm)] font-semibold">Lignes par page</p>
         <PrSelect
-          class="w-[4.75rem]"
+          class="w-max min-w-[4.75rem]"
           aria-label="Lignes par page"
           :model-value="String(pageSize)"
           :options="pageSizeOptions.map((size) => ({ label: String(size), value: String(size) }))"
@@ -38,7 +38,7 @@ const emit = defineEmits<{
         />
       </div>
 
-      <div class="flex w-[7rem] items-center justify-center text-[length:var(--pr-font-size-sm)] font-semibold">
+      <div class="flex min-w-[7rem] items-center justify-center text-[length:var(--pr-font-size-sm)] font-semibold">
         Page {{ page }} sur {{ pageCount }}
       </div>
 
