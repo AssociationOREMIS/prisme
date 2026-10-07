@@ -2,6 +2,24 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.16.0 (2026-10-07)
+
+### Changements visibles
+
+- **Navigation sans rechargement par defaut** (`navigation: 'swap'` de `registerPrisme`), dans tous les navigateurs : un clic recupere la page suivante et seul `#app` est remplace. La navbar et la sidebar restent en place avec leur etat (sidebar repliee, defilement) et leurs props a jour (element actif) ; le contenu (`.pr-shell-grid__content`, sinon tout `#app`) est reconstruit ; titre, adresse, token CSRF, Precedent/Suivant, defilement, focus et annonce aux lecteurs d'ecran suivent. Le survol d'un lien precharge la page. Retour a un chargement normal pour une page qui apporte d'autres scripts ou styles (`@push('scripts')`), une reponse non HTML ou d'un autre site, et les liens `download`/`target`/`logout`/`data-prisme-reload`. Les formulaires gardent leur envoi normal.
+  - A verifier dans une app : un script qui agit sur la page a son chargement (`DOMContentLoaded`) ne se relance pas a chaque page (voir README).
+  - Pour revenir au chargement complet : `navigation: false` dans l'app, ou `localStorage.setItem('prisme:navigation', 'off')` dans un navigateur.
+- **La page suivante est preparee** une fois l'app montee (voir README, « Navigation plus rapide entre les pages »), chaque option se coupe avec `false` :
+  - `preload` (`'idle'` par defaut) : les composants charges a la demande sont telecharges pendant les temps morts, plus de squelette sur les pages suivantes ;
+  - `transitions` (`true` par defaut) : navbar et sidebar immobiles, fondu du contenu ;
+  - `measure` (`true` par defaut) : mesure `prisme:mount` dans l'onglet Performance des devtools (et `prisme:navigation` a chaque page sans rechargement) ;
+  - `prefetch` (`'prerender'` par defaut) : sans la navigation sans rechargement, la page derriere un lien survole est prerendue (Speculation Rules, Chrome et Edge). Liens externes, `download`, `target`, adresses contenant `logout` et `data-no-prefetch` exclus.
+
+### Tests
+
+- Navigation sans rechargement : shell conserve avec son etat, contenu reconstruit (`<main>` ou autre element), bouton Precedent, liens laisses au navigateur, retour au chargement normal, annonce et focus, active par defaut et coupee par `localStorage`. Verifiee aussi dans Chromium (page d'essai avec les vrais composants) et dans Firefox sur Superviseur.
+- Regles de prechargement et exclusions, transitions ajoutees seulement apres le montage, prechargement des composants pendant les temps morts (sans les `eager`, ni avec Save-Data, et apres l'ouverture d'une page prerendue), mesure du montage.
+
 ## 0.15.0 (2026-10-07)
 
 ### Ajouts
