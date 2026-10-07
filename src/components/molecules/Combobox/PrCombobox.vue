@@ -11,7 +11,7 @@ import {
   ComboboxRoot,
   ComboboxViewport,
 } from 'reka-ui'
-import { computed, ref, useId, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 
@@ -35,6 +35,22 @@ export interface PrComboboxProps {
   multiple?: boolean
   name?: string
   id?: string
+  /**
+   * Searches on the server as the person types: returns the options for a query. `options` then
+   * only gives the labels of the values already selected (`old('city_id')`).
+   */
+  search?: (query: string, signal: AbortSignal) => Promise<PrComboboxOption[]>
+  /**
+   * The same from Blade, without JavaScript: `GET search-url?q=...` answers JSON, an array of
+   * `{ label, value }` or a Laravel resource collection (`{ data: [...] }`).
+   */
+  searchUrl?: string
+  /** Name of the query parameter sent to `search-url`. */
+  searchParam?: string
+  /** Characters to type before searching. */
+  minChars?: number
+  /** Milliseconds without typing before searching. */
+  debounce?: number
 }
 
 const props = withDefaults(defineProps<PrComboboxProps>(), {
@@ -51,6 +67,11 @@ const props = withDefaults(defineProps<PrComboboxProps>(), {
   multiple: false,
   name: undefined,
   id: undefined,
+  search: undefined,
+  searchUrl: undefined,
+  searchParam: 'q',
+  minChars: 2,
+  debounce: 250,
 })
 
 // One message, or the first of Laravel's array of messages.
@@ -80,16 +101,83 @@ watch(() => props.modelValue, (value) => {
 
 const currentValue = computed(() => props.modelValue ?? internalValue.value)
 
+// Server-side search: results replace the options; every label seen is kept, so a selected value
+// still shows its label once the results have changed.
+const isRemote = computed(() => Boolean(props.search || props.searchUrl))
+const remoteOptions = ref<PrComboboxOption[]>([])
+const searchState = ref<'idle' | 'short' | 'loading' | 'done' | 'failed'>('short')
+const knownLabels = new Map<string, string>()
+const visibleOptions = computed(() => (isRemote.value ? remoteOptions.value : props.options))
+
+function remember(options: PrComboboxOption[]) {
+  for (const option of options) knownLabels.set(option.value, option.label)
+}
+
+watch(() => props.options, remember, { immediate: true })
+
+async function fetchOptions(query: string, signal: AbortSignal): Promise<PrComboboxOption[]> {
+  if (props.search) return props.search(query, signal)
+  const url = new URL(props.searchUrl as string, window.location.href)
+  url.searchParams.set(props.searchParam, query)
+  const response = await fetch(url, { headers: { Accept: 'application/json' }, credentials: 'same-origin', signal })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  const body = await response.json()
+  return (Array.isArray(body) ? body : body.data ?? []) as PrComboboxOption[]
+}
+
+let searchTimer: ReturnType<typeof setTimeout> | undefined
+let searchController: AbortController | undefined
+
+function onSearchTerm(term: string) {
+  if (!isRemote.value) return
+  clearTimeout(searchTimer)
+  searchController?.abort()
+  const query = term.trim()
+  if (query.length < props.minChars) {
+    remoteOptions.value = []
+    searchState.value = 'short'
+    return
+  }
+  searchState.value = 'loading'
+  searchTimer = setTimeout(async () => {
+    const controller = new AbortController()
+    searchController = controller
+    try {
+      const options = await fetchOptions(query, controller.signal)
+      if (controller.signal.aborted) return
+      remember(options)
+      remoteOptions.value = options
+      searchState.value = 'done'
+    } catch {
+      if (controller.signal.aborted) return
+      remoteOptions.value = []
+      searchState.value = 'failed'
+    }
+  }, props.debounce)
+}
+
+onBeforeUnmount(() => {
+  clearTimeout(searchTimer)
+  searchController?.abort()
+})
+
+const remoteMessage = computed(() => {
+  switch (searchState.value) {
+    case 'short': return props.minChars > 1 ? `Tapez au moins ${props.minChars} caractères` : 'Tapez pour rechercher'
+    case 'loading': return 'Recherche...'
+    case 'failed': return 'La recherche a échoué, réessayez.'
+    default: return remoteOptions.value.length ? '' : 'Aucun résultat'
+  }
+})
+
 function setValue(value: string | string[]) {
   internalValue.value = value
   emit('update:modelValue', value)
 }
 
 const displayValue = computed(() => (val: string | string[]) => {
-  if (Array.isArray(val)) {
-    return val.map(v => props.options?.find(o => o.value === v)?.label ?? v).join(', ')
-  }
-  return props.options?.find(o => o.value === val)?.label ?? val
+  if (Array.isArray(val)) return val.map(labelFor).join(', ')
+  return val ? labelFor(val) : ''
 })
 
 const hasValue = computed(() => {
@@ -107,7 +195,7 @@ function removeValue(value: string) {
 }
 
 function labelFor(value: string) {
-  return props.options?.find(o => o.value === value)?.label ?? value
+  return props.options?.find(o => o.value === value)?.label ?? knownLabels.get(value) ?? value
 }
 </script>
 
@@ -119,6 +207,7 @@ function labelFor(value: string) {
       :model-value="currentValue"
       :multiple="multiple"
       :disabled="disabled"
+      :ignore-filter="isRemote"
       @update:model-value="setValue($event as string | string[])"
     >
       <ComboboxAnchor
@@ -150,6 +239,7 @@ function labelFor(value: string) {
           :aria-required="required || undefined"
           :aria-invalid="errorText ? 'true' : undefined"
           :aria-describedby="describedBy"
+          @update:model-value="onSearchTerm"
         />
         <button
           v-if="hasValue && !disabled"
@@ -173,11 +263,16 @@ function labelFor(value: string) {
           :side-offset="8"
         >
           <ComboboxViewport class="pr-combobox__viewport pr:p-[var(--pr-space-2)]">
-            <ComboboxEmpty class="pr-combobox__empty pr:py-[var(--pr-space-4)] pr:text-center pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]">
+            <!-- Server-side search says where it stands: type more, searching, no result, failure.
+                 A plain div in the listbox; screen readers hear it from the status region below. -->
+            <div v-if="isRemote && remoteMessage" class="pr-combobox__status pr:py-[var(--pr-space-4)] pr:text-center pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]">
+              {{ remoteMessage }}
+            </div>
+            <ComboboxEmpty v-if="!isRemote" class="pr-combobox__empty pr:py-[var(--pr-space-4)] pr:text-center pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]">
               Aucun résultat
             </ComboboxEmpty>
             <ComboboxItem
-              v-for="option in options"
+              v-for="option in visibleOptions"
               :key="option.value"
               class="pr-combobox__item pr:relative pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-md)] pr:py-0 pr:pr-[var(--pr-space-8)] pr:pl-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-50"
               :value="option.value"
@@ -192,6 +287,7 @@ function labelFor(value: string) {
         </ComboboxContent>
       </ComboboxPortal>
     </ComboboxRoot>
+    <p v-if="isRemote" class="pr:sr-only" role="status">{{ remoteMessage }}</p>
     <!-- ComboboxInput only ever carries the search text, not the selected
          value(s), so native form submission goes through these hidden inputs. -->
     <template v-if="name">
