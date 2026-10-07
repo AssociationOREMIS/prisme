@@ -2,8 +2,8 @@ import { compile, nextTick, shallowRef, type App, type RenderFunction, type VNod
 
 /**
  * Navigation without page reloads for Vue apps mounted over Blade pages (`navigation: 'swap'` of
- * `registerPrisme`). The server still answers every link with a full HTML page: a click fetches it,
- * and the app's root template is replaced by the new page's `#app`. Vue patches the difference, so
+ * `registerPrisme`). The server still answers every link and every form with a full HTML page: a click
+ * or a submission fetches it, and the app's root template is replaced by the new page's `#app`. Vue patches the difference, so
  * the navbar and sidebar keep their DOM and state (only their props change, the active item for
  * instance) while the content (`.pr-shell-grid__content`), keyed per page, is rebuilt from scratch.
  * A layout without that element is rebuilt whole: nothing kept, but nothing carried over either.
@@ -11,6 +11,12 @@ import { compile, nextTick, shallowRef, type App, type RenderFunction, type VNod
  * Anything a swap could not reproduce falls back to a normal page load: another layout or other
  * scripts and stylesheets (a page with its own `@push('scripts')`), a non-HTML answer (a download),
  * a network error, a redirect to another site (an expired session sent to the SSO).
+ *
+ * A form is sent the way the browser would send it (same fields, same button, same CSRF token), and
+ * the page the server redirects to is shown: the next page after a success, the same page with its
+ * errors and old values after a failed validation. A form is not sent again when its answer cannot be
+ * swapped: the page it led to is loaded by its address, a file is saved, an error page is shown as is.
+ * Only an answer that never came (offline) leaves the form to the browser.
  */
 
 /** The part of the layout that changes from one page to the next. */
@@ -21,6 +27,9 @@ export const MARKER = 'data-prisme'
 
 /** Links never handled: opened elsewhere, downloads, logouts, opted out with `data-prisme-reload`. */
 const EXCLUDED_LINKS = '[download], [target]:not([target="_self"]), [data-prisme-reload] a, a[data-prisme-reload]'
+
+/** Forms always sent the browser's way, opted out with `data-prisme-reload` (see `requestOf` for the rest). */
+const EXCLUDED_FORMS = '[data-prisme-reload] form, form[data-prisme-reload]'
 
 /** A hovered link is fetched after this delay, and the answer kept this long for the click. */
 const HOVER_DELAY = 80
@@ -35,6 +44,14 @@ interface FetchedPage {
 }
 
 type HistoryState = { prisme: true, scrollY?: number }
+
+interface FormRequest {
+  method: 'GET' | 'POST'
+  url: string
+  body: FormData
+}
+
+type Submitter = HTMLButtonElement | HTMLInputElement
 
 /**
  * Scripts a proxy adds to every response, never the same twice: Cloudflare's bot detection writes the
@@ -71,6 +88,62 @@ function isNavigableLink(link: HTMLAnchorElement): boolean {
 }
 
 const withoutHash = (url: string): string => url.split('#')[0]
+
+/** The fields the browser would send, the clicked button included. */
+function formDataOf(form: HTMLFormElement, submitter: Submitter | null): FormData {
+  try {
+    return new FormData(form, submitter)
+  } catch {
+    const data = new FormData(form)
+    if (submitter?.name) data.append(submitter.name, submitter.value)
+    return data
+  }
+}
+
+/** The request a form submission makes, or null when the browser keeps it (see EXCLUDED_FORMS). */
+function requestOf(form: HTMLFormElement, submitter: Submitter | null): FormRequest | null {
+  if (form.matches(EXCLUDED_FORMS) || submitter?.hasAttribute('data-prisme-reload')) return null
+
+  const attribute = (name: string, override: string): string | null => submitter?.getAttribute(override) ?? form.getAttribute(name)
+  const method = (attribute('method', 'formmethod') ?? 'get').toUpperCase()
+  if (method !== 'GET' && method !== 'POST') return null
+
+  const target = attribute('target', 'formtarget')
+  if ((target && target !== '_self') || attribute('enctype', 'formenctype') === 'text/plain') return null
+
+  const url = new URL(attribute('action', 'formaction') || location.href, location.href)
+  if (url.origin !== location.origin || /logout/i.test(url.pathname)) return null
+
+  const body = formDataOf(form, submitter)
+  if (method === 'GET') {
+    // Like the browser: the fields replace the query of the action, files are left out.
+    const fields = [...body].filter((entry): entry is [string, string] => typeof entry[1] === 'string')
+    url.search = new URLSearchParams(fields).toString()
+    url.hash = ''
+  }
+
+  return { method, url: url.href, body }
+}
+
+/** Saves a file a form answered with (an export), as the browser would have. */
+async function saveFile(response: Response, url: URL): Promise<void> {
+  const disposition = response.headers.get('content-disposition') ?? ''
+  const name = /filename\*=(?:UTF-8'')?([^;]+)/i.exec(disposition)?.[1] ?? /filename="?([^";]+)"?/i.exec(disposition)?.[1]
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(await response.blob())
+  link.download = name ? decodeURIComponent(name.trim()) : url.pathname.split('/').pop() || 'telechargement'
+  document.body.append(link)
+  link.click()
+  link.remove()
+  setTimeout(() => URL.revokeObjectURL(link.href), 60_000)
+}
+
+/** Shows a page that cannot be swapped and must not be asked for again (an error answering a form). */
+function replaceDocument(html: string): void {
+  document.open()
+  document.write(html)
+  document.close()
+}
 
 /** Vue's patch flag that turns its compiler optimisations off for a node (`PatchFlags.BAIL`). */
 const BAIL = -2
@@ -111,7 +184,7 @@ function bailOut(node: unknown): void {
 }
 
 /**
- * Takes over link clicks for the app mounted on `container`, from the template it was mounted with.
+ * Takes over link clicks and form submissions for the app mounted on `container`, from the template it was mounted with.
  * Returns the template to mount the app with: its main content carries a key, so each page gets
  * fresh components while the shell around it is only patched.
  */
@@ -159,28 +232,42 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
   history.scrollRestoration = 'manual'
   history.replaceState({ ...history.state, prisme: true } satisfies HistoryState, '')
 
-  const fetchPage = async (url: string, signal?: AbortSignal): Promise<FetchedPage | null> => {
-    const response = await fetch(url, {
-      credentials: 'same-origin',
-      headers: { Accept: 'text/html', 'X-Prisme-Navigation': '1' },
-      signal,
-    })
-    const finalUrl = new URL(response.url || url)
-    if (finalUrl.origin !== location.origin || !response.headers.get('content-type')?.includes('text/html')) return null
+  const request = (url: string, init: RequestInit = {}): Promise<Response> => fetch(url, {
+    ...init,
+    credentials: 'same-origin',
+    headers: { Accept: 'text/html', 'X-Prisme-Navigation': '1' },
+  })
 
-    const doc = new DOMParser().parseFromString(await response.text(), 'text/html')
+  const isHtml = (response: Response): boolean => !!response.headers.get('content-type')?.includes('text/html')
+
+  /** The page an HTML answer holds, or null when it has no app to swap (another layout, an error page). */
+  const parsePage = (html: string, finalUrl: URL, requestedUrl: string): FetchedPage | null => {
+    const doc = new DOMParser().parseFromString(html, 'text/html')
     const appElement = doc.getElementById(container.id)
     if (!appElement) return null
 
     keyMain(appElement)
 
     return {
-      url: finalUrl.href + (finalUrl.hash ? '' : new URL(url, location.href).hash),
+      url: finalUrl.href + (finalUrl.hash ? '' : new URL(requestedUrl, location.href).hash),
       title: doc.title,
       template: appElement.innerHTML,
       assets: assetsOf(doc, appElement),
       csrfToken: doc.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? null,
     }
+  }
+
+  const fetchPage = async (url: string, signal?: AbortSignal): Promise<FetchedPage | null> => {
+    const response = await request(url, { signal })
+    const finalUrl = new URL(response.url || url)
+    if (finalUrl.origin !== location.origin || !isHtml(response)) return null
+
+    return parsePage(await response.text(), finalUrl, url)
+  }
+
+  const canSwap = (page: FetchedPage): boolean => {
+    const currentAssets = new Set(assetsOf(document, container))
+    return page.assets.every(asset => currentAssets.has(asset))
   }
 
   const takePrefetched = (url: string): Promise<FetchedPage | null> | null => {
@@ -209,8 +296,7 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
     if (signal.aborted) return
     stopProgress()
 
-    const currentAssets = new Set(assetsOf(document, container))
-    if (!page || page.assets.some(asset => !currentAssets.has(asset))) {
+    if (!page || !canSwap(page)) {
       if (mode === 'pop') {
         location.replace(page?.url ?? url)
       } else {
@@ -227,8 +313,74 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
 
     await showPage(page, () => restoreScroll(mode === 'pop' ? scrollY : 0, new URL(page.url).hash))
 
-    performance.measure?.('prisme:navigation', { start: startedAt, detail: { url: page.url } })
-    console.debug(`[prisme] page affichee sans rechargement en ${Math.round(performance.now() - startedAt)} ms`)
+    measure(startedAt, page.url)
+  }
+
+  /**
+   * Sends a form and shows the page it leads to. The request is never sent twice: whatever answer
+   * cannot be swapped is shown another way (the page loaded by its address, a file saved).
+   */
+  const submit = async (form: HTMLFormElement, submitter: Submitter | null, formRequest: FormRequest): Promise<void> => {
+    controller?.abort()
+    controller = new AbortController()
+    const signal = controller.signal
+    const startedAt = performance.now()
+    const stopProgress = progress.startAfter(150)
+    // The data changed: a page fetched on hover may be outdated.
+    prefetched.clear()
+
+    let response: Response
+    try {
+      response = await request(formRequest.url, { method: 'POST', body: formRequest.body, signal })
+    } catch {
+      stopProgress()
+      // The answer never came (offline): the browser sends the form again and shows its own error.
+      if (!signal.aborted) submitNatively(form, submitter, formRequest)
+      return
+    }
+
+    const finalUrl = new URL(response.url || formRequest.url)
+    if (finalUrl.origin !== location.origin) {
+      location.assign(finalUrl.href)
+      return
+    }
+    if (!isHtml(response)) {
+      await saveFile(response, finalUrl)
+      stopProgress()
+      return
+    }
+
+    const html = await response.text()
+    if (signal.aborted) return
+    stopProgress()
+
+    const page = parsePage(html, finalUrl, formRequest.url)
+    if (!page || !canSwap(page)) {
+      // A redirect is followed by its address, like the browser does; an answer to the form itself
+      // (an expired session, a server error) cannot be asked for again, so it is shown as it came.
+      if (response.redirected) {
+        location.assign(finalUrl.href)
+      } else {
+        replaceDocument(html)
+      }
+      return
+    }
+
+    // A page rendered by the POST itself keeps the current address: reloading it must not send the form.
+    const url = response.redirected ? page.url : location.href
+    const samePage = withoutHash(url) === currentUrl
+    if (!samePage) {
+      history.replaceState({ ...history.state, prisme: true, scrollY: window.scrollY } satisfies HistoryState, '')
+      history.pushState({ prisme: true } satisfies HistoryState, '', url)
+      currentUrl = withoutHash(url)
+    }
+
+    // Back on the same page (failed validation), the scroll stays and the first field in error gets the focus.
+    const scrollY = window.scrollY
+    await showPage({ ...page, url }, () => restoreScroll(samePage ? scrollY : 0, samePage ? '' : new URL(url).hash))
+    if (samePage) container.querySelector<HTMLElement>(`${CONTENT} [aria-invalid="true"]`)?.focus()
+
+    measure(startedAt, url)
   }
 
   const showPage = async (page: FetchedPage, afterRender: () => void): Promise<void> => {
@@ -264,6 +416,34 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
     void navigate(link.href, 'push')
   }, listen)
 
+  const submitting = new WeakSet<HTMLFormElement>()
+
+  // On the document, after the form's own handlers: a submission they prevented (a confirm() refused,
+  // a Vue `@submit.prevent`) is left alone.
+  document.addEventListener('submit', (event) => {
+    const form = event.target
+    if (event.defaultPrevented || !(form instanceof HTMLFormElement)) return
+
+    const submitter = (event as SubmitEvent).submitter as Submitter | null
+    const formRequest = requestOf(form, submitter)
+    if (!formRequest) return
+
+    event.preventDefault()
+    if (formRequest.method === 'GET') {
+      void navigate(formRequest.url, 'push')
+      return
+    }
+
+    // A double click sends the form once.
+    if (submitting.has(form)) return
+    submitting.add(form)
+    form.setAttribute('aria-busy', 'true')
+    void submit(form, submitter, formRequest).finally(() => {
+      submitting.delete(form)
+      form.removeAttribute('aria-busy')
+    })
+  }, listen)
+
   window.addEventListener('popstate', (event) => {
     const state = event.state as HistoryState | null
     if (!state?.prisme || withoutHash(location.href) === currentUrl) return
@@ -287,6 +467,25 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
     }, HOVER_DELAY)
   }, listen)
   document.addEventListener('pointerout', () => clearTimeout(hoverTimer), listen)
+}
+
+function measure(startedAt: number, url: string): void {
+  performance.measure?.('prisme:navigation', { start: startedAt, detail: { url } })
+  console.debug(`[prisme] page affichee sans rechargement en ${Math.round(performance.now() - startedAt)} ms`)
+}
+
+/** Sends a form the browser's way, with the button it was sent with. */
+function submitNatively(form: HTMLFormElement, submitter: Submitter | null, formRequest: FormRequest): void {
+  if (submitter?.name) {
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = submitter.name
+    input.value = submitter.value
+    form.append(input)
+  }
+  form.setAttribute('action', formRequest.url)
+  form.setAttribute('method', formRequest.method)
+  HTMLFormElement.prototype.submit.call(form)
 }
 
 function restoreScroll(scrollY: number, hash: string): void {
