@@ -1,6 +1,6 @@
 # Checklist de tests manuels
 
-Ce document liste ce qui doit être vérifié manuellement (ou via une app Laravel de test) avant de considérer les correctifs récents comme validés. La suite automatisée (`npm test`, 28 tests unitaires + 133 tests Storybook) couvre la logique pure ; elle ne couvre pas le rendu réel dans un navigateur, la soumission de formulaire native, ni l'intégration Blade.
+Ce document liste ce qui doit être vérifié manuellement (ou via une app Laravel de test) avant de considérer les correctifs récents comme validés. La suite automatisée (`npm test`) comporte des tests unitaires (logique pure, contrastes des tokens, thème, transformation de `styles-scoped.css`) et des tests Storybook joués dans un vrai Chromium : rendu, interactions au clavier et à la souris, soumission native de formulaires sans `v-model`, et analyse d'accessibilité axe bloquante sur chaque story. Elle ne couvre pas l'intégration dans une vraie app Laravel/Blade, ni les autres navigateurs (Firefox, Safari).
 
 ## DataTable — mode `serverSide`
 
