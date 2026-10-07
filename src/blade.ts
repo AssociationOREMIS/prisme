@@ -94,7 +94,7 @@ export function registerPrisme(app: App, options: RegisterPrismeOptions = {}): v
     if (options.measure ?? true) measureMount()
     // A swap fetches pages itself: prerendered documents would never be used.
     if (prefetch && !swap) addSpeculationRules(prefetch)
-    if (options.transitions ?? true) addViewTransitions()
+    if (options.transitions ?? true) addViewTransitions({ betweenDocuments: !swap })
     if ((options.preload ?? 'idle') && !prefersSavingData()) whenShown(() => preloadWhenIdle(lazyLoaders))
 
     return instance
@@ -121,19 +121,16 @@ function speculationRules(action: 'prerender' | 'prefetch'): object {
 }
 
 /**
- * The navbar and sidebar keep their place, the content cross-fades. Added only once mounted:
- * a page revealed while still under `v-cloak` (not prerendered, slow network) has no opt-in yet,
- * so it shows up as before instead of fading into its skeleton.
+ * The navbar and sidebar keep their place, the content cross-fades: during a swap (a transition
+ * inside the document), or between two documents without swap navigation.
  */
-const VIEW_TRANSITIONS_CSS = `@media (prefers-reduced-motion: no-preference) {
-  @view-transition { navigation: auto; }
+const VIEW_TRANSITION_RULES = `
   .pr-navbar { view-transition-name: pr-navbar; }
   .pr-sidebar { view-transition-name: pr-sidebar; }
   ::view-transition-group(pr-navbar), ::view-transition-group(pr-sidebar),
   ::view-transition-old(pr-navbar), ::view-transition-new(pr-navbar),
   ::view-transition-old(pr-sidebar), ::view-transition-new(pr-sidebar) { animation: none; }
-  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 150ms; }
-}`
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 150ms; }`
 
 function addSpeculationRules(action: 'prerender' | 'prefetch'): void {
   if (!HTMLScriptElement.supports?.('speculationrules')) return
@@ -146,13 +143,34 @@ function addSpeculationRules(action: 'prerender' | 'prefetch'): void {
   document.head.append(script)
 }
 
-function addViewTransitions(): void {
+/**
+ * Between documents, the opt-in is added only once mounted: a page revealed while still under
+ * `v-cloak` (not prerendered, slow network) has no opt-in yet, so it shows up as before instead of
+ * fading into its skeleton. The browser then aborts the transition the previous page started and
+ * logs it: after a form submission, whose answer is never prerendered, the transition is skipped
+ * before it starts. A swap needs none of this, its transitions stay inside the document.
+ */
+/** Set once the page listens for submissions: two apps on a page share it. */
+let skipsTransitionOnSubmit = false
+
+function addViewTransitions({ betweenDocuments }: { betweenDocuments: boolean }): void {
   if (document.head.querySelector(`style[${MARKER}="transitions"]`)) return
 
   const style = document.createElement('style')
   style.setAttribute(MARKER, 'transitions')
-  style.textContent = VIEW_TRANSITIONS_CSS
+  const optIn = betweenDocuments ? '\n  @view-transition { navigation: auto; }' : ''
+  style.textContent = `@media (prefers-reduced-motion: no-preference) {${optIn}${VIEW_TRANSITION_RULES}\n}`
   document.head.append(style)
+
+  if (!betweenDocuments || skipsTransitionOnSubmit) return
+  skipsTransitionOnSubmit = true
+
+  let submitting = false
+  // On window, after the page's own handlers: a submission they cancel does not navigate.
+  window.addEventListener('submit', (event) => { submitting = !event.defaultPrevented })
+  window.addEventListener('pageswap', (event) => {
+    if (submitting) (event as Event & { viewTransition?: { skipTransition: () => void } | null }).viewTransition?.skipTransition()
+  })
 }
 
 /** A prerendered page was mounted before anyone opened it: the detail says so. */

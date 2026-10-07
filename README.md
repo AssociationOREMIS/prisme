@@ -130,6 +130,19 @@ Comme `PrCombobox`/`PrTagInput`, le contenu de l'editeur n'est pas un `<textarea
 <PrRichTextEditor v-model="content" name="body" />
 ```
 
+### Boutons d'action (`action`)
+
+Pour les actions courantes, `action` regle l'icone, le libelle et le ton en une prop : un bouton discret (`ghost`), carre avec seulement l'icone, dont le libelle est le nom accessible et l'infobulle.
+
+```blade
+<pr-button action="view" size="sm" href="{{ route('users.show', $user) }}"></pr-button>
+<pr-button action="edit" size="sm" href="{{ route('users.edit', $user) }}"></pr-button>
+<pr-button action="delete" size="sm" @click="confirmDelete"></pr-button>
+<pr-button action="add" variant="primary">Ajouter un benevole</pr-button>
+```
+
+Actions disponibles (`prButtonActions`) : `view`, `edit`, `delete`, `remove`, `reject`, `approve`, `add`, `duplicate`, `copy`, `download`, `upload`, `search`, `history`, `back`, `more`. `delete`, `remove` et `reject` sont rouges (`tone="danger"`). `label`, `icon`, `tone` et `variant` remplacent ceux de l'action ; un texte dans le bouton s'affiche apres l'icone. Sans `action`, `icon` ajoute une icone Lucide et `label` nomme un bouton qui n'a qu'une icone.
+
 ### Empiler plusieurs composants Prisme verticalement
 
 `PrDataTable` et les autres composants larges (formulaires avec beaucoup de champs) utilisent `flex flex-col` en interne, pas `display: grid`. Un wrapper consommateur en `display: grid` sans `grid-template-columns` explicite autour d'un tel composant produit un debordement (CSS Grid blowout) : la piste implicite se dimensionne sur le contenu le plus large, meme si le conteneur a `min-width: 0` (qui ne protege que sa propre boite, pas sa piste interne).

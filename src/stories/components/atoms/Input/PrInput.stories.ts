@@ -83,3 +83,19 @@ export const LaravelErrorArray: Story = {
     await expect(canvas.queryByText('Le nom est trop court.')).toBeNull()
   },
 }
+
+// A compact form on one line: the label is kept for screen readers only.
+// noinspection JSUnusedGlobalSymbols
+export const HiddenLabel: Story = {
+  render: () => ({
+    components: { PrInput },
+    template: `<PrInput label="Rechercher un bénévole" hide-label placeholder="Nom ou CIB" name="q" />`,
+  }),
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('textbox', { name: 'Rechercher un bénévole' })
+    const label = canvasElement.querySelector('label')!
+    await expect(label.getBoundingClientRect().width).toBeLessThanOrEqual(1)
+    // The field starts at the top: no room left for the hidden label.
+    await expect(input.getBoundingClientRect().top - canvasElement.querySelector('.pr-input')!.getBoundingClientRect().top).toBeLessThan(2)
+  },
+}

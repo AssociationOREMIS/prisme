@@ -274,3 +274,31 @@ export const LayoutCombinations: Story = {
     }
   },
 }
+
+// An app's Tailwind generates the same class names as Prisme (top-0, w-full, flex-col...), in its
+// `utilities` layer: they must not move the toasts, which stay at the bottom right on a wide screen
+// (0.17.0 put Prisme in a lower layer for a while, and they jumped to the top, full width).
+// noinspection JSUnusedGlobalSymbols
+export const WithAppUtilities: Story = {
+  render: (args) => ({
+    components: { PrToast },
+    setup() {
+      const style = document.createElement('style')
+      style.textContent = '@layer utilities { .top-0 { top: 0 } .left-0 { left: 0 } .right-0 { right: 0 } .w-full { width: 100% } .flex-col { flex-direction: column } }'
+      document.head.append(style)
+      return { args }
+    },
+    template: `<PrToast default-open variant="success" title="Enregistré" :duration="60000" />`,
+  }),
+  play: async () => {
+    const viewport = await waitFor(() => {
+      const element = document.querySelector<HTMLElement>('.pr-toast__viewport')
+      expect(element?.querySelector('.pr-toast')).toBeTruthy()
+      return element as HTMLElement
+    })
+    if (window.innerWidth < 640) return
+    const box = viewport.getBoundingClientRect()
+    await expect(box.bottom).toBeCloseTo(window.innerHeight, -1)
+    await expect(box.width).toBeLessThan(window.innerWidth / 2)
+  },
+}

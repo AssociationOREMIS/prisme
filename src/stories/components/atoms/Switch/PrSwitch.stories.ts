@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import { ref } from 'vue'
 import { PrSwitch } from '../../../../components/atoms/Switch'
 import '../../../stories.css'
@@ -40,4 +41,22 @@ export const States: Story = {
       </div>
     `,
   }),
+}
+
+// With `unchecked-value`, the form sends a value when the switch is off too ("0"), so the server can turn
+// the option off; when on, the switch's own value comes last and wins (Laravel keeps the last one).
+// noinspection JSUnusedGlobalSymbols
+export const UncheckedValue: Story = {
+  render: () => ({
+    components: { PrSwitch },
+    template: `<form><PrSwitch label="Actif" name="active" value="1" unchecked-value="0" /><PrSwitch label="Archive" name="archived" value="1" unchecked-value="0" disabled /></form>`,
+  }),
+  play: async ({ canvasElement }) => {
+    const form = canvasElement.querySelector('form')!
+    await expect(new FormData(form).getAll('active')).toEqual(['0'])
+    await expect(new FormData(form).has('archived')).toBe(false)
+
+    await userEvent.click(within(canvasElement).getByRole('switch', { name: 'Actif' }))
+    await expect(new FormData(form).getAll('active').at(-1)).toBe('1')
+  },
 }

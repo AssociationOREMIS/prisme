@@ -2,6 +2,32 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.17.0 (2026-10-07)
+
+### Changements visibles
+
+- `PrButton` sans `variant` reste `primary`, sauf avec `action` (`ghost`).
+
+### Ajouts
+
+- **`PrButton`** :
+  - `action="view|edit|delete|..."` : icone, libelle et ton des actions courantes en une prop (`prButtonActions`, voir README) ;
+  - `icon` : une icone Lucide avant le libelle ;
+  - bouton a icone seule (`icon` sans texte) : carre, nomme par `label`, affiche aussi en infobulle ;
+  - `tone="danger"` : `ghost` ou `secondary` en rouge, pour Supprimer / Retirer / Rejeter dans un tableau.
+- **`unchecked-value`** sur `PrSwitch` et `PrCheckbox` : une case decochee envoie cette valeur (`"0"`), le serveur peut desactiver l'option. Les apps peuvent retirer leur champ cache.
+- **`hide-label`** sur `PrInput` : libelle garde pour les lecteurs d'ecran seulement, pour un formulaire compact sur une ligne.
+- **`PrCollapsible`** : `keep-mounted` garde le contenu ferme dans la page (les champs d'un formulaire gardent leur valeur et sont envoyes), `variant="compact"` sans cadre, avec un declencheur discret comme un lien.
+
+### Corrections
+
+- **Plus d'erreur « Transition was aborted because of invalid state » a l'envoi d'un formulaire.** Avec la navigation sans rechargement, Prisme n'active plus les transitions entre documents (ses transitions restent dans la page) ; sans elle, la transition est annulee avant de partir quand un formulaire est envoye.
+- `PrRichTextEditor` n'importe plus une seconde fois ses styles : ils sont dans `styles.css`.
+
+### Tests
+
+- Les notifications restent en bas a droite quand l'app genere les memes classes que Prisme (`top-0`, `w-full`...). Actions et boutons a icone (infobulle, carre, ton), valeur decochee envoyee, libelle cache, contenu replie envoye, transitions apres un envoi de formulaire.
+
 ## 0.16.1 (2026-10-07)
 
 ### Corrections

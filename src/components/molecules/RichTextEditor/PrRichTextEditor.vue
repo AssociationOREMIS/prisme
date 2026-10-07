@@ -53,8 +53,6 @@ import { common, createLowlight } from 'lowlight'
 import { ImageResize } from 'tiptap-extension-resize-image'
 import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 import { Callout } from '../../../tiptap/callout'
-import '../../../styles/editor-content.css'
-import './rich-text-editor.css'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 

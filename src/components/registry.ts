@@ -13,7 +13,7 @@ import { PrBadge } from './atoms/Badge'
 export type { PrBadgeProps } from './atoms/Badge'
 
 import { PrButton } from './atoms/Button'
-export type { PrButtonProps } from './atoms/Button'
+export type { PrButtonAction, PrButtonActionPreset, PrButtonProps } from './atoms/Button'
 
 import { PrCalendar } from './molecules/Calendar'
 export type { PrCalendarProps } from './molecules/Calendar'

@@ -16,6 +16,12 @@ export interface PrSwitchProps {
   name?: string
   /** Value submitted with `name` in a native form when on (defaults to `"on"`) — set it to distinguish switches sharing the same `name="options[]"`. */
   value?: string
+  /**
+   * Value submitted with `name` when off, e.g. `"0"`: without it, an unchecked switch sends nothing
+   * and the server cannot tell it was turned off. A hidden input placed before the control, so the
+   * control's own value wins when on. Not for a shared array name (`options[]`).
+   */
+  uncheckedValue?: string
 }
 
 const props = withDefaults(defineProps<PrSwitchProps>(), {
@@ -30,6 +36,7 @@ const props = withDefaults(defineProps<PrSwitchProps>(), {
   id: undefined,
   name: undefined,
   value: undefined,
+  uncheckedValue: undefined,
 })
 
 // One message, or the first of Laravel's array of messages.
@@ -67,6 +74,7 @@ const switchClass = computed(() => [
       </span>
       <span v-if="description" class="pr-switch__description text-[length:var(--pr-font-size-sm)] leading-[var(--pr-line-height-tight)] text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
     </span>
+    <input v-if="name && uncheckedValue !== undefined" type="hidden" :name="name" :value="uncheckedValue" :disabled="disabled">
     <SwitchRoot
       v-bind="$attrs"
       class="pr-switch__control relative inline-flex h-[1.375rem] w-[2.375rem] shrink-0 cursor-pointer items-center rounded-[var(--pr-radius-full)] border border-[var(--pr-color-border-strong)] bg-[var(--pr-color-surface-subtle)] p-0.5 transition-[background-color,border-color] duration-[var(--pr-duration-fast)] ease-[var(--pr-ease-standard)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pr-color-focus)] data-[state=checked]:border-[var(--pr-color-primary)] data-[state=checked]:bg-[var(--pr-color-primary)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60"

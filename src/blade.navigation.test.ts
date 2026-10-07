@@ -78,6 +78,40 @@ describe('registerPrisme after mount', () => {
     expect(css).toContain('prefers-reduced-motion: no-preference')
   })
 
+  it('keeps only the transition names with swap navigation, which never changes document', () => {
+    const app = createApp({})
+    registerPrisme(app, { navigation: 'swap' })
+    app.mount(document.body.appendChild(document.createElement('div')))
+
+    const css = transitionsStyle()?.textContent ?? ''
+    expect(css).not.toContain('@view-transition')
+    expect(css).toContain('.pr-navbar { view-transition-name: pr-navbar; }')
+    app.unmount()
+  })
+
+  it('skips the transition between documents when a form is submitted', () => {
+    mountApp()
+    const skipTransition = vi.fn()
+
+    const form = document.body.appendChild(document.createElement('form'))
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+    window.dispatchEvent(Object.assign(new Event('pageswap'), { viewTransition: { skipTransition } }))
+
+    expect(skipTransition).toHaveBeenCalledOnce()
+  })
+
+  it('keeps the transition when a submission is cancelled by the page', () => {
+    mountApp()
+    const skipTransition = vi.fn()
+
+    const form = document.body.appendChild(document.createElement('form'))
+    form.addEventListener('submit', event => event.preventDefault())
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+    window.dispatchEvent(Object.assign(new Event('pageswap'), { viewTransition: { skipTransition } }))
+
+    expect(skipTransition).not.toHaveBeenCalled()
+  })
+
   it('adds each element once when two apps are mounted', () => {
     mountApp()
     mountApp()
