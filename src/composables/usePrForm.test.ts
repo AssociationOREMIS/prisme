@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { fromLaravelErrors, required, usePrForm } from './usePrForm'
+import type { Ref } from 'vue'
+import { describe, expect, expectTypeOf, it } from 'vitest'
+import { fromLaravelErrors, min, minLength, required, usePrForm } from './usePrForm'
 
 describe('usePrForm — isDirty / reset with non-primitive fields', () => {
   it('is not dirty right after creation for an array field', () => {
@@ -132,5 +133,19 @@ describe('usePrForm — handleSubmit', () => {
       throw new Error('boom')
     })).rejects.toThrow('boom')
     expect(form.isSubmitting.value).toBe(false)
+  })
+})
+
+describe('usePrForm — typing', () => {
+  it('takes the typed rules of each field, and types each field from its initial value', () => {
+    const form = usePrForm({
+      name: { initialValue: '', rules: [required(), minLength(2)] },
+      age: { initialValue: 0, rules: [min(18)] },
+    })
+
+    expectTypeOf(form.fields.name).toEqualTypeOf<Ref<string>>()
+    expectTypeOf(form.fields.age).toEqualTypeOf<Ref<number>>()
+    expect(form.validate()).toBe(false)
+    expect(form.errors.name.value).toBe('Ce champ est requis')
   })
 })
