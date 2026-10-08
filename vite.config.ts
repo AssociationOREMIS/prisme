@@ -69,6 +69,9 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['src/**/*.test.ts'],
+          setupFiles: ['src/vitest.setup.ts'],
+          // Node 25 has its own localStorage, which shadows jsdom's and warns without a storage file.
+          execArgv: ['--no-experimental-webstorage'],
         },
       },
       {
@@ -77,6 +80,15 @@ export default defineConfig({
           storybookTest({
             configDir: path.join(dirname, '.storybook'),
           }),
+          {
+            // Stories with a `template` string use Vue's runtime compiler. Storybook points `vue` to
+            // its bundler build, whose compiler-core the browser tests' dependency optimizer took in its
+            // Node build: every story warned "decodeEntities option is passed but will be ignored".
+            // The browser build carries its own compiler. After Storybook's alias, which it replaces.
+            name: 'prisme:vue-browser-build',
+            enforce: 'post',
+            config: () => ({ resolve: { alias: { vue: path.join(dirname, 'node_modules/vue/dist/vue.esm-browser.js') } } }),
+          },
         ],
         test: {
           name: 'storybook',

@@ -55,7 +55,7 @@
     "dev": "vite",
     "generate:paths": "node scripts/generate-component-paths.mjs",
     "pretype-check": "npm run generate:paths",
-    "type-check": "vue-tsc -p tsconfig.build.json --noEmit",
+    "type-check": "vue-tsc -p tsconfig.build.json --noEmit && vue-tsc -p tsconfig.app.json --noEmit",
     "prebuild": "npm run generate:paths",
     "build": "node scripts/build.mjs && vue-tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build",
