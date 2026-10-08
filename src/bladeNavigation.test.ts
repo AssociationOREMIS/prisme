@@ -1,13 +1,17 @@
 // @vitest-environment jsdom
 import { createApp, defineComponent, h, nextTick, ref, type App } from 'vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi, type MockInstance } from 'vitest'
 import { registerPrisme } from './blade'
+import { documentLoader } from './bladeNavigation'
 
 // navigation: 'swap' (the default) replaces the page's #app without reloading: the shell keeps its components
 // (and their state), the main content is rebuilt, and anything unusual falls back to a page load.
 
 let mountedShells = 0
 let mountedApp: App | null = null
+// jsdom can neither scroll nor leave its document: both are watched instead.
+let scrollTo: MockInstance<typeof window.scrollTo>
+let loads: MockInstance<typeof documentLoader.assign>
 
 /** Stands for the sidebar: counts its mounts and keeps a local state. */
 const ShellCounter = defineComponent({
@@ -65,6 +69,9 @@ beforeEach(() => {
   history.replaceState(null, '', '/')
   vi.spyOn(console, 'debug').mockImplementation(() => undefined)
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
+  loads = vi.spyOn(documentLoader, 'assign').mockImplementation(() => undefined)
+  vi.spyOn(documentLoader, 'replace').mockImplementation(() => undefined)
 })
 
 afterEach(() => {
@@ -91,7 +98,28 @@ describe("registerPrisme navigation: 'swap'", () => {
     expect(location.pathname).toBe('/users')
     expect(mountedShells).toBe(1)
     expect(document.querySelector('.shell')?.textContent).toBe('1')
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 0)
     expect(document.querySelector('.shell')?.getAttribute('data-active')).toBe('Benevoles')
+  })
+
+  it('lands on the element named by the anchor of the link, like a pagination link back to its list', async () => {
+    const scrollIntoView = vi.fn()
+    Object.defineProperty(Element.prototype, 'scrollIntoView', { value: scrollIntoView, configurable: true })
+    stubServer({ '/staff': { html: pageHtml('Staff', '<h1>Staff</h1><section id="inactive">Page 2</section>') } })
+    mountFirstPage('<h1>Staff</h1><section id="inactive"><a id="next" href="/staff?inactive_page=2#inactive">2</a></section>')
+
+    try {
+      click('#next')
+      await settle()
+
+      expect(location.search).toBe('?inactive_page=2')
+      expect(location.hash).toBe('#inactive')
+      expect(scrollIntoView).toHaveBeenCalledOnce()
+      expect(scrollIntoView.mock.contexts[0]).toBe(document.getElementById('inactive'))
+      expect(scrollTo).not.toHaveBeenCalled()
+    } finally {
+      delete (Element.prototype as Partial<Element>).scrollIntoView
+    }
   })
 
   it('rebuilds the main content, so a component there never keeps the previous page state', async () => {
@@ -161,8 +189,7 @@ describe("registerPrisme navigation: 'swap'", () => {
     click('#export')
     await settle()
 
-    // jsdom cannot navigate: the page simply stays as it was, without a pushed history entry.
-    expect(document.querySelector('main h1')?.textContent).toBe('Accueil')
+    expect(loads.mock.calls.map(([url]) => new URL(url).pathname)).toEqual(['/map', '/export'])
     expect(location.pathname).toBe('/')
   })
 
@@ -198,7 +225,8 @@ describe("registerPrisme navigation: 'swap'", () => {
     expect(document.querySelector('main h1')?.textContent).toBe('Liste')
 
     mountedApp?.unmount()
-    vi.stubGlobal('localStorage', { getItem: (key: string) => (key === 'prisme:navigation' ? 'off' : null) })
+    window.localStorage.setItem('prisme:navigation', 'off')
+    onTestFinished(() => window.localStorage.removeItem('prisme:navigation'))
     mountWithoutOption()
     const event = click('#to-users')
     expect(event.defaultPrevented).toBe(false)
@@ -292,7 +320,7 @@ describe("registerPrisme navigation: 'swap', forms", () => {
     submit('#save')
     await settle()
 
-    const [, init] = fetchMock.mock.calls[0]
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     expect(init.method).toBe('POST')
     const body = init.body as FormData
     expect(Object.fromEntries(body)).toEqual({ _token: 'csrf-1', name: 'Bretagne', intent: 'save' })

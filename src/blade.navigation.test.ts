@@ -65,7 +65,7 @@ describe('registerPrisme after mount', () => {
   })
 
   it('opts into view transitions only once mounted, keeping the navbar and sidebar still', () => {
-    const app = createApp({})
+    const app = createApp({ template: '<p>page</p>' })
     registerPrisme(app, { navigation: false })
     expect(transitionsStyle()).toBeNull()
 
@@ -79,7 +79,7 @@ describe('registerPrisme after mount', () => {
   })
 
   it('keeps only the transition names with swap navigation, which never changes document', () => {
-    const app = createApp({})
+    const app = createApp({ template: '<p>page</p>' })
     registerPrisme(app, { navigation: 'swap' })
     app.mount(document.body.appendChild(document.createElement('div')))
 

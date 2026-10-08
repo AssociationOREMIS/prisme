@@ -21,3 +21,17 @@ export function buildPaginationItems(total: number, current: number): PrPaginati
 
   return items
 }
+
+/**
+ * Address of `page` for a server-paginated list (Laravel `?page=2`): the
+ * current address with only the page parameter changed, so the other query
+ * parameters (filters, the page of another list) are kept. `fragment` replaces
+ * the hash, to land back on the list instead of the top of the page.
+ */
+export function buildPageHref(currentHref: string, pageParam: string, page: number, fragment?: string): string {
+  const url = new URL(currentHref)
+  url.searchParams.set(pageParam, String(page))
+  url.hash = fragment ? `#${fragment.replace(/^#/, '')}` : ''
+
+  return url.href
+}

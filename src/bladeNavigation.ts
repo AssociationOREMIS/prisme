@@ -141,6 +141,15 @@ async function saveFile(response: Response, url: URL): Promise<void> {
   setTimeout(() => URL.revokeObjectURL(link.href), 60_000)
 }
 
+/**
+ * Loads a page the browser's way, when it cannot be swapped. In one place so the tests can see
+ * which page is loaded: jsdom cannot leave its document.
+ */
+export const documentLoader = {
+  assign: (url: string): void => location.assign(url),
+  replace: (url: string): void => location.replace(url),
+}
+
 /** Shows a page that cannot be swapped and must not be asked for again (an error answering a form). */
 function replaceDocument(html: string): void {
   document.open()
@@ -301,9 +310,9 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
 
     if (!page || !canSwap(page)) {
       if (mode === 'pop') {
-        location.replace(page?.url ?? url)
+        documentLoader.replace(page?.url ?? url)
       } else {
-        location.assign(page?.url ?? url)
+        documentLoader.assign(page?.url ?? url)
       }
       return
     }
@@ -344,7 +353,7 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
 
     const finalUrl = new URL(response.url || formRequest.url)
     if (finalUrl.origin !== location.origin) {
-      location.assign(finalUrl.href)
+      documentLoader.assign(finalUrl.href)
       return
     }
     if (!isHtml(response)) {
@@ -362,7 +371,7 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
       // A redirect is followed by its address, like the browser does; an answer to the form itself
       // (an expired session, a server error) cannot be asked for again, so it is shown as it came.
       if (response.redirected) {
-        location.assign(finalUrl.href)
+        documentLoader.assign(finalUrl.href)
       } else {
         replaceDocument(html)
       }

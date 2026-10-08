@@ -2,6 +2,24 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.19.3 (2026-10-08)
+
+### Ajouts
+
+- **Pagination en liens pour une liste paginee par le serveur** : avec `page-param`, `PrPagination` affiche de vrais liens au lieu de boutons, suivis sans rechargement par la navigation de Prisme. Chaque lien reprend l'adresse actuelle en changeant seulement ce parametre (les filtres et la page d'une autre liste sont gardes), et `fragment` ajoute une ancre pour que la page suivante s'ouvre sur la liste. Le README donne une vue de pagination Laravel qui l'utilise (`Paginator::defaultView`), a la place de celle de Laravel, en anglais et avec un theme sombre qui suit le systeme plutot que Prisme.
+  - A verifier dans une app : plusieurs paginations sur une meme page ont chacune besoin de leur `aria-label`.
+
+### Correctifs
+
+- **`PrScrollArea` n'affiche une barre de defilement que si le contenu deborde** : la barre horizontale apparaissait meme sans debordement, et le coin entre les deux barres provoquait une erreur `ResizeObserver loop` a l'affichage. Le coin est retire, la barre verticale s'arrete au-dessus de la barre horizontale.
+- **`usePrForm` accepte les regles typees** : `rules: [required(), minLength(2)]`, l'usage documente, etait refuse par TypeScript. Chaque champ reste type d'apres sa valeur initiale.
+
+### Tests
+
+- `npm run type-check` verifie aussi les tests et les stories, qui cachaient des erreurs de type.
+- Les rechargements complets de la navigation sont verifies (quelle page est chargee), ainsi que l'arrivee sur l'ancre d'un lien.
+- Sortie des tests sans bruit : messages de jsdom, `localStorage` de Node 25, avertissements du compilateur Vue dans les stories.
+
 ## 0.19.2 (2026-10-08)
 
 ### Correctifs

@@ -331,6 +331,32 @@ Un script de l'app qui agit sur la page a son chargement (`DOMContentLoaded`, `q
 
 `navigation: false` coupe la navigation sans rechargement pour une app. Pour comparer ou ecarter une cause dans son propre navigateur, dans la console : `localStorage.setItem('prisme:navigation', 'off')` puis recharger (`localStorage.removeItem('prisme:navigation')` pour revenir).
 
+#### Pagination d'une liste Laravel
+
+Avec `page-param`, `PrPagination` affiche de vrais liens au lieu de boutons : la navigation sans rechargement les suit, la page ne se recharge pas. Chaque lien reprend l'adresse actuelle en changeant seulement ce parametre, donc les filtres et la page d'une autre liste sont gardes. `fragment` ajoute une ancre aux liens : la page suivante s'ouvre sur la liste, pas en haut de la page.
+
+Pour l'utiliser partout a la place de la pagination de Laravel (en anglais, et avec un theme sombre qui suit le systeme plutot que Prisme), une vue suffit :
+
+```blade
+{{-- resources/views/pagination/prisme.blade.php --}}
+@if ($paginator->hasPages())
+    <pr-pagination
+        :page="{{ $paginator->currentPage() }}"
+        :page-count="{{ $paginator->lastPage() }}"
+        page-param="{{ $paginator->getPageName() }}"
+        aria-label="{{ $label ?? 'Pagination' }}"
+        @if ($paginator->fragment()) fragment="{{ $paginator->fragment() }}" @endif
+    ></pr-pagination>
+@endif
+```
+
+```php
+// AppServiceProvider::boot()
+Paginator::defaultView('pagination.prisme');
+```
+
+`{{ $users->fragment('users')->links() }}` ramene alors sur l'element `id="users"`. Plusieurs paginations sur une meme page ont chacune besoin de leur nom : `$users->links(data: ['label' => 'Pages des bénévoles'])`.
+
 ### `app.use(Prisme)` ou imports nommes ?
 
 - `app.use(Prisme)` enregistre en une seule fois tous les composants Prisme comme composants globaux de l'application. C'est le plus adapte quand les composants sont utilises directement dans du HTML/Blade (pas de `<script setup>` pour les declarer), au prix d'inclure l'integralite de la bibliotheque dans le bundle.
