@@ -26,6 +26,10 @@ export interface PrButtonProps {
   action?: PrButtonAction
 }
 
+// The attributes given to the button (@click, class, data-*, form...) go to the actual <button>/<a>:
+// an icon-only button's root is its tooltip, which would otherwise receive them and swallow the click.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<PrButtonProps>(), {
   variant: undefined,
   size: 'md',
@@ -119,6 +123,7 @@ const buttonClass = computed(() => [
   <PrTooltip v-if="isIconOnly" :content="label" :disabled="isUnavailable">
     <component
       :is="href ? 'a' : 'button'"
+      v-bind="$attrs"
       :class="buttonClass"
       :type="href ? undefined : type"
       :disabled="href ? undefined : isUnavailable"
@@ -138,6 +143,7 @@ const buttonClass = computed(() => [
   <component
     v-else
     :is="href ? 'a' : 'button'"
+    v-bind="$attrs"
     :class="buttonClass"
     :type="href ? undefined : type"
     :disabled="href ? undefined : isUnavailable"
