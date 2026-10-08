@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { ref } from 'vue'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { Eye, Pencil, Save, Trash2 } from '@lucide/vue'
 import { PrButton, prButtonActions } from '../../../../components/atoms/Button'
@@ -191,6 +192,30 @@ export const RowActions: Story = {
     const ghost = canvas.getByRole('button', { name: 'Modifier' })
     await expect(getComputedStyle(remove).color).not.toBe(getComputedStyle(ghost).color)
     await expect(getComputedStyle(canvas.getByRole('button', { name: 'Retirer' })).color).toBe(getComputedStyle(remove).color)
+  },
+}
+
+// An icon-only button's root is its tooltip: listeners and attributes must still reach the <button>.
+// noinspection JSUnusedGlobalSymbols
+export const IconOnlyListeners: Story = {
+  render: () => ({
+    components: { PrButton },
+    setup: () => ({ Pencil, clicks: ref(0) }),
+    template: `
+      <div class="story-stack">
+        <PrButton variant="ghost" size="sm" :icon="Pencil" label="Monter" data-row="3" class="row-action" @click="clicks++" />
+        <output>{{ clicks }}</output>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const button = canvas.getByRole('button', { name: 'Monter' })
+    await expect(button).toHaveAttribute('data-row', '3')
+    await expect(button).toHaveClass('row-action')
+
+    await userEvent.click(button)
+    await expect(canvasElement.querySelector('output')).toHaveTextContent('1')
   },
 }
 
