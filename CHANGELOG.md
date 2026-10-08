@@ -2,6 +2,16 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.19.2 (2026-10-08)
+
+### Correctifs
+
+- **Un bouton icone seule recoit ses ecouteurs et attributs** : sa racine est son infobulle, qui recevait jusqu'ici `@click`, `class`, `data-*`... et le clic n'atteignait jamais le bouton. `PrButton` les pose maintenant sur le vrai `<button>` ou `<a>`, dans les deux formes. Les contournements (clic capte sur un element parent) peuvent etre retires.
+
+### Tests
+
+- Story `IconOnlyListeners` : un bouton icone seule porte son attribut `data-*` et sa classe, et son `@click` s'execute.
+
 ## 0.19.1 (2026-10-07)
 
 ### Ajouts
