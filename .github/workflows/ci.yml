@@ -1,6 +1,6 @@
 name: CI
 
-# Type check, tests and build on every pull request and on develop, so a broken change is
+# Lint, type check, tests and build on every pull request and on develop, so a broken change is
 # caught before the merge into main (which publishes, see npm-publish.yml).
 on:
   pull_request:
@@ -27,6 +27,7 @@ jobs:
 
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - run: npm run lint
       - run: npm run type-check
       - run: npm run test
       - run: npm run build
