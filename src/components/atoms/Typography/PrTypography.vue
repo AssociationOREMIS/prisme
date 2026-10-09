@@ -27,10 +27,10 @@ const props = withDefaults(defineProps<PrTypographyProps>(), {
 
 const normalizedVariant = computed(() => (props.variant === 'code' ? 'inline-code' : props.variant))
 const typographyVariantClass = computed(() => ({
-  h1: 'pr:text-4xl pr:lg:text-5xl pr:font-extrabold pr:leading-none',
-  h2: 'pr:mt-[var(--pr-space-10)] pr:first:mt-0 pr:pb-[var(--pr-space-3)] pr:text-3xl pr:font-extrabold pr:leading-[1.2]',
-  h3: 'pr:text-2xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)]',
-  h4: 'pr:text-xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)]',
+  h1: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-4xl pr:lg:text-5xl pr:font-bold pr:leading-none',
+  h2: 'pr:font-[family-name:var(--pr-font-heading)] pr:mt-[var(--pr-space-10)] pr:first:mt-0 pr:pb-[var(--pr-space-3)] pr:text-3xl pr:font-bold pr:leading-[1.2]',
+  h3: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-2xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)]',
+  h4: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)]',
   p: 'pr:not-first:mt-[var(--pr-space-6)] pr:leading-[var(--pr-line-height-normal)]',
   blockquote: 'pr:mt-[var(--pr-space-6)] pr:border-l-2 pr:border-[var(--pr-color-border)] pr:pl-[var(--pr-space-6)] pr:italic pr:text-[color:var(--pr-color-text-muted)]',
   ul: 'pr:my-[var(--pr-space-6)] pr:list-disc pr:pl-[var(--pr-space-6)] pr:text-[color:var(--pr-color-text)] pr:[&>li]:mt-[var(--pr-space-2)] pr:[&>li]:text-inherit',

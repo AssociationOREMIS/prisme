@@ -70,7 +70,7 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
           ]"
           aria-hidden="true"
         />
-        <p :class="{ 'pr:max-[780px]:hidden': hideTitleOnMobile }" class="pr-navbar__title pr:m-0 pr:min-w-0 pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-lg)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
+        <p :class="{ 'pr:max-[780px]:hidden': hideTitleOnMobile }" class="pr-navbar__title pr:font-[family-name:var(--pr-font-heading)] pr:m-0 pr:min-w-0 pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-lg)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
       </slot>
     </div>
 

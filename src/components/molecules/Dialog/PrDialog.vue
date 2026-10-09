@@ -53,7 +53,7 @@ const emit = defineEmits<{
         <div class="pr-dialog__header pr:flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-4)] pr:border-b pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-5)]">
           <!-- min-w-0: a long title wraps instead of pushing the close button out. -->
           <div class="pr:min-w-0 pr:[overflow-wrap:anywhere]">
-            <DialogTitle v-if="title" class="pr-dialog__title pr:m-0 pr:text-[length:var(--pr-font-size-xl)] pr:font-[750] pr:leading-[var(--pr-line-height-tight)]">{{ title }}</DialogTitle>
+            <DialogTitle v-if="title" class="pr-dialog__title pr:font-[family-name:var(--pr-font-heading)] pr:m-0 pr:text-[length:var(--pr-font-size-xl)] pr:font-[750] pr:leading-[var(--pr-line-height-tight)]">{{ title }}</DialogTitle>
             <DialogTitle v-else-if="ariaLabel" class="pr:sr-only">{{ ariaLabel }}</DialogTitle>
             <DialogDescription v-if="description" class="pr-dialog__description pr:mt-[var(--pr-space-2)] pr:mb-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text-muted)]">
               {{ description }}

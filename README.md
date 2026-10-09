@@ -12,12 +12,16 @@ Elle fournit des composants, des styles et des tokens de design pour construire 
 
 ## Typographie
 
-Le token `--pr-font-sans` (utilisé par tous les composants via `reset.css`) declare `Roboto` en premier, pour rester coherent avec les applications OREMIS existantes (`data`, `formation`). Importez `@oremis/prisme/fonts.css` pour la charger : sans cela, les navigateurs retombent silencieusement sur la police systeme (`ui-sans-serif`/`system-ui`).
+Prisme utilise deux polices, reprises du design system Atmosphere :
+- **Nunito Sans** pour le texte (`--pr-font-sans`, applique a tous les composants via `reset.css`), en police variable : un seul fichier couvre toutes les graisses ;
+- **Poppins** pour les grands titres (`--pr-font-heading`) : `PrTypography` de `h1` a `h4`, en-tete de page, titres de carte, de fenetre, de volet et de navbar. Les petits titres (alertes, toasts, listes) restent en Nunito Sans, plus lisible a petite taille.
 
-Auto-hebergez Roboto plutot que de la charger depuis Google Fonts : avec un `<link>` vers `fonts.googleapis.com`, le navigateur de chaque visiteur transmet son adresse IP a Google, ce qui a deja ete sanctionne en Europe au titre du RGPD (sans consentement prealable). Pour une association dont le public peut etre vulnerable, ce n'est pas acceptable. `@oremis/prisme/fonts.css` s'appuie sur [`@fontsource/roboto`](https://fontsource.org/fonts/roboto) (installe avec Prisme) : les fichiers de police sont servis par votre application.
+Importez `@oremis/prisme/fonts.css` pour les charger : sans cela, les navigateurs retombent silencieusement sur la police systeme (`ui-sans-serif`/`system-ui`).
+
+Les polices sont auto-hebergees plutot que chargees depuis Google Fonts : avec un `<link>` vers `fonts.googleapis.com`, le navigateur de chaque visiteur transmet son adresse IP a Google, ce qui a deja ete sanctionne en Europe au titre du RGPD (sans consentement prealable). Pour une association dont le public peut etre vulnerable, ce n'est pas acceptable. `@oremis/prisme/fonts.css` s'appuie sur [`@fontsource-variable/nunito-sans`](https://fontsource.org/fonts/nunito-sans) et [`@fontsource/poppins`](https://fontsource.org/fonts/poppins) (installes avec Prisme) : les fichiers de police sont servis par votre application.
 
 ```ts
-// Avant styles.css. Prisme fournit Roboto (@fontsource/roboto) : le bundler de l'app sert les fichiers.
+// Avant styles.css. Prisme fournit les polices (@fontsource) : le bundler de l'app sert les fichiers.
 import '@oremis/prisme/fonts.css'
 import '@oremis/prisme/styles.css'
 ```
