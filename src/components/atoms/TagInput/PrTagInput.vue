@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { X } from '@lucide/vue'
-import { computed, ref, useId, watch } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { usePrMessages } from '../../../i18n/context'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrTagInputProps {
   modelValue?: string[]
@@ -55,16 +56,11 @@ const inputValue = ref('')
 
 // Without a v-model (a plain Blade form), `modelValue` stays undefined: keep the tags locally
 // so they show and get submitted, while a real v-model still takes priority.
-const internalTags = ref<string[]>([...(props.modelValue ?? props.defaultValue)])
-
-watch(() => props.modelValue, (value) => {
-  if (value !== undefined) internalTags.value = [...value]
-})
-
-const tags = computed(() => props.modelValue ?? internalTags.value)
+const { value: currentTags, set: setCurrentTags } = useFieldValue(props, () => [])
+const tags = computed(() => currentTags.value ?? [])
 
 function setTags(next: string[]) {
-  internalTags.value = next
+  setCurrentTags(next)
   emit('update:modelValue', next)
 }
 

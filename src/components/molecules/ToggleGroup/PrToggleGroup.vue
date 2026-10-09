@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, useId, watch } from 'vue'
+import { computed, useId } from 'vue'
 import { ToggleGroupItem, ToggleGroupRoot } from 'reka-ui'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrToggleGroupItem {
   label: string
@@ -67,17 +68,11 @@ const describedBy = computed(() => {
 // Without a v-model the sliding indicator still has to follow the selection (it read
 // `modelValue` only, leaving the selected item white on transparent): keep the value locally,
 // while a real v-model still takes priority.
-const internalValue = ref(props.modelValue ?? props.defaultValue)
-
-watch(() => props.modelValue, (value) => {
-  if (value !== undefined) internalValue.value = value
-})
-
-const currentValue = computed(() => props.modelValue ?? internalValue.value)
+const { value: currentValue, set: setCurrentValue } = useFieldValue(props, () => undefined)
 
 function updateValue(value: unknown) {
   if (typeof value === 'string' || Array.isArray(value)) {
-    internalValue.value = value as string | string[]
+    setCurrentValue(value as string | string[])
     emit('update:modelValue', value as string | string[])
   }
 }

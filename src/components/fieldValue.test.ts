@@ -42,3 +42,37 @@ describe('PrDatePicker value', () => {
     expect((wrapper.find('input').element as HTMLInputElement).value).toBe('2026-10-09')
   })
 })
+
+describe('reset to an undefined initial value', () => {
+  it('clears a radio group and a tag input bound with v-model', async () => {
+    const { usePrForm } = await import('../composables/usePrForm')
+    const { PrRadioGroup } = await import('./molecules/RadioGroup')
+    const { PrTagInput } = await import('./atoms/TagInput')
+    const Form = defineComponent({
+      components: { PrRadioGroup, PrTagInput },
+      setup: () => usePrForm({
+        role: { initialValue: undefined as string | undefined },
+        tags: { initialValue: undefined as string[] | undefined },
+      }),
+      template: `
+        <PrRadioGroup v-model="fields.role.value" label="Rôle" :options="[{ label: 'Bénévole', value: 'volunteer' }, { label: 'Formateur', value: 'trainer' }]" />
+        <PrTagInput v-model="fields.tags.value" label="Compétences" />
+      `,
+    })
+    const wrapper = mount(Form, { attachTo: document.body })
+    const vm = wrapper.vm as unknown as { fields: { role: { value?: string }, tags: { value?: string[] } }, reset: () => void }
+
+    vm.fields.role.value = 'trainer'
+    vm.fields.tags.value = ['Écoute']
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[role="radio"][data-state="checked"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Écoute')
+
+    vm.reset()
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('[role="radio"][data-state="checked"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Écoute')
+    wrapper.unmount()
+  })
+})

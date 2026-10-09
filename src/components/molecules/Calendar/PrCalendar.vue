@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, ref, useId } from 'vue'
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { parseIsoDate, toIsoDate } from './utils'
 import { usePrMessages } from '../../../i18n/context'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrCalendarProps {
   modelValue?: string
@@ -24,13 +25,7 @@ const emit = defineEmits<{
 // is aria-selected, today is aria-current, and only one day is in the tab order (roving
 // tabindex) so arrow keys move inside the month instead of tabbing through 31 buttons.
 
-const internalValue = ref(props.modelValue ?? props.defaultValue)
-
-watch(() => props.modelValue, (value) => {
-  if (value !== undefined) internalValue.value = value
-})
-
-const selected = computed(() => props.modelValue ?? internalValue.value)
+const { value: selected, set: setSelected } = useFieldValue(props, () => undefined)
 const today = toIsoDate(new Date())
 
 const focused = ref<Date>(selected.value ? parseIsoDate(selected.value) : new Date())
@@ -92,7 +87,7 @@ function move(months: number) {
 }
 
 function select(day: CalendarDay) {
-  internalValue.value = day.iso
+  setSelected(day.iso)
   focused.value = day.date
   emit('update:modelValue', day.iso)
 }

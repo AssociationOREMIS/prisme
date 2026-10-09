@@ -15,6 +15,7 @@ import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { usePrMessages } from '../../../i18n/context'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrComboboxOption {
   label: string
@@ -97,13 +98,7 @@ const describedBy = computed(() => {
 
 // Without a v-model (a plain Blade form), keep the selection locally so it shows and gets
 // submitted through the hidden inputs; a real v-model still takes priority.
-const internalValue = ref(props.modelValue ?? props.defaultValue ?? (props.multiple ? [] : undefined))
-
-watch(() => props.modelValue, (value) => {
-  if (value !== undefined) internalValue.value = value
-})
-
-const currentValue = computed(() => props.modelValue ?? internalValue.value)
+const { value: currentValue, set: setCurrentValue } = useFieldValue(props, () => (props.multiple ? [] : undefined))
 
 // Server-side search: results replace the options; every label seen is kept, so a selected value
 // still shows its label once the results have changed.
@@ -175,7 +170,7 @@ const remoteMessage = computed(() => {
 })
 
 function setValue(value: string | string[]) {
-  internalValue.value = value
+  setCurrentValue(value)
   emit('update:modelValue', value)
 }
 

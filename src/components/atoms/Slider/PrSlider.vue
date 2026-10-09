@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, useId, watch } from 'vue'
+import { computed, useId } from 'vue'
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui'
 import { PrLabel } from '../Label'
 import { usePrMessages } from '../../../i18n/context'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrSliderProps {
   modelValue?: number
@@ -44,17 +45,12 @@ const emit = defineEmits<{
 // make it permanently controlled at a constant value, snapping the thumb back
 // on every drag. Track the live value locally so uncontrolled usage (only
 // `defaultValue` set) still moves, while a real v-model keeps taking priority.
-const internalValue = ref(props.modelValue ?? props.defaultValue)
-
-watch(() => props.modelValue, (value) => {
-  if (value !== undefined) internalValue.value = value
-})
-
-const sliderValue = computed(() => [props.modelValue ?? internalValue.value])
+const { value: currentValue, set: setCurrentValue } = useFieldValue(props, () => undefined)
+const sliderValue = computed(() => [currentValue.value ?? props.min])
 
 function updateValue(value: number[] | undefined) {
   const next = value?.[0] ?? props.min
-  internalValue.value = next
+  setCurrentValue(next)
   emit('update:modelValue', next)
 }
 
