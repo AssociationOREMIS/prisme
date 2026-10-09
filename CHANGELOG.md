@@ -2,6 +2,30 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.21.0 (2026-10-09)
+
+### Ajouts
+
+- **`usePrForm` met le focus sur le premier champ en erreur** quand `handleSubmit` refuse l'envoi (regles ou 422) : au clavier ou avec un lecteur d'ecran, on arrive directement sur ce qu'il faut corriger. Le champ est cherche dans le formulaire qui a le focus, ou celui passe en option (`usePrForm(schema, { form: formRef })`) ; `focusOnError: false` desactive ce comportement. `focusFirstError()` le fait a la demande.
+- **`PrErrorSummary`** : liste des erreurs au-dessus d'un formulaire, annoncee des son apparition (`role="alert"`). Il prend `errorList` de `usePrForm` (« Email : Adresse email invalide », grace au nouveau `label` de chaque champ du schema) ou des messages simples (`$errors->all()` en Blade).
+- **Squelettes de chargement fournis par Prisme** : `getPrSkeletonStyles()` donne le CSS a mettre dans le `<head>` (formes `pr-sk--*`, silhouette de page `pr-sk-page`), avec les couleurs des tokens en clair et en sombre ; `prSkeletonFor` dessine les composants charges a la demande (`registerPrisme(app, { loading: prSkeletonFor })`). Les copies de `skeleton-styles.blade.php` et `skeletons.ts` dans les apps peuvent etre retirees. Voir le README, « Squelettes de chargement ».
+- **Token `--pr-color-primary-contrast-accent`** : un accent lisible sur un fond primaire, en clair (bleu clair sur bleu) comme en sombre (bleu sur fond clair). Remplace les `:global([data-pr-theme='dark'])` d'une icone posee sur une bulle de message.
+- **`search-placeholder` de `PrCombobox` s'affiche enfin** : quand le champ a le focus, pour dire quoi taper (« Nom ou CIB »). Le prop existait mais n'etait jamais utilise.
+
+### Changements visibles
+
+- Tri des colonnes de `PrDataTable` : « Croissant » et « Decroissant » au lieu de « Asc » et « Desc ».
+
+### Corrections
+
+- `PrSkeleton` scintille aussi en theme sombre : ses deux couleurs y etaient identiques. Nouveaux tokens `--pr-color-skeleton` et `--pr-color-skeleton-shine`.
+
+### Tests
+
+- Un composant oublie dans `registry.ts` ou dans les exports de `src/index.ts` fait echouer les tests (`src/components/registry.test.ts`).
+- Les tests de stories ne sont plus instables : `@lucide/vue` est pre-optimise par Vite (75 000 requetes par run faisaient perdre des imports a Chrome). La suite passe d'environ 110 s a 20 s.
+- Contraste verifie pour le texte et l'accent poses sur la couleur primaire.
+
 ## 0.20.0 (2026-10-09)
 
 ### Ajouts
