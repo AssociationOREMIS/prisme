@@ -2,6 +2,25 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.1 (2026-10-09)
+
+Premiere version candidate de la 1.0, publiee sous le tag npm `next` (`npm install @oremis/prisme@next`) : elle fige l'API. Voir le README, « Passer de 0.x a 1.0 » et « Versions et compatibilite ».
+
+### Changements cassants
+
+Les alias deprecies entre la 0.20 et la 0.22 sont retires. Une app en 0.23 sans avertissement `[prisme]` dans la console n'a rien a changer.
+
+- `PrCheckbox`, `PrSwitch` : `checked` et `update:checked` retires, utilisez `v-model` (ou `default-checked`).
+- `PrToggle` : `pressed` et `update:pressed` retires, utilisez `v-model` (ou `default-pressed`).
+- `PrToast` : `variant="default"` retire, utilisez `neutral`.
+- `PrSpinner`, `PrSidebar`, `PrNavigationMenu`, `PrToastProvider`, `PrThemeToggle` : `label` retire, utilisez `aria-label`.
+- `PrDataTable` : `data`, `is-loading`, `display-pagination`, `display-view-options`, `hide-selected-rows-count` et `danger` des actions de ligne retires, utilisez `rows`, `loading`, `hide-pagination`, `hide-view-options`, `show-selected-rows-count` et `tone: 'danger'`.
+
+### Documentation
+
+- Politique de versions : semver, alias deprecies en version mineure, retrait en majeure, et liste de ce qui fait partie de l'API publique (dont les chemins `components/<categorie>/<Nom>`).
+- Guide de migration de 0.x vers 1.0.
+
 ## 0.23.0 (2026-10-09)
 
 ### Ajouts
