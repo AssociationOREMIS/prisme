@@ -30,7 +30,7 @@ export interface PrFileUploadProps {
   required?: boolean
   label?: string
   hint?: string
-  error?: string
+  error?: PrFieldError
   name?: string
   id?: string
   /**
