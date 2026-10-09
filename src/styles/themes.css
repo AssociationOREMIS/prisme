@@ -41,6 +41,8 @@
 
   --pr-color-primary: var(--pr-blue-600);
   --pr-color-primary-contrast: var(--pr-neutral-0);
+  /* An accent (icon, highlight) set on a primary background: a read receipt on a sent bubble. */
+  --pr-color-primary-contrast-accent: var(--pr-blue-200);
   --pr-color-primary-hover: var(--pr-blue-700);
   --pr-color-primary-active: var(--pr-blue-800);
   --pr-color-primary-soft: var(--pr-blue-50);
@@ -91,6 +93,7 @@
 
   --pr-color-primary: #fafaff;
   --pr-color-primary-contrast: #21212e;
+  --pr-color-primary-contrast-accent: var(--pr-blue-600);
   --pr-color-primary-hover: #eeeff5;
   --pr-color-primary-active: #d2d3e0;
   --pr-color-primary-soft: rgb(250 250 255 / 10%);
@@ -140,6 +143,7 @@
 
     --pr-color-primary: #fafaff;
     --pr-color-primary-contrast: #21212e;
+    --pr-color-primary-contrast-accent: var(--pr-blue-600);
     --pr-color-primary-hover: #eeeff5;
     --pr-color-primary-active: #d2d3e0;
     --pr-color-primary-soft: rgb(250 250 255 / 10%);

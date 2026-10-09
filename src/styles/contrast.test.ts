@@ -69,6 +69,8 @@ const TEXT: Array<[string, string]> = [
   ['--pr-color-text-muted', '--pr-color-surface-subtle'],
   ['--pr-color-text-subtle', '--pr-color-surface-subtle'],
   ['--pr-color-text-muted', '--pr-color-primary-soft'],
+  ['--pr-color-primary-contrast', '--pr-color-primary'],
+  ['--pr-color-primary-contrast-accent', '--pr-color-primary'],
   ['--pr-color-success', '--pr-color-success-soft'],
   ['--pr-color-danger', '--pr-color-danger-soft'],
   ['--pr-color-info', '--pr-color-info-soft'],
