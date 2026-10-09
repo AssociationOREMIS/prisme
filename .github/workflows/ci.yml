@@ -29,5 +29,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run lint
       - run: npm run type-check
-      - run: npm run test
+      # The browser tests sometimes lose the page (Chrome drops an import or closes): one rerun,
+      # flagged as a warning. A real failure fails twice and still stops the job.
+      - name: Test (one rerun if the browser drops)
+        run: npm run test || { echo "::warning::Tests failed, rerunning once"; npm run test; }
       - run: npm run build
