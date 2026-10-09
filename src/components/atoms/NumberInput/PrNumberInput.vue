@@ -2,11 +2,13 @@
 import { Minus, Plus } from '@lucide/vue'
 import { computed, ref, useId, watch } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { useFieldValue } from '../../fieldValue'
 import { usePrMessages } from '../../../i18n/context'
 
 export interface PrNumberInputProps {
-  modelValue?: number
-  defaultValue?: number
+  /** `null` when the field is empty. */
+  modelValue?: number | null
+  defaultValue?: number | null
   label?: string
   hint?: string
   error?: PrFieldError
@@ -42,7 +44,7 @@ const messages = usePrMessages()
 const errorText = useErrorText(() => props.error)
 
 const emit = defineEmits<{
-  'update:modelValue': [value: number]
+  'update:modelValue': [value: number | null]
 }>()
 
 const generatedId = useId()
@@ -56,15 +58,18 @@ const describedBy = computed(() => {
 })
 
 // Without a v-model (a plain Blade form), the +/- buttons and typing must still change the
-// value: keep it locally, while a real v-model still takes priority.
-const internalValue = ref(props.modelValue ?? props.defaultValue)
-const currentValue = computed(() => props.modelValue ?? internalValue.value)
+// value: the field keeps it, while a real v-model controls it.
+const { value: currentValue, set: setCurrentValue } = useFieldValue(props, () => null)
 
-function setValue(value: number) {
-  internalValue.value = value
-  if (!isFocused.value) inputValue.value = String(value)
+function setValue(value: number | null) {
+  setCurrentValue(value)
+  if (!isFocused.value) inputValue.value = value === null ? '' : String(value)
   emit('update:modelValue', value)
 }
+
+// Rounded to the step's decimals: 0.1 + 0.2 gives 0.3, not 0.30000000000000004.
+const stepDecimals = computed(() => (String(props.step).split('.')[1] ?? '').length)
+const roundToStep = (value: number) => Number(value.toFixed(stepDecimals.value))
 
 const canDecrement = computed(() => {
   if (props.disabled) return false
@@ -87,27 +92,23 @@ function clamp(value: number): number {
 
 function decrement() {
   if (!canDecrement.value) return
-  setValue(clamp((currentValue.value ?? 0) - props.step))
+  setValue(clamp(roundToStep((currentValue.value ?? 0) - props.step)))
 }
 
 function increment() {
   if (!canIncrement.value) return
-  setValue(clamp((currentValue.value ?? 0) + props.step))
+  setValue(clamp(roundToStep((currentValue.value ?? 0) + props.step)))
 }
 
 // Local text buffer so the field can be visually emptied while typing
 // (e.g. to retype a value) without desyncing from modelValue until blur.
 const isFocused = ref(false)
-const inputValue = ref(currentValue.value !== undefined ? String(currentValue.value) : '')
+const asText = (value: number | null | undefined) => (value === null || value === undefined ? '' : String(value))
+const inputValue = ref(asText(currentValue.value))
 
-watch(
-  () => props.modelValue,
-  (val) => {
-    if (val !== undefined) internalValue.value = val
-    if (isFocused.value) return
-    inputValue.value = val !== undefined ? String(val) : ''
-  },
-)
+watch(currentValue, (value) => {
+  if (!isFocused.value) inputValue.value = asText(value)
+})
 
 function onFocus() {
   isFocused.value = true
@@ -123,9 +124,14 @@ function onInput(event: Event) {
 
 function onBlur() {
   isFocused.value = false
+  // Emptied: the field is now empty (null), it does not take its old value back.
+  if (inputValue.value.trim() === '') {
+    if (currentValue.value !== null && currentValue.value !== undefined) setValue(null)
+    return
+  }
   const num = parseFloat(inputValue.value)
-  if (inputValue.value.trim() === '' || Number.isNaN(num)) {
-    inputValue.value = currentValue.value !== undefined ? String(currentValue.value) : ''
+  if (Number.isNaN(num)) {
+    inputValue.value = asText(currentValue.value)
     return
   }
   const clamped = clamp(num)
