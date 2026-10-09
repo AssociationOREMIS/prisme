@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import {
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -21,9 +21,15 @@ export interface PrAlertDialogProps {
   confirmText?: string
   cancelText?: string
   variant?: 'primary' | 'danger'
+  /**
+   * `@confirm` handler. When it returns a promise (a request), the dialog stays open with the
+   * confirm button loading, closes once it resolves, and stays open if it fails (the app shows
+   * its error). Otherwise it closes at once.
+   */
+  onConfirm?: () => unknown
 }
 
-withDefaults(defineProps<PrAlertDialogProps>(), {
+const props = withDefaults(defineProps<PrAlertDialogProps>(), {
   open: undefined,
   defaultOpen: false,
   title: undefined,
@@ -31,23 +37,52 @@ withDefaults(defineProps<PrAlertDialogProps>(), {
   confirmText: undefined,
   cancelText: undefined,
   variant: 'primary',
+  onConfirm: undefined,
 })
 
 const messages = usePrMessages()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  confirm: []
   cancel: []
 }>()
+
+// Open state kept here too: the dialog closes itself once an async confirm resolves.
+const localOpen = ref(props.open ?? props.defaultOpen)
+watch(() => props.open, (value) => {
+  if (value !== undefined) localOpen.value = value
+})
+const isOpen = computed(() => props.open ?? localOpen.value)
+
+function setOpen(value: boolean) {
+  if (!value && pending.value) return
+  localOpen.value = value
+  emit('update:open', value)
+}
+
+const pending = ref(false)
+
+async function confirm() {
+  const result = props.onConfirm?.()
+  if (!(result instanceof Promise)) {
+    setOpen(false)
+    return
+  }
+  pending.value = true
+  try {
+    await result
+    pending.value = false
+    setOpen(false)
+  }
+  catch {
+    // Stays open: the app shows what went wrong (a toast, an error in the dialog).
+    pending.value = false
+  }
+}
 </script>
 
 <template>
-  <AlertDialogRoot
-    :open="open"
-    :default-open="defaultOpen"
-    @update:open="emit('update:open', $event)"
-  >
+  <AlertDialogRoot :open="isOpen" @update:open="setOpen">
     <AlertDialogTrigger as-child>
       <slot name="trigger" />
     </AlertDialogTrigger>
@@ -65,13 +100,12 @@ const emit = defineEmits<{
         </div>
         <div class="pr-alert-dialog__footer pr:flex pr:flex-wrap pr:justify-end pr:gap-[var(--pr-space-3)] pr:border-t pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-5)]">
           <AlertDialogCancel as-child @click="emit('cancel')">
-            <PrButton variant="secondary">{{ cancelText ?? messages.alertDialog.cancel }}</PrButton>
+            <PrButton variant="secondary" :disabled="pending">{{ cancelText ?? messages.alertDialog.cancel }}</PrButton>
           </AlertDialogCancel>
-          <AlertDialogAction as-child @click="emit('confirm')">
-            <PrButton :variant="variant === 'danger' ? 'danger' : 'primary'">
-              {{ confirmText ?? messages.alertDialog.confirm }}
-            </PrButton>
-          </AlertDialogAction>
+          <!-- Not reka's AlertDialogAction, which closes on click: an async confirm keeps the dialog open. -->
+          <PrButton :variant="variant === 'danger' ? 'danger' : 'primary'" :loading="pending" @click="confirm">
+            {{ confirmText ?? messages.alertDialog.confirm }}
+          </PrButton>
         </div>
       </AlertDialogContent>
     </AlertDialogPortal>
