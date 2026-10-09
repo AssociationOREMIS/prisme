@@ -182,6 +182,7 @@ export type {
 } from './composables/usePrForm'
 
 export { mountPrismeIsolated } from './composables/mountPrismeIsolated'
+export { getPrSkeletonStyles, prSkeletonFor } from './skeleton'
 export type {
   PrIsolatedMountOptions,
   PrIsolatedMountResult,

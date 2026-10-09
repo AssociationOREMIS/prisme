@@ -23,6 +23,9 @@
   --pr-color-surface-raised: var(--pr-neutral-0);
   --pr-color-surface-subtle: var(--pr-neutral-100);
   --pr-color-border: var(--pr-neutral-200);
+  /* Loading placeholders (PrSkeleton, getPrSkeletonStyles): a base and the lighter band that sweeps it. */
+  --pr-color-skeleton: var(--pr-neutral-100);
+  --pr-color-skeleton-shine: var(--pr-neutral-200);
   /* Field borders must reach 3:1 against the surface (WCAG 1.4.11): neutral-300 gave 1.48. */
   --pr-color-border-strong: #8291a7;
   --pr-color-text: var(--pr-neutral-900);
@@ -79,6 +82,8 @@
   --pr-color-surface-raised: #21212e;
   --pr-color-surface-subtle: #2c2d3c;
   --pr-color-border: #2c2d3c;
+  --pr-color-skeleton: #2c2d3c;
+  --pr-color-skeleton-shine: #3a3b4d;
   --pr-color-border-strong: #64667e;
   --pr-color-text: #fafaff;
   --pr-color-text-muted: #999ab4;
@@ -129,6 +134,8 @@
     --pr-color-surface-raised: #21212e;
     --pr-color-surface-subtle: #2c2d3c;
     --pr-color-border: #2c2d3c;
+    --pr-color-skeleton: #2c2d3c;
+    --pr-color-skeleton-shine: #3a3b4d;
     --pr-color-border-strong: #64667e;
     --pr-color-text: #fafaff;
     --pr-color-text-muted: #999ab4;

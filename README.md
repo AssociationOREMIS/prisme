@@ -321,7 +321,7 @@ app.use(Prisme).use(PrismeEditor)
 ```ts
 import { createApp } from 'vue'
 import { PrButton, PrNavbar, PrSidebar } from '@oremis/prisme'
-import { registerPrisme } from '@oremis/prisme/blade'
+import { prSkeletonFor, registerPrisme } from '@oremis/prisme/blade'
 import '@oremis/prisme/styles.css'
 
 const app = createApp({})
@@ -330,13 +330,48 @@ registerPrisme(app, {
   // Sur toutes les pages : affiches des le premier rendu, sans apparaitre apres coup.
   eager: { PrButton, PrNavbar, PrSidebar },
   // Optionnel : un squelette pendant le chargement d'un composant (au-dela de `delay`, 150 ms par defaut).
-  loading: (name) => (name === 'PrSelect' ? SelectSkeleton : undefined),
+  // prSkeletonFor dessine les champs, interrupteurs et declencheurs de dialogue (voir « Squelettes de chargement »).
+  loading: prSkeletonFor,
 })
 
 app.mount('#app')
 ```
 
 Montez Vue sur un noeud qui porte `v-cloak` et cachez-le avec `[v-cloak] { display: none }` pour eviter de voir les balises brutes avant le montage. Tout texte saisi par quelqu'un doit etre place dans un element `v-pre` : Vue compile toute la page, et `{{ ... }}` dans une note serait sinon evalue.
+
+#### Squelettes de chargement
+
+Pendant que Vue demarre, la page cachee par `v-cloak` peut etre remplacee par sa silhouette grise : barre de navigation, menu et contenu. Ses styles doivent s'afficher avant tout le reste, donc dans le `<head>`, en ligne. `getPrSkeletonStyles()` les fournit avec les couleurs des tokens Prisme, en clair et en sombre ; comme le script de theme, ecrivez-les dans une vue Blade a l'installation :
+
+```js
+// scripts/generate-prisme.mjs, lance par "postinstall"
+import { writeFileSync } from 'node:fs'
+import { getPrSkeletonStyles } from '@oremis/prisme'
+
+writeFileSync('resources/views/partials/prisme-skeleton-styles.blade.php', `<style>${getPrSkeletonStyles()}</style>\n`)
+```
+
+```blade
+<head>
+    <style>[v-cloak] { display: none; }</style>
+    @include('partials.prisme-skeleton-styles')
+    ...
+</head>
+<body>
+    <div id="app" v-cloak>...</div>
+    <div class="pr-sk-page">
+        <p class="pr-sk-sr-only" role="status">Chargement de la page...</p>
+        <div class="pr-sk-page__navbar" aria-hidden="true"></div>
+        <div class="pr-sk-page__sidebar" aria-hidden="true">...</div>
+        <div class="pr-sk-page__content" aria-hidden="true">
+            <span class="pr-sk pr-sk--title"></span>
+            <div class="pr-sk-page__card"><span class="pr-sk pr-sk--text"></span></div>
+        </div>
+    </div>
+</body>
+```
+
+Formes disponibles : `pr-sk--text`, `title`, `label`, `field`, `textarea`, `button`, `switch`, `icon`, `block`, `circle`, alignees par `pr-sk-stack` (en colonne) et `pr-sk-row` (en ligne). `.pr-sk-page` ne s'affiche que juste apres un `#app[v-cloak]`, et disparait au montage de Vue. Sans sidebar, `pr-sk-page__content--centered` centre le contenu. L'animation s'arrete pour les personnes qui reduisent les animations. `prSkeletonFor` reprend les memes classes pour les composants charges a la demande.
 
 #### Navigation plus rapide entre les pages
 

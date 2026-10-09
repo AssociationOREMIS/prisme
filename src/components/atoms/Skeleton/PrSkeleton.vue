@@ -16,7 +16,7 @@ const skeletonVariantClass: Record<NonNullable<PrSkeletonProps['variant']>, stri
 }
 
 const skeletonClass = computed(() => [
-  'pr-skeleton pr:block pr:overflow-hidden pr:rounded-[var(--pr-radius-md)] pr:bg-[linear-gradient(90deg,var(--pr-color-surface-subtle),var(--pr-color-border),var(--pr-color-surface-subtle))] pr:bg-[length:200%_100%] pr:animate-[pr-skeleton_1.4s_ease-in-out_infinite]',
+  'pr-skeleton pr:block pr:overflow-hidden pr:rounded-[var(--pr-radius-md)] pr:bg-[linear-gradient(90deg,var(--pr-color-skeleton),var(--pr-color-skeleton-shine),var(--pr-color-skeleton))] pr:bg-[length:200%_100%] pr:animate-[pr-skeleton_1.4s_ease-in-out_infinite]',
   skeletonVariantClass[props.variant],
 ])
 </script>
