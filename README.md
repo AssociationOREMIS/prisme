@@ -69,7 +69,7 @@ La valeur d'un champ passe toujours par un `v-model` nu (`modelValue`). Un etat 
 
 Pour un usage non controle (un formulaire Blade, sans etat cote consommateur), donnez la valeur de depart avec `default-value`, `default-checked`, `default-pressed` ou `default-open` selon le composant. Un `model-value` sans ecouteur fait la meme chose sur les champs texte (`PrInput`, `PrTextarea`) : le champ garde ce qui est tape, meme quand une erreur s'affiche. Dans une vue Blade : `<pr-input name="nom" default-value="{{ old('nom', $benevole->nom) }}">` ou `<pr-checkbox name="active" default-checked>`.
 
-Avant la 0.20, `PrCheckbox` et `PrSwitch` utilisaient `v-model:checked`, `PrToggle` `v-model:pressed`. Ces noms fonctionnent encore jusqu'a la 1.0, avec un avertissement dans la console.
+Avant la 0.20, `PrCheckbox` et `PrSwitch` utilisaient `v-model:checked`, `PrToggle` `v-model:pressed` : ces noms n'existent plus depuis la 1.0 (voir « Passer de 0.x a 1.0 »).
 
 ### Textes et langue
 
@@ -546,6 +546,46 @@ mountPrismeIsolated(ChatLauncher, host, {
 La police se charge, elle, dans le document hote (voir [Typographie](#typographie)).
 
 Attention avec `PrRichTextEditor` (et tout autre composant qui accepte un prop `name` pour rendre un `<input>` cache destine a une soumission de formulaire native) : un element place dans un shadow DOM n'est pas inclus dans la soumission native du `<form>` ancetre. Ne passez pas `name` dans ce cas : gardez un vrai `<input type="hidden">` dans le DOM normal (hors du shadow root), et synchronisez-le vous-meme via `v-model`/un callback plutot que de compter sur l'auto-rendu du composant.
+
+## Versions et compatibilite
+
+Prisme suit le [versionnage semantique](https://semver.org/lang/fr/) depuis la 1.0 :
+
+- **Correctif** (1.0.x) : un bug corrige, sans rien changer a l'API.
+- **Mineure** (1.x.0) : un ajout (composant, prop, option) qui ne casse rien. Un nom qui change y garde l'ancien en **alias deprecie** : il marche toujours, avec un avertissement unique dans la console qui donne le nouveau nom.
+- **Majeure** (x.0.0) : le retrait des alias deprecies et les changements cassants, listes dans un guide de migration.
+
+Une montee de version mineure ne demande donc rien aux apps ; il suffit de lire les avertissements de la console pour preparer la majeure suivante. Les versions de test (`1.0.0-rc.1`) sont publiees sous le tag npm `next` : `npm install @oremis/prisme@next`.
+
+L'API publique, couverte par cette promesse :
+- ce qu'exportent `@oremis/prisme`, `@oremis/prisme/blade`, `@oremis/prisme/editor` et `@oremis/prisme/registry` ;
+- les chemins `@oremis/prisme/components/<categorie>/<Nom>` (`atoms/Button`, `molecules/Toast`...), stables meme si un composant change de categorie ;
+- les props, evenements, slots et balises Blade (`<pr-xxx>`) documentes, les variables CSS `--pr-*` et les classes `pr-xxx` des composants.
+
+Ne sont pas publics : les fichiers sous `dist/internal/`, les classes utilitaires `pr:*` et la structure HTML interne d'un composant.
+
+## Passer de 0.x a 1.0
+
+La 1.0 retire les alias deprecies entre la 0.20 et la 0.22. Une app en 0.23 qui n'affiche aucun avertissement `[prisme]` dans la console n'a rien a changer. Sinon :
+
+| Avant | Apres |
+| --- | --- |
+| `v-model:checked` sur `PrCheckbox` et `PrSwitch` | `v-model` (ou `default-checked` en Blade) |
+| `v-model:pressed` sur `PrToggle` | `v-model` (ou `default-pressed`) |
+| `variant="default"` sur `PrToast` | `variant="neutral"` |
+| `label` sur `PrSpinner`, `PrSidebar`, `PrNavigationMenu`, `PrToastProvider`, `PrThemeToggle` | `aria-label` |
+| `:data` sur `PrDataTable` | `:rows` |
+| `is-loading` sur `PrDataTable` | `loading` |
+| `:display-pagination="false"` | `hide-pagination` |
+| `:display-view-options="false"` | `hide-view-options` |
+| `:hide-selected-rows-count="false"` | `show-selected-rows-count` |
+| `{ label: 'Supprimer', danger: true }` dans `row-actions` | `{ label: 'Supprimer', tone: 'danger' }` |
+
+Changements de comportement a connaitre en venant d'une version plus ancienne que la 0.23 :
+- **0.22** : un `model-value` sans ecouteur sur `PrInput`/`PrTextarea` est une valeur de depart (le champ garde ce qui est tape) ; `no-results-message` de `PrDataTable` ne s'affiche plus que lorsque la recherche ne trouve rien.
+- **0.23** : un champ lie par `v-model` affiche exactement sa valeur (`undefined` = vide) ; `PrNumberInput` envoie `null` quand il est vide ; un `@confirm` asynchrone de `PrAlertDialog` garde la fenetre ouverte jusqu'a la fin de la requete.
+
+Pour reperer les anciens noms dans une app : `grep -rnE "v-model:(checked|pressed)|is-loading|display-pagination|display-view-options|hide-selected-rows-count|danger: true|variant=\"default\"" resources/ src/`, puis verifier les `label` des cinq composants ci-dessus.
 
 ## Development
 
