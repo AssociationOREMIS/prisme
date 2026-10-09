@@ -45,6 +45,13 @@ export interface RegisterPrismeOptions {
   navigation?: 'swap' | false
   /** Texts Prisme writes itself, French by default: `prMessagesEn`, or a few replaced (see `PrMessagesOverride`). */
   messages?: PrMessagesOverride
+  /**
+   * Vue compiles the whole Blade page, so `{{ ... }}` in a text typed by someone (a name, a
+   * comment) would run as Vue code. Other delimiters, rare in typed text, close that door for
+   * text the app forgot to put in `v-pre`: `delimiters: ['[[%', '%]]']`. The page's own Vue
+   * interpolations (`@{{ x }}` in Blade) then use them instead.
+   */
+  delimiters?: [string, string]
 }
 
 type PrerenderingDocument = Document & { prerendering?: boolean }
@@ -69,6 +76,7 @@ export function registerPrisme(app: App, options: RegisterPrismeOptions = {}): v
   const lazyLoaders: Array<() => Promise<unknown>> = []
 
   providePrMessages(app, options.messages)
+  if (options.delimiters) app.config.compilerOptions.delimiters = options.delimiters
 
   for (const [name, component] of Object.entries(eager)) {
     app.component(name, component)

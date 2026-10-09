@@ -351,7 +351,7 @@ registerPrisme(app, {
 app.mount('#app')
 ```
 
-Montez Vue sur un noeud qui porte `v-cloak` et cachez-le avec `[v-cloak] { display: none }` pour eviter de voir les balises brutes avant le montage. Tout texte saisi par quelqu'un doit etre place dans un element `v-pre` : Vue compile toute la page, et `{{ ... }}` dans une note serait sinon evalue.
+Montez Vue sur un noeud qui porte `v-cloak` et cachez-le avec `[v-cloak] { display: none }` pour eviter de voir les balises brutes avant le montage. Tout texte saisi par quelqu'un doit etre place dans un element `v-pre` : Vue compile toute la page, et `{{ ... }}` dans une note serait sinon evalue. En filet de securite pour un texte oublie hors de `v-pre`, `registerPrisme(app, { delimiters: ['[[%', '%]]'] })` change les delimiteurs de Vue : un `{{ ... }}` saisi reste du texte, et les interpolations Vue de vos vues s'ecrivent `[[% x %]]` au lieu de `@{{ x }}`.
 
 #### Squelettes de chargement
 
