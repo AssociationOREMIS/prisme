@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { defineComponent, ref } from 'vue'
 import { PrButton } from '../../components/atoms/Button'
+import { PrErrorSummary } from '../../components/atoms/ErrorSummary'
 import { PrInput } from '../../components/atoms/Input'
 import { PrDatePicker } from '../../components/molecules/DatePicker'
 import { PrSelect } from '../../components/molecules/Select'
@@ -14,7 +15,7 @@ import {
 import '../stories.css'
 
 const DemoForm = defineComponent({
-  components: { PrInput, PrDatePicker, PrSelect, PrButton },
+  components: { PrErrorSummary, PrInput, PrDatePicker, PrSelect, PrButton },
   setup() {
     const roleOptions = [
       { label: 'Administrateur', value: 'admin' },
@@ -24,11 +25,13 @@ const DemoForm = defineComponent({
 
     const today = new Date().toISOString().slice(0, 10)
 
-    const { fields, errors, reset, handleSubmit, isValid, isDirty } = usePrForm({
-      name: { initialValue: '', rules: [required(), minLength(2), maxLength(80)] },
-      email: { initialValue: '', rules: [required(), email()] },
-      birthDate: { initialValue: '', rules: [required('Veuillez indiquer votre date de naissance')] },
-      role: { initialValue: '', rules: [required('Veuillez choisir un rôle')] },
+    // A refused submit moves the focus to the first invalid field; `label` names each field
+    // in the error summary.
+    const { fields, errors, errorList, reset, handleSubmit, isValid, isDirty } = usePrForm({
+      name: { initialValue: '', rules: [required(), minLength(2), maxLength(80)], label: 'Nom complet' },
+      email: { initialValue: '', rules: [required(), email()], label: 'Email' },
+      birthDate: { initialValue: '', rules: [required('Veuillez indiquer votre date de naissance')], label: 'Date de naissance' },
+      role: { initialValue: '', rules: [required('Veuillez choisir un rôle')], label: 'Rôle' },
     })
 
     const submitted = ref(false)
@@ -69,10 +72,11 @@ const DemoForm = defineComponent({
       onSubmit()
     }
 
-    return { fields, errors, reset, isValid, isDirty, onSubmit, simulateLaravel422, submitted, isLoading, roleOptions, today }
+    return { fields, errors, errorList, reset, isValid, isDirty, onSubmit, simulateLaravel422, submitted, isLoading, roleOptions, today }
   },
   template: `
     <form class="story-column" style="max-width: 28rem" @submit.prevent="onSubmit">
+      <PrErrorSummary :errors="errorList" />
       <PrInput v-model="fields.name.value" :error="errors.name.value ?? undefined" label="Nom complet" placeholder="Jean Dupont" required />
       <PrInput v-model="fields.email.value" :error="errors.email.value ?? undefined" label="Email" type="email" placeholder="jean@example.com" required />
       <PrDatePicker v-model="fields.birthDate.value" :error="errors.birthDate.value ?? undefined" label="Date de naissance" :max="today" required />

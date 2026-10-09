@@ -65,6 +65,9 @@ export type { PrListItemProps } from './molecules/ListItem'
 import { PrDropdownMenu } from './molecules/DropdownMenu'
 export type { PrDropdownMenuProps } from './molecules/DropdownMenu'
 
+import { PrErrorSummary } from './atoms/ErrorSummary'
+export type { PrErrorSummaryProps } from './atoms/ErrorSummary'
+
 import { PrDialog } from './molecules/Dialog'
 export type { PrDialogProps } from './molecules/Dialog'
 
@@ -197,6 +200,7 @@ export const componentRegistry = {
   PrDialog,
   PrDivider,
   PrDropdownMenu,
+  PrErrorSummary,
   PrFileUpload,
   PrHoverCard,
   PrInput,

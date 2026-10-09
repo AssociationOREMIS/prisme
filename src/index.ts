@@ -20,6 +20,7 @@ export { PrDatePicker } from './components/molecules/DatePicker'
 export { PrDialog } from './components/molecules/Dialog'
 export { PrDivider } from './components/atoms/Divider'
 export { PrDropdownMenu } from './components/molecules/DropdownMenu'
+export { PrErrorSummary } from './components/atoms/ErrorSummary'
 export { PrFileUpload } from './components/molecules/FileUpload'
 export { PrHoverCard } from './components/molecules/HoverCard'
 export { PrInput } from './components/atoms/Input'
@@ -81,6 +82,7 @@ export type {
   PrDialogProps,
   PrDividerProps,
   PrDropdownMenuProps,
+  PrErrorSummaryProps,
   PrFileUploadProps,
   PrHoverCardProps,
   PrInputProps,
@@ -172,6 +174,8 @@ export {
 export type {
   LaravelValidationErrors,
   PrFieldConfig,
+  PrFormError,
+  PrFormOptions,
   PrFormReturn,
   PrFormSchema,
   PrValidationRule,

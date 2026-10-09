@@ -84,6 +84,35 @@ app.use(Prisme, { messages: { dataTable: { empty: 'Aucun benevole' } } }) // un 
 
 La meme option existe sur `registerPrisme(app, { messages })` (Blade) et `mountPrismeIsolated(..., { messages })`. `locale` (dans les messages) regle les noms de mois et de jours et le format des nombres. Un prop sur le composant (`close-label`, `placeholder`, `empty-text`...) reste prioritaire pour cette instance. `usePrMessages()` donne ces textes a un composant de l'app, et le type `PrMessages` liste toutes les cles.
 
+### Formulaires (`usePrForm`)
+
+`usePrForm` garde les valeurs et les erreurs d'un formulaire, valide avec des regles (`required()`, `email()`, `minLength(2)`...) et reprend les erreurs d'une reponse Laravel 422.
+
+```vue
+<script setup lang="ts">
+import { email, PrErrorSummary, PrInput, required, usePrForm } from '@oremis/prisme'
+
+const { fields, errors, errorList, handleSubmit } = usePrForm({
+  name: { initialValue: '', rules: [required()], label: 'Nom' },
+  email: { initialValue: '', rules: [required(), email()], label: 'Email' },
+})
+
+const save = () => handleSubmit(() => axios.post('/benevoles', { name: fields.name.value, email: fields.email.value }))
+</script>
+
+<template>
+  <form @submit.prevent="save">
+    <PrErrorSummary :errors="errorList" />
+    <PrInput v-model="fields.name.value" :error="errors.name.value ?? undefined" label="Nom" />
+    <PrInput v-model="fields.email.value" :error="errors.email.value ?? undefined" label="Email" type="email" />
+  </form>
+</template>
+```
+
+Quand `handleSubmit` refuse l'envoi (regles ou 422), le focus va au premier champ en erreur : au clavier ou avec un lecteur d'ecran, on arrive directement sur ce qu'il faut corriger. Le champ est cherche dans le formulaire qui a le focus ; avec plusieurs formulaires ou un envoi declenche ailleurs, passez-le : `usePrForm(schema, { form: formRef })`. `focusOnError: false` desactive ce comportement.
+
+`PrErrorSummary` liste les erreurs au-dessus du formulaire, annoncees des leur apparition (`role="alert"`) : « Email : Adresse email invalide » grace au `label` de chaque champ. En Blade, il prend aussi des messages simples : `<pr-error-summary :errors='@json($errors->all())'></pr-error-summary>`.
+
 ### `PrRichTextEditor`
 
 Editeur de texte riche (Vue 3 + [tiptap](https://tiptap.dev)), avec titres, listes, tableaux, images, video YouTube, blocs de code colores, sections repliables et encadres `Callout` (info/succes/avertissement/danger).
