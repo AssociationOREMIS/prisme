@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, provide, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
 import { prAppShellContextKey } from '../../layouts/AppShell/appShellContext'
 import PrSidebarCollapseButton from './PrSidebarCollapseButton.vue'
 import { prSidebarContextKey } from './sidebarContext'
@@ -92,13 +92,24 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
-onMounted(() => {
-  window.addEventListener('keydown', handleKeydown)
+// Escape is only listened to while the mobile flyout is open.
+watch(mobileExpanded, (open) => {
+  if (open) window.addEventListener('keydown', handleKeydown)
+  else window.removeEventListener('keydown', handleKeydown)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown)
 })
+
+// The open flyout covers the page: tabbing out of it would land on content hidden behind the
+// backdrop, so leaving it with the focus closes it.
+function handleFocusOut(event: FocusEvent) {
+  const next = event.relatedTarget
+  if (mobileExpanded.value && next instanceof Node && !(event.currentTarget as HTMLElement).contains(next)) {
+    closeMobileFlyout()
+  }
+}
 
 provide(prSidebarContextKey, {
   collapsed,
@@ -121,6 +132,7 @@ provide(prSidebarContextKey, {
     :aria-label="ariaLabel ?? label ?? messages.sidebar.label"
     :data-collapsed="collapsed ? 'true' : 'false'"
     :data-mobile-expanded="mobileExpanded ? 'true' : 'false'"
+    @focusout="handleFocusOut"
   >
     <div class="pr-sidebar__scroll pr:min-h-0 pr:flex-auto pr:overflow-y-auto pr:px-[var(--pr-space-4)] pr:py-[var(--pr-space-5)]">
       <nav class="pr-sidebar__nav pr:grid pr:gap-[var(--pr-space-2)]">
