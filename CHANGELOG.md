@@ -2,7 +2,7 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 0.22.0 (2026-10-09)
 
 ### Ajouts
 
