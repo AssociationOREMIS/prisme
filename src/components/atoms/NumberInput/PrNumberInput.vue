@@ -177,7 +177,7 @@ defineOptions({ inheritAttrs: false })
         @input="onInput"
         @focus="onFocus"
         @blur="onBlur"
-      />
+      >
       <button
         type="button"
         class="pr-number-input__btn pr:flex pr:h-full pr:min-w-[2.375rem] pr:cursor-pointer pr:items-center pr:justify-center pr:border-l pr:border-[var(--pr-color-border-strong)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:disabled:cursor-not-allowed pr:disabled:opacity-50"

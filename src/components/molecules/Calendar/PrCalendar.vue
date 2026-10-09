@@ -122,6 +122,7 @@ function onKeydown(event: KeyboardEvent) {
         <ChevronRight :size="16" aria-hidden="true" />
       </button>
     </div>
+    <!-- eslint-disable-next-line vuejs-accessibility/interactive-supports-focus -- roving focus: the day buttons take focus, not the grid (WAI-ARIA grid pattern) -->
     <table ref="gridRef" class="pr-calendar__grid pr:w-full pr:border-separate pr:border-spacing-[var(--pr-space-1)]" role="grid" :aria-labelledby="labelId" @keydown="onKeydown">
       <thead>
         <tr>

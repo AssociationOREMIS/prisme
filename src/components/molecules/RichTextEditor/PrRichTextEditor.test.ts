@@ -17,12 +17,12 @@ import { defineComponent, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import PrRichTextEditor from './PrRichTextEditor.vue'
 
-async function waitForEditor(wrapper: VueWrapper) {
-  await vi.waitFor(() => {
-    if (!(wrapper.vm as any).editor) throw new Error('editor not ready')
+async function waitForEditor(wrapper: VueWrapper<InstanceType<typeof PrRichTextEditor>>) {
+  return vi.waitFor(() => {
+    const editor = wrapper.vm.editor
+    if (!editor) throw new Error('editor not ready')
+    return editor
   })
-
-  return (wrapper.vm as any).editor
 }
 
 describe('prRichTextEditor', () => {
@@ -126,7 +126,7 @@ describe('prRichTextEditor', () => {
     const editor = await waitForEditor(wrapper)
 
     const file = new File(['fake-image-bytes'], 'photo.png', { type: 'image/png' })
-    const url = await (wrapper.vm as any).insertImageFromFile(file)
+    const url = await wrapper.vm.insertImageFromFile(file)
 
     expect(uploadImage).toHaveBeenCalledTimes(1)
     expect(uploadImage.mock.calls[0][0]).toBe(file)
@@ -145,7 +145,7 @@ describe('prRichTextEditor', () => {
     const editor = await waitForEditor(wrapper)
 
     const file = new File(['fake-image-bytes'], 'photo.png', { type: 'image/png' })
-    const url = await (wrapper.vm as any).insertImageFromFile(file)
+    const url = await wrapper.vm.insertImageFromFile(file)
     await wrapper.vm.$nextTick()
 
     expect(url).toBeNull()
@@ -161,7 +161,7 @@ describe('prRichTextEditor', () => {
     await waitForEditor(wrapper)
 
     const file = new File(['fake-image-bytes'], 'photo.png', { type: 'image/png' })
-    const url = await (wrapper.vm as any).insertImageFromFile(file)
+    const url = await wrapper.vm.insertImageFromFile(file)
     await wrapper.vm.$nextTick()
 
     expect(url).toBeNull()

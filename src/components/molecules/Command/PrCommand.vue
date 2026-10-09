@@ -139,6 +139,7 @@ function onKeydown(event: KeyboardEvent) {
         :aria-selected="index === highlightedIndex ? 'true' : undefined"
         :disabled="item.disabled"
         @mouseenter="!item.disabled && (highlightedIndex = index)"
+        @focus="!item.disabled && (highlightedIndex = index)"
         @click="emit('select', item)"
       >
         <span class="pr-command__item-label pr:text-[length:var(--pr-font-size-sm)] pr:font-bold pr:leading-[var(--pr-line-height-tight)]">{{ item.label }}</span>

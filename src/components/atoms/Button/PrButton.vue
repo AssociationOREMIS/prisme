@@ -141,8 +141,8 @@ const buttonClass = computed(() => [
     </component>
   </PrTooltip>
   <component
-    v-else
     :is="href ? 'a' : 'button'"
+    v-else
     v-bind="$attrs"
     :class="buttonClass"
     :type="href ? undefined : type"

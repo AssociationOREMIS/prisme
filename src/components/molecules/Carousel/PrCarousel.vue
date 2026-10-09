@@ -29,6 +29,7 @@ function move(delta: number) {
 </script>
 
 <template>
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- a focusable carousel region: arrow keys move between slides -->
   <section
     class="pr-carousel pr:grid pr:grid-cols-[auto_1fr_auto] pr:items-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
     aria-roledescription="carousel"

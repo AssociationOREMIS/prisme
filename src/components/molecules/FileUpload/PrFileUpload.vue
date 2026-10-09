@@ -261,7 +261,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       :required="required"
       :name="name"
       @change="onInputChange"
-    />
+    >
     <div
       class="pr-file-upload__dropzone pr:flex pr:cursor-pointer pr:flex-col pr:items-center pr:justify-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border-2 pr:border-dashed pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-6)] pr:py-[var(--pr-space-8)] pr:text-center pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
       :class="{
@@ -314,8 +314,8 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
             {{ formatSize(file.size) }}
           </p>
           <PrProgress
-            :aria-label="`Envoi de ${file.name}`"
             v-if="upload && stateFor(file).status === 'uploading'"
+            :aria-label="`Envoi de ${file.name}`"
             class="pr-file-upload__progress pr:mt-[var(--pr-space-1)]"
             :model-value="stateFor(file).progress"
           />

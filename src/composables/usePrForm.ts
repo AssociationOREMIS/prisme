@@ -9,6 +9,7 @@ export interface PrFieldConfig<T = unknown> {
 
 // `any`, not `unknown`: each field's rules take that field's value, and a rule for a string
 // (`minLength()`) is not a rule for any value. Each field is still typed from its own config.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type PrFormSchema = Record<string, PrFieldConfig<any>>
 
 type InferValue<C> = C extends PrFieldConfig<infer T> ? T : never

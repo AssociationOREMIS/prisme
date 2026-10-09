@@ -19,7 +19,7 @@ export interface PrStep {
 export interface PrStepperProps {
   modelValue?: number
   defaultValue?: number
-  steps: PrStep[]
+  steps?: PrStep[]
   orientation?: 'horizontal' | 'vertical'
   linear?: boolean
 }

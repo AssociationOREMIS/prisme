@@ -140,6 +140,7 @@ defineOptions({ inheritAttrs: false })
       <span>{{ label }}</span>
       <span v-if="required" class="pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
     </label>
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -- a mouse shortcut to the inner input, which keyboard users reach directly -->
     <div
       class="pr-tag-input__field pr:flex pr:min-h-[2.375rem] pr:w-full pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-2)] pr:py-[var(--pr-space-1)] pr:transition-[border-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:focus-within:outline-2 pr:focus-within:outline-offset-2 pr:focus-within:outline-[var(--pr-color-focus)]"
       :class="{
@@ -181,7 +182,7 @@ defineOptions({ inheritAttrs: false })
         @keydown="onKeydown"
         @blur="onBlur"
         @paste="onPaste"
-      />
+      >
     </div>
     <!-- The draft input above only ever holds in-progress text, so the
          committed tags are submitted natively through these hidden inputs. -->

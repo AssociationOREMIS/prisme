@@ -75,12 +75,12 @@ const checkboxClass = computed(() => [
     <input v-if="name && uncheckedValue !== undefined" type="hidden" :name="name" :value="uncheckedValue" :disabled="disabled">
     <CheckboxRoot
       v-bind="$attrs"
+      :id="id"
       class="pr-checkbox__control pr:mt-[0.0625rem] pr:inline-grid pr:size-[1.125rem] pr:shrink-0 pr:cursor-pointer pr:appearance-none pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:p-0 pr:leading-none pr:text-[color:var(--pr-color-primary-contrast)] pr:box-border pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[state=checked]:border-[var(--pr-color-primary)] pr:data-[state=checked]:bg-[var(--pr-color-primary)] pr:data-[state=indeterminate]:border-[var(--pr-color-primary)] pr:data-[state=indeterminate]:bg-[var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
       :model-value="checked"
       :default-value="defaultChecked"
       :disabled="disabled"
       :required="required"
-      :id="id"
       :name="name"
       :value="value"
       :aria-invalid="errorText ? 'true' : undefined"

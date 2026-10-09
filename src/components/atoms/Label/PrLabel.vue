@@ -20,7 +20,7 @@ const labelClass = computed(() => [
 </script>
 
 <template>
-  <label :class="labelClass" :for="for">
+  <label :class="labelClass" :for="props.for">
     <slot />
     <span v-if="required" class="pr-label__required pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
   </label>
