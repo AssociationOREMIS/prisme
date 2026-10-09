@@ -86,6 +86,11 @@ export const Light: Story = {
     await expect(hostStyle.getPropertyValue('--pr-color-primary').trim()).toBe('#08619f')
     // ...and actually reach the components: the primary button is painted.
     await expect(view.getComputedStyle(button).backgroundColor).toBe('rgb(8, 97, 159)')
+    // Tailwind's @property defaults work in the shadow root too: the secondary button keeps its
+    // border (border-style came out empty, so no border, before they were copied to the document).
+    const secondary = host.shadowRoot!.querySelectorAll('button')[1]
+    await expect(view.getComputedStyle(secondary).borderTopStyle).toBe('solid')
+    await expect(view.getComputedStyle(secondary).borderTopWidth).toBe('1px')
   },
 }
 

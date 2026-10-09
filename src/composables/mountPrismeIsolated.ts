@@ -74,6 +74,7 @@ export function mountPrismeIsolated(
     const style = document.createElement('style')
     style.textContent = options.styles
     shadowRoot.appendChild(style)
+    registerPropertiesInDocument(options.styles, target.ownerDocument)
   }
 
   const mountPoint = document.createElement('div')
@@ -91,6 +92,28 @@ export function mountPrismeIsolated(
       app.unmount()
     },
   }
+}
+
+const PROPERTY_RULE = /@property\s+(--[\w-]+)\s*\{[^}]*\}/g
+const registeredProperties = new WeakMap<Document, Set<string>>()
+
+/**
+ * Browsers ignore `@property` inside a shadow root, and Prisme's Tailwind utilities rely on
+ * them for their defaults (`--tw-border-style: solid`...): without them, borders, shadows and
+ * focus rings of an isolated component vanish. They only declare custom properties, so copying
+ * them into the target's document, once each, changes nothing else on the host page.
+ */
+function registerPropertiesInDocument(css: string, doc: Document): void {
+  const registered = registeredProperties.get(doc) ?? new Set<string>()
+  registeredProperties.set(doc, registered)
+  const rules = [...css.matchAll(PROPERTY_RULE)].filter(([, name]) => !registered.has(name))
+  if (rules.length === 0) return
+
+  for (const [, name] of rules) registered.add(name)
+  const style = doc.createElement('style')
+  style.setAttribute('data-prisme-properties', '')
+  style.textContent = rules.map(([rule]) => rule).join('\n')
+  doc.head.appendChild(style)
 }
 
 const THEME_ATTRIBUTE = 'data-pr-theme'
