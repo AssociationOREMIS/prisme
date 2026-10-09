@@ -2,6 +2,15 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.3 (2026-10-09)
+
+Troisieme version candidate, sous le tag npm `next`.
+
+### Changements visibles
+
+- **Nouvelles polices, reprises du design system Atmosphere** : Nunito Sans pour le texte (`--pr-font-sans`, en police variable) et Poppins pour les grands titres (nouveau token `--pr-font-heading`) : `PrTypography` de `h1` a `h4`, en-tete de page, titres de carte, de fenetre, de volet, de confirmation et de navbar. Les petits titres (alertes, toasts, listes) restent en Nunito Sans. `@oremis/prisme/fonts.css` les charge (auto-hebergees, via `@fontsource`) a la place de Roboto : les apps qui l'importent changent de police sans rien faire.
+- Les boutons et les titres `h1`/`h2` de `PrTypography` passent en graisse 700. Avec Roboto, seule la graisse 700 etait chargee, si bien qu'ils s'affichaient deja en 700 : leur aspect ne change pas.
+
 ## 1.0.0-rc.2 (2026-10-09)
 
 Deuxieme version candidate, sous le tag npm `next`. Corrige deux bugs trouves en passant Formation a la rc.1.

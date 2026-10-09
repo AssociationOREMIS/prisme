@@ -68,7 +68,7 @@ const buttonBaseClass = [
   // table column never shrinks the button down to « Gé / rer ».
   'pr:relative pr:inline-flex pr:max-w-full pr:items-center pr:justify-center pr:text-center',
   'pr:border pr:border-transparent pr:rounded-[var(--pr-radius-md)]',
-  'pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:no-underline pr:[overflow-wrap:break-word]',
+  'pr:font-bold pr:leading-[var(--pr-line-height-tight)] pr:no-underline pr:[overflow-wrap:break-word]',
   'pr:cursor-pointer pr:transition-[background-color,border-color,color,box-shadow]',
   'pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]',
   'pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]',

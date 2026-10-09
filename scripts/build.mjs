@@ -113,7 +113,7 @@ function copyStaticStyles() {
 }
 
 /**
- * `fonts.css` only imports @fontsource/roboto (a dependency of Prisme): copied as is, so the
+ * `fonts.css` only imports @fontsource packages (dependencies of Prisme): copied as is, so the
  * app's bundler resolves the imports and serves the font files.
  */
 function copyFonts() {

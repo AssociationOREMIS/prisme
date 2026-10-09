@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/vue3-vite'
 import { themes } from 'storybook/theming'
+import '../src/styles/fonts.css'
 import '../src/styles/prisme.css'
 import './preview.css'
 import type { PrTheme } from '../src/composables/usePrTheme'
