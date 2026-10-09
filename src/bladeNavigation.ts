@@ -300,7 +300,7 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
     let page: FetchedPage | null
     try {
       page = await (takePrefetched(url) ?? fetchPage(url, signal))
-    } catch (error) {
+    } catch {
       stopProgress()
       if (signal.aborted) return
       page = null

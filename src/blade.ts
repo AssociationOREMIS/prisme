@@ -1,6 +1,7 @@
 import { defineAsyncComponent, type App, type Component } from 'vue'
 import { componentLoaders } from './components/loaders.generated'
 import { enableSwapNavigation, MARKER } from './bladeNavigation'
+import { providePrMessages, type PrMessagesOverride } from './i18n/context'
 
 export interface RegisterPrismeOptions {
   /**
@@ -42,6 +43,8 @@ export interface RegisterPrismeOptions {
    * in one browser (to compare, or to rule it out when something looks wrong).
    */
   navigation?: 'swap' | false
+  /** Texts Prisme writes itself, French by default: `prMessagesEn`, or a few replaced (see `PrMessagesOverride`). */
+  messages?: PrMessagesOverride
 }
 
 type PrerenderingDocument = Document & { prerendering?: boolean }
@@ -64,6 +67,8 @@ type PrerenderingDocument = Document & { prerendering?: boolean }
 export function registerPrisme(app: App, options: RegisterPrismeOptions = {}): void {
   const eager = options.eager ?? {}
   const lazyLoaders: Array<() => Promise<unknown>> = []
+
+  providePrMessages(app, options.messages)
 
   for (const [name, component] of Object.entries(eager)) {
     app.component(name, component)

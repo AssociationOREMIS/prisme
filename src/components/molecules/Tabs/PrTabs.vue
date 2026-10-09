@@ -16,7 +16,7 @@ export interface PrTab {
 export interface PrTabsProps {
   modelValue?: string
   defaultValue?: string
-  tabs: PrTab[]
+  tabs?: PrTab[]
   orientation?: 'horizontal' | 'vertical'
 }
 

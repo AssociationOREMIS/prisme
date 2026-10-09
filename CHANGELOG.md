@@ -2,6 +2,34 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.20.0 (2026-10-09)
+
+### Ajouts
+
+- **Textes et langue configurables** : tous les textes que Prisme ecrit lui-meme (boutons Fermer/Annuler, noms lus par les lecteurs d'ecran, messages vides, erreurs d'envoi et de recherche, messages des regles de `usePrForm`) viennent d'un catalogue type, `PrMessages`. Francais par defaut (`prMessagesFr`), anglais fourni (`prMessagesEn`). L'option `messages` de `app.use(Prisme)`, `registerPrisme` et `mountPrismeIsolated` remplace un pack entier ou quelques textes : `{ dataTable: { empty: 'Aucun benevole' } }`. Un prop sur le composant reste prioritaire pour cette instance. `usePrMessages()` donne ces textes aux composants de l'app. Voir le README, section « Textes et langue ».
+- **`v-model` sur `PrCheckbox`, `PrSwitch` et `PrToggle`** : la valeur d'un champ passe toujours par un `v-model` simple, comme sur `PrInput` ou `PrSelect`. Un etat qui n'est pas une valeur (`open`, `page`, `collapsed`) garde son nom : `PrPagination` reste en `v-model:page`.
+- **`PrToast` accepte `variant="neutral"`**, comme `PrBadge`.
+
+### Changements visibles
+
+- Les tailles de fichier de `PrFileUpload` suivent la langue : « 1,5 Mo » au lieu de « 1.5 Mo », « 12 o » au lieu de « 12 B ».
+- `PrCommand` met en surbrillance l'element qui recoit le focus clavier, comme au survol.
+
+### Depreciations (retirees en 1.0)
+
+- `v-model:checked` (`PrCheckbox`, `PrSwitch`) et `v-model:pressed` (`PrToggle`) : remplacer par `v-model`. `default-checked` et `default-pressed` ne changent pas.
+- `variant="default"` sur `PrToast` : remplacer par `variant="neutral"`.
+
+Les anciens noms fonctionnent toujours, avec un avertissement dans la console qui donne le nouveau.
+
+### Corrections
+
+- `tabs` (`PrTabs`) et `steps` (`PrStepper`) sont optionnels pour TypeScript : ils avaient deja une liste vide par defaut.
+
+### Outillage
+
+- ESLint (`npm run lint`, verifie en CI) : regles recommandees de TypeScript, Vue, Storybook et d'accessibilite (`vuejs-accessibility`). Les regles de mise en page sont desactivees.
+
 ## 0.19.3 (2026-10-08)
 
 ### Ajouts

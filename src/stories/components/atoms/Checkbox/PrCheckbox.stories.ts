@@ -11,7 +11,7 @@ const meta = {
   args: {
     label: 'Recevoir les notifications',
     description: 'Les alertes importantes restent toujours envoyees.',
-    checked: false,
+    modelValue: false,
     disabled: false,
     required: false,
   },
@@ -27,7 +27,7 @@ export const Default: Story = {
       const checked = ref(false)
       return { args, checked }
     },
-    template: '<PrCheckbox v-model:checked="checked" v-bind="args" />',
+    template: '<PrCheckbox v-model="checked" v-bind="args" />',
   }),
 }
 
@@ -37,8 +37,8 @@ export const States: Story = {
     template: `
       <div class="story-column">
         <PrCheckbox label="Non coche" />
-        <PrCheckbox checked label="Coche" />
-        <PrCheckbox checked="indeterminate" label="Indetermine" />
+        <PrCheckbox default-checked label="Coche" />
+        <PrCheckbox default-checked="indeterminate" label="Indetermine" />
         <PrCheckbox disabled label="Desactive" />
       </div>
     `,

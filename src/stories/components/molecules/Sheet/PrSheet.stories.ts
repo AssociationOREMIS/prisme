@@ -37,7 +37,7 @@ export const Default: Story = {
           <PrButton variant="secondary">Ouvrir</PrButton>
         </template>
         <div class="story-column">
-          <PrSwitch label="Notifications" checked />
+          <PrSwitch label="Notifications" default-checked />
           <PrSwitch label="Mode automatique" />
         </div>
         <template #footer>

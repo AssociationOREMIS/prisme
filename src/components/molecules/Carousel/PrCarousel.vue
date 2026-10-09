@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrCarouselItem {
   title: string
@@ -14,12 +15,14 @@ export interface PrCarouselProps {
 
 const props = withDefaults(defineProps<PrCarouselProps>(), {
   items: () => [],
-  ariaLabel: 'Carrousel',
+  ariaLabel: undefined,
 })
+
+const messages = usePrMessages()
 
 const index = ref(0)
 const current = computed(() => props.items[index.value])
-const positionLabel = computed(() => `Élément ${index.value + 1} sur ${props.items.length}`)
+const positionLabel = computed(() => messages.carousel.position(index.value + 1, props.items.length))
 
 function move(delta: number) {
   const total = props.items.length
@@ -29,15 +32,16 @@ function move(delta: number) {
 </script>
 
 <template>
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- a focusable carousel region: arrow keys move between slides -->
   <section
     class="pr-carousel pr:grid pr:grid-cols-[auto_1fr_auto] pr:items-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
     aria-roledescription="carousel"
-    :aria-label="ariaLabel"
+    :aria-label="ariaLabel ?? messages.carousel.label"
     tabindex="0"
     @keydown.left.prevent="move(-1)"
     @keydown.right.prevent="move(1)"
   >
-    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Élément précédent" @click="move(-1)">
+    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]" type="button" :aria-label="messages.carousel.previous" @click="move(-1)">
       <ChevronLeft :size="16" />
     </button>
     <div
@@ -51,7 +55,7 @@ function move(delta: number) {
       <strong>{{ current?.title }}</strong>
       <span v-if="current?.description">{{ current.description }}</span>
     </div>
-    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]" type="button" aria-label="Élément suivant" @click="move(1)">
+    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]" type="button" :aria-label="messages.carousel.next" @click="move(1)">
       <ChevronRight :size="16" />
     </button>
   </section>

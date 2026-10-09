@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'reka-ui'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrDialogProps {
   open?: boolean
@@ -24,8 +25,10 @@ withDefaults(defineProps<PrDialogProps>(), {
   defaultOpen: false,
   title: undefined,
   description: undefined,
-  closeLabel: 'Fermer',
+  closeLabel: undefined,
 })
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -48,7 +51,7 @@ const emit = defineEmits<{
               {{ description }}
             </DialogDescription>
           </div>
-          <DialogClose class="pr-dialog__close pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
+          <DialogClose class="pr-dialog__close pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel ?? messages.common.close">
             <X :size="18" aria-hidden="true" />
           </DialogClose>
         </div>

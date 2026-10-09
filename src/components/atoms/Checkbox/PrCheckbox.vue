@@ -2,12 +2,15 @@
 import { computed, useId } from 'vue'
 import { Check, Minus } from '@lucide/vue'
 import { CheckboxIndicator, CheckboxRoot, type CheckboxCheckedState } from 'reka-ui'
+import { warnDeprecated } from '../../deprecation'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrCheckboxProps {
   // Written out rather than reka's CheckboxCheckedState: Vue's compiler cannot read an imported
   // type, so it did not know these are booleans, and a bare Blade `default-checked` attribute
   // came in as '' (unchecked) instead of true.
+  modelValue?: boolean | 'indeterminate'
+  /** @deprecated Use `modelValue` (`v-model`) instead. Removed in 1.0. */
   checked?: boolean | 'indeterminate'
   defaultChecked?: boolean | 'indeterminate'
   label?: string
@@ -29,6 +32,7 @@ export interface PrCheckboxProps {
 }
 
 const props = withDefaults(defineProps<PrCheckboxProps>(), {
+  modelValue: undefined,
   checked: undefined,
   defaultChecked: false,
   label: undefined,
@@ -47,8 +51,18 @@ const props = withDefaults(defineProps<PrCheckboxProps>(), {
 const errorText = useErrorText(() => props.error)
 
 const emit = defineEmits<{
+  'update:modelValue': [value: CheckboxCheckedState]
+  /** @deprecated Use `update:modelValue` (`v-model`) instead. Removed in 1.0. */
   'update:checked': [value: CheckboxCheckedState]
 }>()
+
+if (props.checked !== undefined) warnDeprecated('PrCheckbox', 'checked', 'modelValue (v-model)')
+const currentValue = computed(() => props.modelValue ?? props.checked)
+
+function update(value: CheckboxCheckedState) {
+  emit('update:modelValue', value)
+  emit('update:checked', value)
+}
 
 // Multi-root template (label + error/hint message) disables Vue's automatic
 // attrs fallthrough, so extraneous attributes like a DataTable's aria-label
@@ -75,17 +89,17 @@ const checkboxClass = computed(() => [
     <input v-if="name && uncheckedValue !== undefined" type="hidden" :name="name" :value="uncheckedValue" :disabled="disabled">
     <CheckboxRoot
       v-bind="$attrs"
+      :id="id"
       class="pr-checkbox__control pr:mt-[0.0625rem] pr:inline-grid pr:size-[1.125rem] pr:shrink-0 pr:cursor-pointer pr:appearance-none pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:p-0 pr:leading-none pr:text-[color:var(--pr-color-primary-contrast)] pr:box-border pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[state=checked]:border-[var(--pr-color-primary)] pr:data-[state=checked]:bg-[var(--pr-color-primary)] pr:data-[state=indeterminate]:border-[var(--pr-color-primary)] pr:data-[state=indeterminate]:bg-[var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
-      :model-value="checked"
+      :model-value="currentValue"
       :default-value="defaultChecked"
       :disabled="disabled"
       :required="required"
-      :id="id"
       :name="name"
       :value="value"
       :aria-invalid="errorText ? 'true' : undefined"
       :aria-describedby="describedBy"
-      @update:model-value="emit('update:checked', $event)"
+      @update:model-value="update"
     >
       <template #default="{ state }">
         <CheckboxIndicator

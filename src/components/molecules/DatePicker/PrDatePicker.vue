@@ -76,6 +76,7 @@ function onFocusOut() {
 <template>
   <div class="pr-date-picker" @focusin="onFocusIn" @focusout="onFocusOut">
     <PrInput
+      :id="id"
       :model-value="internalValue"
       :label="label"
       :hint="hint"
@@ -86,7 +87,6 @@ function onFocusOut() {
       :min="min"
       :max="max"
       :name="name"
-      :id="id"
       @update:model-value="onUpdate"
     />
   </div>

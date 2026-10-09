@@ -11,6 +11,7 @@ import PrDataTablePagination from './PrDataTablePagination.vue'
 import PrDataTableViewOptions from './PrDataTableViewOptions.vue'
 import type { PrDataTableColumn, PrDataTableProps, PrDataTableRowAction, PrDataTableSort } from './types'
 import { compareDataTableValues } from './utils'
+import { usePrMessages } from '../../../i18n/context'
 
 const props = withDefaults(defineProps<PrDataTableProps>(), {
   columns: () => [],
@@ -19,7 +20,7 @@ const props = withDefaults(defineProps<PrDataTableProps>(), {
   rowKey: 'id',
   loading: false,
   isLoading: false,
-  emptyText: 'Aucune donnée',
+  emptyText: undefined,
   noResultsMessage: undefined,
   pageSize: 10,
   pageSizeOptions: () => [10, 20, 30, 40, 50],
@@ -36,6 +37,8 @@ const props = withDefaults(defineProps<PrDataTableProps>(), {
   sort: undefined,
   filter: undefined,
 })
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   'update:selectedRows': [rows: Record<string, unknown>[]]
@@ -64,10 +67,10 @@ const slots = defineSlots<{
 const isLoading = computed(() => props.loading || props.isLoading)
 const columns = computed(() => props.columns)
 const sourceRows = computed(() => props.data ?? props.rows)
-const emptyMessage = computed(() => props.noResultsMessage ?? props.emptyText)
+const emptyMessage = computed(() => props.noResultsMessage ?? props.emptyText ?? messages.dataTable.empty)
 const filterColumnKey = computed(() => props.filterKey ?? columns.value.find((column) => column.filterable !== false)?.key ?? '')
 const filterLabel = computed(() => props.filterPlaceholder
-  ?? `Filtrer ${columns.value.find((column) => column.key === filterColumnKey.value)?.label.toLocaleLowerCase() ?? 'les lignes'}...`)
+  ?? messages.dataTable.filter(columns.value.find((column) => column.key === filterColumnKey.value)?.label))
 // The page size in use is always offered, so the select never falls back to its placeholder.
 const pageSizeOptions = computed(() => props.pageSizeOptions.includes(activePageSize.value)
   ? props.pageSizeOptions
@@ -281,9 +284,9 @@ onBeforeUnmount(() => {
             <tr class="pr-data-table__row pr:border-b pr:border-[var(--pr-color-border)] pr:transition-colors pr:last:border-b-0">
               <th v-if="selectable" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
                 <PrCheckbox
-                  :checked="selectAllState"
-                  aria-label="Sélectionner la page"
-                  @update:checked="togglePageRows(Boolean($event))"
+                  :model-value="selectAllState"
+                  :aria-label="messages.dataTable.selectPage"
+                  @update:model-value="togglePageRows(Boolean($event))"
                 />
               </th>
               <th
@@ -303,7 +306,7 @@ onBeforeUnmount(() => {
                 />
               </th>
               <th v-if="hasRowActions" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
-                <span class="pr:sr-only">Actions</span>
+                <span class="pr:sr-only">{{ messages.dataTable.actions }}</span>
               </th>
             </tr>
           </thead>
@@ -341,9 +344,9 @@ onBeforeUnmount(() => {
               >
                 <td v-if="selectable" class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle">
                   <PrCheckbox
-                    :checked="selectedKeys.has(rowId(row))"
-                    :aria-label="`Sélectionner ${rowLabel(row)}`"
-                    @update:checked="toggleRow(row, Boolean($event))"
+                    :model-value="selectedKeys.has(rowId(row))"
+                    :aria-label="messages.dataTable.selectRow(rowLabel(row))"
+                    @update:model-value="toggleRow(row, Boolean($event))"
                   />
                 </td>
                 <td
@@ -359,9 +362,9 @@ onBeforeUnmount(() => {
                 </td>
                 <td v-if="hasRowActions" class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle">
                   <slot name="row-actions" :row="row">
-                    <PrDropdownMenu align="end" label="Actions">
+                    <PrDropdownMenu align="end" :label="messages.dataTable.actions">
                       <template #trigger>
-                        <PrButton class="pr:ml-auto pr:size-8 pr:p-0" variant="ghost" size="sm" aria-label="Actions">
+                        <PrButton class="pr:ml-auto pr:size-8 pr:p-0" variant="ghost" size="sm" :aria-label="messages.dataTable.actions">
                           <MoreHorizontal :size="16" aria-hidden="true" />
                         </PrButton>
                       </template>

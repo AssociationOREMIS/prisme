@@ -2,6 +2,7 @@
 import { ChevronDown, CircleUser } from '@lucide/vue'
 import { computed, ref, type Component } from 'vue'
 import PrDropdownMenu from '../../molecules/DropdownMenu/PrDropdownMenu.vue'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrNavbarUserMenuProps {
   /** Full display name, shown in the trigger and in the dropdown header. */
@@ -20,8 +21,10 @@ const props = withDefaults(defineProps<PrNavbarUserMenuProps>(), {
   identifier: undefined,
   email: undefined,
   roles: () => [],
-  rolesFallback: 'Rôle inconnu',
+  rolesFallback: undefined,
 })
+
+const messages = usePrMessages()
 
 // Declared rather than inferred: the inferred slot type copied reka's whole DropdownMenuItem
 // type into the published .d.ts, which fails type checking in apps with other Vue/TS versions.
@@ -42,7 +45,7 @@ const displayName = computed(() => (
   props.identifier ? `${props.name} (${props.identifier})` : props.name
 ))
 const rolesLabel = computed(() => (
-  props.roles.length ? props.roles.join(' | ') : props.rolesFallback
+  props.roles.length ? props.roles.join(' | ') : (props.rolesFallback ?? messages.navbar.unknownRole)
 ))
 </script>
 

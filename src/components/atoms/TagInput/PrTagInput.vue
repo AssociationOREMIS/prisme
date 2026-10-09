@@ -2,6 +2,7 @@
 import { X } from '@lucide/vue'
 import { computed, ref, useId, watch } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrTagInputProps {
   modelValue?: string[]
@@ -25,11 +26,13 @@ const props = withDefaults(defineProps<PrTagInputProps>(), {
   error: undefined,
   disabled: false,
   required: false,
-  placeholder: 'Ajouter...',
+  placeholder: undefined,
   maxTags: undefined,
   id: undefined,
   name: undefined,
 })
+
+const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
@@ -140,6 +143,7 @@ defineOptions({ inheritAttrs: false })
       <span>{{ label }}</span>
       <span v-if="required" class="pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
     </label>
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -- a mouse shortcut to the inner input, which keyboard users reach directly -->
     <div
       class="pr-tag-input__field pr:flex pr:min-h-[2.375rem] pr:w-full pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-2)] pr:py-[var(--pr-space-1)] pr:transition-[border-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:focus-within:outline-2 pr:focus-within:outline-offset-2 pr:focus-within:outline-[var(--pr-color-focus)]"
       :class="{
@@ -160,7 +164,7 @@ defineOptions({ inheritAttrs: false })
           v-if="!disabled"
           type="button"
           class="pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
-          :aria-label="`Supprimer ${tag}`"
+          :aria-label="messages.tagInput.remove(tag)"
           @click.stop="removeTag(index)"
         >
           <X :size="10" aria-hidden="true" />
@@ -173,7 +177,7 @@ defineOptions({ inheritAttrs: false })
         v-model="inputValue"
         class="pr-tag-input__input pr:min-w-[6rem] pr:grow pr:bg-transparent pr:py-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
         type="text"
-        :placeholder="tags.length === 0 ? placeholder : undefined"
+        :placeholder="tags.length === 0 ? (placeholder ?? messages.tagInput.placeholder) : undefined"
         :disabled="disabled || !canAddMore"
         :required="required && tags.length === 0"
         :aria-invalid="errorText ? 'true' : undefined"
@@ -181,7 +185,7 @@ defineOptions({ inheritAttrs: false })
         @keydown="onKeydown"
         @blur="onBlur"
         @paste="onPaste"
-      />
+      >
     </div>
     <!-- The draft input above only ever holds in-progress text, so the
          committed tags are submitted natively through these hidden inputs. -->

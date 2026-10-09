@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { buildPageHref, buildPaginationItems } from './utils'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrPaginationProps {
   page?: number
@@ -26,6 +27,8 @@ const props = withDefaults(defineProps<PrPaginationProps>(), {
   pageParam: undefined,
   fragment: undefined,
 })
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   'update:page': [value: number]
@@ -82,8 +85,8 @@ function go(nextPage: number) {
 </script>
 
 <template>
-  <nav class="pr-pagination pr:inline-flex pr:flex-wrap pr:items-center pr:gap-(--pr-space-2)" aria-label="Pagination">
-    <component :is="controlTag" v-bind="control(currentPage - 1, isDisabled || currentPage <= 1)" class="pr-pagination__prev" :class="paginationButtonClass" aria-label="Page précédente" @click="go(currentPage - 1)">
+  <nav class="pr-pagination pr:inline-flex pr:flex-wrap pr:items-center pr:gap-(--pr-space-2)" :aria-label="messages.pagination.label">
+    <component :is="controlTag" v-bind="control(currentPage - 1, isDisabled || currentPage <= 1)" class="pr-pagination__prev" :class="paginationButtonClass" :aria-label="messages.pagination.previous" @click="go(currentPage - 1)">
       <ChevronLeft :size="16" aria-hidden="true" />
     </component>
     <template v-for="(item, index) in pages" :key="`${item}-${index}`">
@@ -99,7 +102,7 @@ function go(nextPage: number) {
         {{ item }}
       </component>
     </template>
-    <component :is="controlTag" v-bind="control(currentPage + 1, isDisabled || currentPage >= currentPageCount)" class="pr-pagination__next" :class="paginationButtonClass" aria-label="Page suivante" @click="go(currentPage + 1)">
+    <component :is="controlTag" v-bind="control(currentPage + 1, isDisabled || currentPage >= currentPageCount)" class="pr-pagination__next" :class="paginationButtonClass" :aria-label="messages.pagination.next" @click="go(currentPage + 1)">
       <ChevronRight :size="16" aria-hidden="true" />
     </component>
   </nav>

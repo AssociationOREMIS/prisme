@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 import { Search } from '@lucide/vue'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrCommandItem {
   label: string
@@ -17,9 +18,11 @@ export interface PrCommandProps {
 
 const props = withDefaults(defineProps<PrCommandProps>(), {
   items: () => [],
-  placeholder: 'Rechercher',
-  emptyText: 'Aucun résultat',
+  placeholder: undefined,
+  emptyText: undefined,
 })
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   select: [item: PrCommandItem]
@@ -116,8 +119,8 @@ function onKeydown(event: KeyboardEvent) {
       <input
         v-model="query"
         class="pr-command__input pr:min-h-11 pr:flex-auto pr:border-0 pr:bg-transparent pr:font-[inherit] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
-        :placeholder="placeholder"
-        :aria-label="placeholder"
+        :placeholder="placeholder ?? messages.command.placeholder"
+        :aria-label="placeholder ?? messages.command.placeholder"
         role="combobox"
         aria-autocomplete="list"
         :aria-expanded="true"
@@ -139,12 +142,13 @@ function onKeydown(event: KeyboardEvent) {
         :aria-selected="index === highlightedIndex ? 'true' : undefined"
         :disabled="item.disabled"
         @mouseenter="!item.disabled && (highlightedIndex = index)"
+        @focus="!item.disabled && (highlightedIndex = index)"
         @click="emit('select', item)"
       >
         <span class="pr-command__item-label pr:text-[length:var(--pr-font-size-sm)] pr:font-bold pr:leading-[var(--pr-line-height-tight)]">{{ item.label }}</span>
         <span v-if="item.description" class="pr-command__item-description pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ item.description }}</span>
       </button>
-      <p v-if="filteredItems.length === 0" role="status" class="pr-command__empty pr:m-0 pr:p-[var(--pr-space-4)] pr:text-center pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ emptyText }}</p>
+      <p v-if="filteredItems.length === 0" role="status" class="pr-command__empty pr:m-0 pr:p-[var(--pr-space-4)] pr:text-center pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ emptyText ?? messages.common.noResults }}</p>
     </div>
   </div>
 </template>

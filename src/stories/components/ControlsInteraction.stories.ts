@@ -71,9 +71,9 @@ export const WithVModel: Story = {
     },
     template: `
       <div style="display: grid; gap: 1.25rem; max-width: 28rem;">
-        <PrCheckbox v-model:checked="consent" label="J'accepte" />
-        <PrSwitch v-model:checked="newsletter" label="Recevoir les nouvelles" />
-        <PrToggle v-model:pressed="bold" aria-label="Gras">G</PrToggle>
+        <PrCheckbox v-model="consent" label="J'accepte" />
+        <PrSwitch v-model="newsletter" label="Recevoir les nouvelles" />
+        <PrToggle v-model="bold" aria-label="Gras">G</PrToggle>
         <PrPagination v-model:page="page" :page-count="5" />
         <output data-testid="state">{{ consent }}|{{ newsletter }}|{{ bold }}|{{ page }}</output>
       </div>

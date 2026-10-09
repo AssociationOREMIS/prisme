@@ -55,13 +55,13 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
           ]"
           :src="resolvedLogoSrc"
           alt="OREMIS"
-        />
+        >
         <img
           v-if="hasMobileLogo"
           class="pr-navbar__logo pr-navbar__logo--mobile pr:hidden pr:h-9 pr:w-9 pr:shrink-0 pr:object-contain pr:object-center pr:max-[780px]:block"
           :src="mobileLogoSrc"
           alt="OREMIS"
-        />
+        >
         <span
           class="pr-navbar__divider"
           :class="[

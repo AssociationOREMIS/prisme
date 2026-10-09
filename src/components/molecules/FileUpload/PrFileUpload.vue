@@ -4,6 +4,7 @@ import { computed, reactive, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 import { PrProgress } from '../../atoms/Progress'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrRejectedFile {
   file: File
@@ -58,6 +59,8 @@ const props = withDefaults(defineProps<PrFileUploadProps>(), {
   upload: undefined,
 })
 
+const messages = usePrMessages()
+
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
 
@@ -81,7 +84,7 @@ function extractUploadErrorMessage(err: unknown): string {
     if (response?.data?.message) return response.data.message
   }
   if (err instanceof Error) return err.message
-  return "Échec de l'envoi"
+  return messages.fileUpload.uploadFailed
 }
 
 async function startUpload(file: File) {
@@ -155,10 +158,13 @@ function openFilePicker() {
   if (!props.disabled) inputRef.value?.click()
 }
 
+const sizeFormatter = new Intl.NumberFormat(messages.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+
 function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
+  const { bytes: b, kilobytes, megabytes } = messages.fileUpload
+  if (bytes < 1024) return `${bytes} ${b}`
+  if (bytes < 1024 * 1024) return `${sizeFormatter.format(bytes / 1024)} ${kilobytes}`
+  return `${sizeFormatter.format(bytes / (1024 * 1024))} ${megabytes}`
 }
 
 function validateFiles(files: File[]): { accepted: File[]; rejected: PrRejectedFile[] } {
@@ -168,7 +174,7 @@ function validateFiles(files: File[]): { accepted: File[]; rejected: PrRejectedF
 
   for (const file of files) {
     if (props.maxSize && file.size > props.maxSize) {
-      rejected.push({ file, reason: `Taille maximale dépassée (${formatSize(props.maxSize)})` })
+      rejected.push({ file, reason: messages.fileUpload.tooLarge(formatSize(props.maxSize)) })
       continue
     }
     if (props.accept) {
@@ -179,7 +185,7 @@ function validateFiles(files: File[]): { accepted: File[]; rejected: PrRejectedF
         return file.type === type
       })
       if (!matches) {
-        rejected.push({ file, reason: 'Type de fichier non accepté' })
+        rejected.push({ file, reason: messages.fileUpload.typeNotAccepted })
         continue
       }
     }
@@ -190,7 +196,7 @@ function validateFiles(files: File[]): { accepted: File[]; rejected: PrRejectedF
     const available = Math.max(props.maxFiles - currentCount, 0)
     const overflow = accepted.splice(available)
     for (const file of overflow) {
-      rejected.push({ file, reason: `Nombre maximum de fichiers atteint (${props.maxFiles})` })
+      rejected.push({ file, reason: messages.fileUpload.tooMany(props.maxFiles) })
     }
   }
 
@@ -261,7 +267,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       :required="required"
       :name="name"
       @change="onInputChange"
-    />
+    >
     <div
       class="pr-file-upload__dropzone pr:flex pr:cursor-pointer pr:flex-col pr:items-center pr:justify-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border-2 pr:border-dashed pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-6)] pr:py-[var(--pr-space-8)] pr:text-center pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
       :class="{
@@ -291,7 +297,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       />
       <div>
         <p :id="instructionsId" class="pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text)]">
-          Glisser-déposer ou <span class="pr:text-[color:var(--pr-color-primary)]">choisir un fichier</span>
+          {{ messages.fileUpload.drop }} <span class="pr:text-[color:var(--pr-color-primary)]">{{ messages.fileUpload.choose }}</span>
         </p>
         <p v-if="accept || maxSize" class="pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">
           <span v-if="accept">{{ accept }}</span>
@@ -314,8 +320,8 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
             {{ formatSize(file.size) }}
           </p>
           <PrProgress
-            :aria-label="`Envoi de ${file.name}`"
             v-if="upload && stateFor(file).status === 'uploading'"
+            :aria-label="messages.fileUpload.uploading(file.name)"
             class="pr-file-upload__progress pr:mt-[var(--pr-space-1)]"
             :model-value="stateFor(file).progress"
           />
@@ -334,7 +340,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
           v-if="upload && stateFor(file).status === 'error'"
           type="button"
           class="pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
-          :aria-label="`Réessayer l'envoi de ${file.name}`"
+          :aria-label="messages.fileUpload.retry(file.name)"
           @click="startUpload(file)"
         >
           <RotateCw :size="16" aria-hidden="true" />
@@ -342,7 +348,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         <button
           type="button"
           class="pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
-          :aria-label="`Supprimer ${file.name}`"
+          :aria-label="messages.fileUpload.remove(file.name)"
           @click="removeFile(index)"
         >
           <X :size="16" aria-hidden="true" />

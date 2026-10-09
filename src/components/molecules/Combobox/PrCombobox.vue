@@ -14,6 +14,7 @@ import {
 import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrComboboxOption {
   label: string
@@ -57,7 +58,7 @@ const props = withDefaults(defineProps<PrComboboxProps>(), {
   modelValue: undefined,
   defaultValue: undefined,
   options: () => [],
-  placeholder: 'Sélectionner',
+  placeholder: undefined,
   searchPlaceholder: 'Rechercher...',
   label: undefined,
   hint: undefined,
@@ -73,6 +74,8 @@ const props = withDefaults(defineProps<PrComboboxProps>(), {
   minChars: 2,
   debounce: 250,
 })
+
+const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
@@ -163,10 +166,10 @@ onBeforeUnmount(() => {
 
 const remoteMessage = computed(() => {
   switch (searchState.value) {
-    case 'short': return props.minChars > 1 ? `Tapez au moins ${props.minChars} caractères` : 'Tapez pour rechercher'
-    case 'loading': return 'Recherche...'
-    case 'failed': return 'La recherche a échoué, réessayez.'
-    default: return remoteOptions.value.length ? '' : 'Aucun résultat'
+    case 'short': return props.minChars > 1 ? messages.combobox.typeAtLeast(props.minChars) : messages.combobox.typeToSearch
+    case 'loading': return messages.combobox.searching
+    case 'failed': return messages.combobox.searchFailed
+    default: return remoteOptions.value.length ? '' : messages.common.noResults
   }
 })
 
@@ -224,7 +227,7 @@ function labelFor(value: string) {
             v-if="!disabled"
             type="button"
             class="pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
-            :aria-label="`Retirer ${labelFor(value)}`"
+            :aria-label="messages.combobox.remove(labelFor(value))"
             @click.stop="removeValue(value)"
           >
             <X :size="10" aria-hidden="true" />
@@ -234,7 +237,7 @@ function labelFor(value: string) {
           :id="inputId"
           class="pr-combobox__input pr:min-w-0 pr:grow pr:bg-transparent pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
           :display-value="multiple ? undefined : displayValue"
-          :placeholder="hasValue ? undefined : placeholder"
+          :placeholder="hasValue ? undefined : (placeholder ?? messages.common.select)"
           :required="required && !hasValue"
           :aria-required="required || undefined"
           :aria-invalid="errorText ? 'true' : undefined"
@@ -245,7 +248,7 @@ function labelFor(value: string) {
           v-if="hasValue && !disabled"
           type="button"
           class="pr-combobox__clear pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)]"
-          :aria-label="'Effacer la sélection'"
+          :aria-label="messages.combobox.clear"
           @click.stop="clearValue"
         >
           <X :size="14" aria-hidden="true" />
@@ -269,7 +272,7 @@ function labelFor(value: string) {
               {{ remoteMessage }}
             </div>
             <ComboboxEmpty v-if="!isRemote" class="pr-combobox__empty pr:py-[var(--pr-space-4)] pr:text-center pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]">
-              Aucun résultat
+              {{ messages.common.noResults }}
             </ComboboxEmpty>
             <ComboboxItem
               v-for="option in visibleOptions"

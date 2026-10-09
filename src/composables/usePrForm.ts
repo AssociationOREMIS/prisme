@@ -1,4 +1,6 @@
-import { computed, ref, type ComputedRef, type Ref } from 'vue'
+import { computed, hasInjectionContext, ref, type ComputedRef, type Ref } from 'vue'
+import { usePrMessages } from '../i18n/context'
+import { prMessagesFr } from '../i18n/messages'
 
 export type PrValidationRule<T = unknown> = (value: T) => string | true
 
@@ -9,6 +11,7 @@ export interface PrFieldConfig<T = unknown> {
 
 // `any`, not `unknown`: each field's rules take that field's value, and a rule for a string
 // (`minLength()`) is not a rule for any value. Each field is still typed from its own config.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type PrFormSchema = Record<string, PrFieldConfig<any>>
 
 type InferValue<C> = C extends PrFieldConfig<infer T> ? T : never
@@ -132,9 +135,14 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
   return { fields, errors, generalErrors, validate, validateField, reset, handleSubmit, isValid, isDirty, isSubmitting }
 }
 
-// Built-in validation rule helpers
+// Built-in validation rule helpers. Their default messages come from the app's messages when
+// the rule is made in a component's setup, French otherwise (a rule made at module level).
+function validationMessages() {
+  return (hasInjectionContext() ? usePrMessages() : prMessagesFr).validation
+}
+
 export const required =
-  (message = 'Ce champ est requis'): PrValidationRule<unknown> =>
+  (message = validationMessages().required): PrValidationRule<unknown> =>
   (value) => {
     if (value === null || value === undefined) return message
     if (typeof value === 'string' && value.trim() === '') return message
@@ -143,42 +151,42 @@ export const required =
   }
 
 export const email =
-  (message = 'Adresse email invalide'): PrValidationRule<string> =>
+  (message = validationMessages().email): PrValidationRule<string> =>
   (value) => {
     if (!value) return true
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || message
   }
 
 export const minLength =
-  (min: number, message?: string): PrValidationRule<string> =>
+  (min: number, message = validationMessages().minLength(min)): PrValidationRule<string> =>
   (value) => {
     if (!value) return true
-    return value.length >= min || (message ?? `Minimum ${min} caractères`)
+    return value.length >= min || message
   }
 
 export const maxLength =
-  (max: number, message?: string): PrValidationRule<string> =>
+  (max: number, message = validationMessages().maxLength(max)): PrValidationRule<string> =>
   (value) => {
     if (!value) return true
-    return value.length <= max || (message ?? `Maximum ${max} caractères`)
+    return value.length <= max || message
   }
 
 export const pattern =
-  (regex: RegExp, message = 'Format invalide'): PrValidationRule<string> =>
+  (regex: RegExp, message = validationMessages().pattern): PrValidationRule<string> =>
   (value) => {
     if (!value) return true
     return regex.test(value) || message
   }
 
 export const min =
-  (minVal: number, message?: string): PrValidationRule<number> =>
+  (minVal: number, message = validationMessages().min(minVal)): PrValidationRule<number> =>
   (value) =>
-    value >= minVal || (message ?? `Valeur minimale : ${minVal}`)
+    value >= minVal || message
 
 export const max =
-  (maxVal: number, message?: string): PrValidationRule<number> =>
+  (maxVal: number, message = validationMessages().max(maxVal)): PrValidationRule<number> =>
   (value) =>
-    value <= maxVal || (message ?? `Valeur maximale : ${maxVal}`)
+    value <= maxVal || message
 
 // Laravel 422 error integration
 export type LaravelValidationErrors = Record<string, string[]>
