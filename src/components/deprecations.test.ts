@@ -1,12 +1,14 @@
 // @vitest-environment jsdom
 //
-// PrCheckbox, PrSwitch and PrToggle moved to `v-model` (modelValue) in 0.20. The old
-// `checked`/`pressed` names keep working until 1.0, with a warning naming the new one.
+// Names renamed in 0.20 keep working until 1.0, with a warning naming the new one:
+// `checked`/`pressed` on PrCheckbox, PrSwitch and PrToggle (now `v-model`), and
+// PrToast's `variant="default"` (now `neutral`, as on PrBadge).
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { PrCheckbox } from './atoms/Checkbox'
 import { PrSwitch } from './atoms/Switch'
 import { PrToggle } from './atoms/Toggle'
+import { PrToast } from './molecules/Toast'
 
 const cases = [
   { name: 'PrCheckbox', component: PrCheckbox, oldProp: 'checked', control: 'button[role="checkbox"]' },
@@ -42,5 +44,14 @@ describe.each(cases)('$name', ({ name, component, oldProp, control }) => {
 
     expect(wrapper.emitted(`update:${oldProp}`)).toEqual([[false]])
     expect(wrapper.emitted('update:modelValue')).toEqual([[false]])
+  })
+})
+
+describe('PrToast', () => {
+  it('reads variant="default" as neutral, with a warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(PrToast, { props: { variant: 'default', defaultOpen: true, title: 'Enregistré' } })
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('PrToast: `variant="default"` is deprecated, use `variant="neutral"`'))
   })
 })
