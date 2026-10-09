@@ -2,6 +2,23 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.23.0 (2026-10-09)
+
+### Ajouts
+
+- **`usePrToast()`** : afficher un toast depuis le code, composant ou non (un store, un intercepteur HTTP), via le `PrToastProvider` de la page. Au plus quatre toasts a l'ecran, les plus anciens se ferment. Voir le README, « Toasts depuis le code ».
+- **`PrAlertDialog` attend une confirmation asynchrone** : si le gestionnaire `@confirm` renvoie une promesse (une requete), le bouton de confirmation affiche un chargement, Annuler et Echap attendent, et la fenetre se ferme a la fin, ou reste ouverte en cas d'echec pour que l'app affiche l'erreur. Un gestionnaire synchrone ferme toujours la fenetre tout de suite.
+- **Option `delimiters` de `registerPrisme`** : Vue compile toute la page Blade, donc un `{{ ... }}` saisi par quelqu'un et oublie hors de `v-pre` etait execute. D'autres delimiteurs (`['[[%', '%]]']`) le laissent en texte.
+
+### Changements de comportement
+
+- **Un champ lie par `v-model` affiche exactement sa valeur** : `PrRadioGroup`, `PrCombobox`, `PrSelect`, `PrTagInput`, `PrToggleGroup`, `PrSlider` et `PrCalendar` ignoraient une valeur revenue a `undefined` et gardaient l'ancienne selection, si bien que `usePrForm.reset()` la laissait affichee. Sans `v-model` (formulaire Blade), le champ garde sa propre valeur, comme `PrInput` depuis la 0.22.
+- **`PrNumberInput` peut etre vide** : `modelValue` devient `number | null`, et un champ vide envoie `null` au lieu de reprendre l'ancienne valeur en sortant du champ. `+` et `-` arrondissent au pas (0,1 + 0,2 donne 0,3).
+
+### Tests
+
+- Interactions au clavier verifiees pour `PrAlertDialog` (focus dans la fenetre, Echap, retour du focus), `PrDropdownMenu` (fleches, Echap), `PrPopover` et `PrAccordion`.
+
 ## 0.22.0 (2026-10-09)
 
 ### Ajouts

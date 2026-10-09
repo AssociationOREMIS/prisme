@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, useId, watch } from 'vue'
+import { computed, useId } from 'vue'
 import { Circle } from '@lucide/vue'
 import { RadioGroupIndicator, RadioGroupItem, RadioGroupRoot } from 'reka-ui'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrRadioOption {
   label: string
@@ -50,13 +51,7 @@ const generatedId = useId()
 // Without a v-model (a plain Blade form with only `default-value`), binding the root to
 // `modelValue ?? defaultValue` would keep it controlled at a constant value and freeze the
 // selection. Track the live value locally, as PrSlider does; a real v-model still wins.
-const internalValue = ref(props.modelValue ?? props.defaultValue)
-
-watch(() => props.modelValue, (value) => {
-  if (value !== undefined) internalValue.value = value
-})
-
-const rootValue = computed(() => props.modelValue ?? internalValue.value)
+const { value: rootValue, set: setValue } = useFieldValue(props, () => undefined)
 const labelId = computed(() => `pr-radio-group-${generatedId}-label`)
 const hintId = computed(() => `pr-radio-group-${generatedId}-hint`)
 const errorId = computed(() => `pr-radio-group-${generatedId}-error`)
@@ -75,7 +70,7 @@ const radioRootClass = computed(() => [
 
 function updateValue(value: unknown) {
   if (typeof value === 'string') {
-    internalValue.value = value
+    setValue(value)
     emit('update:modelValue', value)
   }
 }

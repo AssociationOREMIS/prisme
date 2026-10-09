@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Check, ChevronDown, ChevronUp } from '@lucide/vue'
-import { computed, ref, useId, watch } from 'vue'
+import { computed, useId } from 'vue'
 import {
   SelectContent,
   SelectIcon,
@@ -18,6 +18,7 @@ import {
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { usePrMessages } from '../../../i18n/context'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrSelectOption {
   label: string
@@ -79,14 +80,11 @@ const hasEmptyOption = computed(() => props.options.some((option) => option.valu
 
 // With an empty option, reka's own hidden <select> would post the internal value: the field
 // then posts through its own hidden input, so it needs the current value even without v-model.
-const currentValue = ref(props.modelValue ?? props.defaultValue)
-watch(() => props.modelValue, (value) => {
-  if (value !== undefined) currentValue.value = value
-})
+const { value: currentValue, set: setCurrentValue } = useFieldValue(props, () => undefined)
 
 function update(value: unknown) {
   if (typeof value !== 'string') return
-  currentValue.value = toExternal(value)
+  setCurrentValue(toExternal(value))
   emit('update:modelValue', toExternal(value))
 }
 

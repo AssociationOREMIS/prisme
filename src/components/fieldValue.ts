@@ -1,11 +1,11 @@
 import { computed, getCurrentInstance, ref, watch, type ComputedRef } from 'vue'
 
 /**
- * The value a text field shows. A real `v-model` (a `modelValue` with an `update:modelValue`
- * listener) controls it. Otherwise the field keeps what the user types, starting from
- * `modelValue`, `defaultValue` or `initial()`: a Blade form passes the server's value as
- * `model-value` without listening, and a re-render while typing (an error showing up) must
- * not put that value back.
+ * The value a field shows. A real `v-model` (an `update:modelValue` listener) controls it
+ * entirely: `undefined` there means empty, so `usePrForm.reset()` back to an `undefined` initial
+ * value clears the field. Without a listener (a Blade form), the field keeps its own value,
+ * starting from `modelValue`, `defaultValue` or `initial()`: the server's value passed as
+ * `model-value` is a starting point, and a re-render (an error showing up) must not put it back.
  */
 export function useFieldValue<T>(
   props: { modelValue?: T, defaultValue?: T },
@@ -19,7 +19,7 @@ export function useFieldValue<T>(
     if (value !== undefined) local.value = value
   })
 
-  const value = computed(() => (listens && props.modelValue !== undefined ? props.modelValue : local.value) as T | undefined)
+  const value = computed(() => (listens ? props.modelValue : local.value) as T | undefined)
 
   return {
     value,

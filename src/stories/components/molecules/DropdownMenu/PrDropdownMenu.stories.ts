@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { Check, MoreHorizontal } from '@lucide/vue'
 import { ref } from 'vue'
 import { PrButton } from '../../../../components/atoms/Button'
@@ -93,4 +94,34 @@ export const WithCheckboxItems: Story = {
       </div>
     `,
   }),
+}
+
+// Keyboard use: Enter opens on the first item, arrows move, Escape closes and gives the focus back.
+export const Keyboard: Story = {
+  render: () => ({
+    components: { PrButton, PrDropdownMenu },
+    template: `
+      <PrDropdownMenu label="Actions">
+        <template #trigger><PrButton variant="secondary">Actions</PrButton></template>
+        <template #default="{ item, itemClass }">
+          <component :is="item" :class="itemClass">Modifier</component>
+          <component :is="item" :class="itemClass">Dupliquer</component>
+        </template>
+      </PrDropdownMenu>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const body = within(document.body)
+    const trigger = within(canvasElement).getByRole('button', { name: 'Actions' })
+
+    trigger.focus()
+    await userEvent.keyboard('{Enter}')
+    await waitFor(() => expect(body.getByRole('menuitem', { name: 'Modifier' })).toHaveFocus())
+    await userEvent.keyboard('{ArrowDown}')
+    await waitFor(() => expect(body.getByRole('menuitem', { name: 'Dupliquer' })).toHaveFocus())
+
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(body.queryByRole('menu')).toBeNull())
+    await waitFor(() => expect(trigger).toHaveFocus())
+  },
 }

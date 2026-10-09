@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import { ref } from 'vue'
 import { PrAccordion } from '../../../../components/molecules/Accordion'
 import '../../../stories.css'
@@ -55,4 +56,26 @@ export const DisabledItem: Story = {
     },
     template: '<PrAccordion v-model="value" :items="itemsWithDisabled" />',
   }),
+}
+
+// Each header is a button that says whether its section is open.
+export const Keyboard: Story = {
+  render: () => ({
+    components: { PrAccordion },
+    setup: () => ({ items }),
+    template: '<PrAccordion type="single" collapsible :items="items" />',
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const documents = canvas.getByRole('button', { name: 'Documents' })
+    await expect(documents).toHaveAttribute('aria-expanded', 'false')
+
+    documents.focus()
+    await userEvent.keyboard('{Enter}')
+    await expect(documents).toHaveAttribute('aria-expanded', 'true')
+    await expect(canvas.getByText('Pieces jointes associees.')).toBeVisible()
+
+    await userEvent.keyboard('{Enter}')
+    await expect(documents).toHaveAttribute('aria-expanded', 'false')
+  },
 }
