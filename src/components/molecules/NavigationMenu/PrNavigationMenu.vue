@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { usePrMessages } from '../../../i18n/context'
+import { warnDeprecated } from '../../deprecation'
 export interface PrNavigationMenuItem {
   label: string
   href: string
@@ -15,13 +16,19 @@ export interface PrNavigationMenuItem {
  */
 export interface PrNavigationMenuProps {
   items?: PrNavigationMenuItem[]
+  /** Name for screen readers (the element shows no text of its own). */
+  ariaLabel?: string
+  /** @deprecated Use `ariaLabel` (`aria-label`) instead: `label` is for visible text. Removed in 1.0. */
   label?: string
 }
 
-withDefaults(defineProps<PrNavigationMenuProps>(), {
+const props = withDefaults(defineProps<PrNavigationMenuProps>(), {
   items: () => [],
+  ariaLabel: undefined,
   label: undefined,
 })
+
+if (props.label !== undefined) warnDeprecated('PrNavigationMenu', 'label', 'aria-label')
 
 const messages = usePrMessages()
 
@@ -34,7 +41,7 @@ function isActive(item: PrNavigationMenuItem): boolean {
 </script>
 
 <template>
-  <nav class="pr-navigation-menu pr:inline-flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)]" :aria-label="label ?? messages.navigationMenu.label">
+  <nav class="pr-navigation-menu pr:inline-flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)]" :aria-label="ariaLabel ?? label ?? messages.navigationMenu.label">
     <a
       v-for="item in items"
       :key="item.href"

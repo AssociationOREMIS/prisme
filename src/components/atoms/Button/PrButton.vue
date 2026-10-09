@@ -138,7 +138,7 @@ const buttonClass = computed(() => [
       :data-loading="loading ? 'true' : 'false'"
     >
       <span v-if="loading" class="pr-button__loader pr:absolute pr:inset-0 pr:inline-flex pr:items-center pr:justify-center" aria-hidden="true">
-        <PrSpinner size="sm" :label="messages.common.loading" />
+        <PrSpinner size="sm" :aria-label="messages.common.loading" />
       </span>
       <component :is="icon" class="pr-button__icon" :class="{ 'pr:opacity-0': loading }" :size="iconSize[size]" aria-hidden="true" />
     </component>
@@ -161,7 +161,7 @@ const buttonClass = computed(() => [
       class="pr-button__loader pr:absolute pr:inset-0 pr:inline-flex pr:items-center pr:justify-center"
       aria-hidden="true"
     >
-      <PrSpinner size="sm" :label="messages.common.loading" />
+      <PrSpinner size="sm" :aria-label="messages.common.loading" />
     </span>
     <!-- Hidden with opacity, not visibility: the label stays the button's accessible name while it loads. -->
     <span

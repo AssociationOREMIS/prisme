@@ -7,7 +7,7 @@ const meta = {
   component: PrThemeToggle,
   tags: ['autodocs'],
   args: {
-    label: 'Theme',
+    ariaLabel: 'Theme',
   },
 } satisfies Meta<typeof PrThemeToggle>
 

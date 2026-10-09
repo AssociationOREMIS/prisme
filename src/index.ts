@@ -77,6 +77,7 @@ export type {
   PrCommandProps,
   PrDataTableColumn,
   PrDataTableProps,
+  PrDataTableRowAction,
   PrDataTableSort,
   PrDatePickerProps,
   PrDialogProps,

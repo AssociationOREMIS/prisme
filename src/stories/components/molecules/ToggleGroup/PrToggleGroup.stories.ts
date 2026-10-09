@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, within } from 'storybook/test'
 import { ref } from 'vue'
 import { PrToggleGroup } from '../../../../components/molecules/ToggleGroup'
 import '../../../stories.css'
@@ -61,4 +62,18 @@ export const States: Story = {
       </div>
     `,
   }),
+}
+
+// A field like the others: a visible label names the group for screen readers (no aria-label needed).
+export const WithLabel: Story = {
+  render: () => ({
+    components: { PrToggleGroup },
+    setup() {
+      return { items: [{ label: 'Collège', value: 'college' }, { label: 'Lycée', value: 'lycee' }] }
+    },
+    template: '<PrToggleGroup label="Établissement" :items="items" required hint="Celui de l\'élève accompagné" />',
+  }),
+  play: async ({ canvasElement }) => {
+    await expect(within(canvasElement).getByRole('group', { name: 'Établissement' })).toBeTruthy()
+  },
 }

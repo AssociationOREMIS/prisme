@@ -67,7 +67,7 @@ La valeur d'un champ passe toujours par un `v-model` nu (`modelValue`). Un etat 
 | `PrPagination`, `PrDataTable` | `page` | `v-model:page="valeur"` |
 | `PrSidebar`, `PrAppShell` | `collapsed` | `v-model:collapsed="valeur"` |
 
-Chacun de ces composants accepte aussi un `default-xxx` (`defaultValue`, `defaultChecked`, `defaultPressed`, `defaultOpen`) pour un usage non controle, sans avoir a gerer l'etat cote consommateur. Dans une vue Blade, c'est en general ce qu'il faut : `<pr-checkbox name="active" default-checked>`.
+Pour un usage non controle (un formulaire Blade, sans etat cote consommateur), donnez la valeur de depart avec `default-value`, `default-checked`, `default-pressed` ou `default-open` selon le composant. Un `model-value` sans ecouteur fait la meme chose sur les champs texte (`PrInput`, `PrTextarea`) : le champ garde ce qui est tape, meme quand une erreur s'affiche. Dans une vue Blade : `<pr-input name="nom" default-value="{{ old('nom', $benevole->nom) }}">` ou `<pr-checkbox name="active" default-checked>`.
 
 Avant la 0.20, `PrCheckbox` et `PrSwitch` utilisaient `v-model:checked`, `PrToggle` `v-model:pressed`. Ces noms fonctionnent encore jusqu'a la 1.0, avec un avertissement dans la console.
 

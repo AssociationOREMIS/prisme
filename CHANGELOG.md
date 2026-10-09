@@ -2,6 +2,33 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 0.22.0 (2026-10-09)
+
+### Ajouts
+
+- **`default-value` sur `PrInput`, `PrTextarea` et `PrDatePicker`**, pour un champ sans `v-model` (formulaire Blade).
+- **`PrToggleGroup` a un `label` visible**, `required` et `id`, comme les autres champs : le libelle nomme le groupe pour les lecteurs d'ecran.
+- **`aria-label` sur `PrDialog` et `PrSheet`** : sans `title`, une fenetre n'avait aucun nom pour les lecteurs d'ecran. Un avertissement le signale en console quand les deux manquent.
+- `PrDataTableRowAction` est exporte.
+
+### Corrections
+
+- **Le texte tape dans `PrInput` et `PrTextarea` n'est plus perdu** quand le champ se re-affiche (une erreur qui apparait) alors qu'il recoit un `model-value` sans ecouteur, comme dans un formulaire Blade : il revenait a la valeur du serveur. Un `model-value` sans ecouteur est maintenant une valeur de depart. Une date incomplete dans `PrDatePicker` revient a la derniere date valide tapee.
+- **Le volet mobile de `PrSidebar` se ferme quand le focus le quitte** : en tabulant, on arrivait sur la page cachee derriere le fond. Echap n'est ecoute que pendant que le volet est ouvert.
+- `error` de `PrFileUpload` accepte le tableau de Laravel, comme les autres champs.
+- **`PrDataTable` distingue ses deux messages vides** : `empty-text` quand le tableau n'a aucune ligne, `no-results-message` (par defaut « Aucun resultat ») seulement quand la recherche ne trouve rien. Avant, `no-results-message` remplacait les deux.
+
+### Depreciations (retirees en 1.0)
+
+- **`PrDataTable`** : `data` devient `rows`, `is-loading` devient `loading`, `display-pagination` et `display-view-options` deviennent `hide-pagination` et `hide-view-options`, `hide-selected-rows-count` devient `show-selected-rows-count`, et `danger: true` d'une action de ligne devient `tone: 'danger'`.
+- **`label` devient `aria-label`** sur `PrSpinner`, `PrSidebar`, `PrNavigationMenu`, `PrToastProvider` et `PrThemeToggle` : ce texte n'etait jamais affiche. Desormais `label` designe toujours un texte visible.
+
+Les anciens noms fonctionnent toujours, avec un avertissement dans la console qui donne le nouveau.
+
+### Tests et CI
+
+- En CI, la suite est relancee une fois si le navigateur de test lache (import perdu, page fermee, run bloque), avec un avertissement. Chaque tentative est limitee a 10 minutes, pour qu'un blocage ne fige pas la CI. Un vrai echec echoue deux fois.
+
 ## 0.21.0 (2026-10-09)
 
 ### Ajouts

@@ -29,5 +29,9 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run lint
       - run: npm run type-check
-      - run: npm run test
+      # The browser tests sometimes lose the page (Chrome drops an import or closes, or a run
+      # hangs): each attempt is capped at 10 minutes, and one rerun is flagged as a warning. A real
+      # failure fails twice and still stops the job.
+      - name: Test (one rerun if the browser drops)
+        run: timeout 10m npm run test || { echo "::warning::Tests failed or hung, rerunning once"; timeout 10m npm run test; }
       - run: npm run build

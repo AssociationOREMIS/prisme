@@ -31,7 +31,7 @@ import { PrCommand } from './molecules/Command'
 export type { PrCommandItem, PrCommandProps } from './molecules/Command'
 
 import { PrDataTable } from './molecules/DataTable'
-export type { PrDataTableColumn, PrDataTableProps, PrDataTableSort } from './molecules/DataTable'
+export type { PrDataTableColumn, PrDataTableProps, PrDataTableRowAction, PrDataTableSort } from './molecules/DataTable'
 export { fromLaravelPaginator } from './molecules/DataTable'
 export type {
   LaravelFlatPaginatorResponse,

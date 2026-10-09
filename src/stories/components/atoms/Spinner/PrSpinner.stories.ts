@@ -14,7 +14,7 @@ const meta = {
   },
   args: {
     size: 'md',
-    label: 'Chargement',
+    ariaLabel: 'Chargement',
   },
 } satisfies Meta<typeof PrSpinner>
 

@@ -14,6 +14,9 @@ export interface PrDataTableColumn {
 
 export interface PrDataTableRowAction {
   label: string
+  /** `danger` colors a destructive action (Supprimer), like PrButton's `tone`. */
+  tone?: 'danger'
+  /** @deprecated Use `tone: 'danger'` instead. Removed in 1.0. */
   danger?: boolean
   disabled?: boolean
 }
@@ -26,17 +29,28 @@ export interface PrDataTableSort {
 export interface PrDataTableProps {
   columns?: PrDataTableColumn[]
   rows?: Record<string, unknown>[]
+  /** @deprecated Use `rows` instead. Removed in 1.0. */
   data?: Record<string, unknown>[]
   rowKey?: string
   loading?: boolean
+  /** @deprecated Use `loading` instead. Removed in 1.0. */
   isLoading?: boolean
+  /** Shown when the table has no row at all. */
   emptyText?: string
+  /** Shown when the search filter matches no row (« Aucun bénévole ne correspond »). Defaults to « Aucun résultat ». */
   noResultsMessage?: string
   pageSize?: number
   pageSizeOptions?: number[]
   selectable?: boolean
+  hidePagination?: boolean
+  hideViewOptions?: boolean
+  /** Shows « 3 sur 40 ligne(s) sélectionnée(s) » under a `selectable` table. */
+  showSelectedRowsCount?: boolean
+  /** @deprecated Use `hidePagination` instead. Removed in 1.0. */
   displayPagination?: boolean
+  /** @deprecated Use `hideViewOptions` instead. Removed in 1.0. */
   displayViewOptions?: boolean
+  /** @deprecated Use `showSelectedRowsCount` instead. Removed in 1.0. */
   hideSelectedRowsCount?: boolean
   filterKey?: string
   filterPlaceholder?: string

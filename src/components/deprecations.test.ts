@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { PrCheckbox } from './atoms/Checkbox'
 import { PrSwitch } from './atoms/Switch'
 import { PrToggle } from './atoms/Toggle'
+import { PrSpinner } from './atoms/Spinner'
 import { PrToast } from './molecules/Toast'
 
 const cases = [
@@ -53,5 +54,17 @@ describe('PrToast', () => {
     mount(PrToast, { props: { variant: 'default', defaultOpen: true, title: 'Enregistré' } })
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('PrToast: `variant="default"` is deprecated, use `variant="neutral"`'))
+  })
+})
+
+describe('label on components without visible text', () => {
+  it('becomes aria-label: the old label still names a PrSpinner, with a warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    expect(mount(PrSpinner, { props: { ariaLabel: 'Envoi en cours' } }).find('[aria-label]').attributes('aria-label')).toBe('Envoi en cours')
+    expect(warn).not.toHaveBeenCalled()
+
+    expect(mount(PrSpinner, { props: { label: 'Chargement de la conversation' } }).find('[aria-label]').attributes('aria-label')).toBe('Chargement de la conversation')
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('PrSpinner: `label` is deprecated, use `aria-label`'))
   })
 })

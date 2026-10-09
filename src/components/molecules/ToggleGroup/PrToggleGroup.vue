@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 import { ToggleGroupItem, ToggleGroupRoot } from 'reka-ui'
+import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrToggleGroupItem {
@@ -15,10 +16,16 @@ export interface PrToggleGroupProps {
   items?: PrToggleGroupItem[]
   type?: 'single' | 'multiple'
   disabled?: boolean
+  /** Visible label above the group, which names it for screen readers. */
+  label?: string
+  /** Marks the label as required (an asterisk): a group of buttons has no native required state. */
+  required?: boolean
   hint?: string
   error?: PrFieldError
+  /** Name for screen readers when there is no visible `label`. */
   ariaLabel?: string
   name?: string
+  id?: string
 }
 
 const props = withDefaults(defineProps<PrToggleGroupProps>(), {
@@ -27,10 +34,13 @@ const props = withDefaults(defineProps<PrToggleGroupProps>(), {
   items: () => [],
   type: 'single',
   disabled: false,
+  label: undefined,
+  required: false,
   hint: undefined,
   error: undefined,
   ariaLabel: undefined,
   name: undefined,
+  id: undefined,
 })
 
 // One message, or the first of Laravel's array of messages.
@@ -45,6 +55,7 @@ const emit = defineEmits<{
 defineOptions({ inheritAttrs: false })
 
 const generatedId = useId()
+const labelId = computed(() => `pr-toggle-group-${generatedId}-label`)
 const hintId = computed(() => `pr-toggle-group-${generatedId}-hint`)
 const errorId = computed(() => `pr-toggle-group-${generatedId}-error`)
 // Only the message actually shown: the error replaces the hint.
@@ -103,7 +114,12 @@ const toggleGroupItemClass = [
 </script>
 
 <template>
+  <!-- A group of buttons has no single control for the label to point at: it names the group through aria-labelledby. -->
+  <div v-if="label" class="pr-toggle-group__label pr:mb-[var(--pr-space-2)]">
+    <PrLabel :id="labelId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
+  </div>
   <ToggleGroupRoot
+    :id="id"
     v-bind="$attrs"
     :class="toggleGroupClass"
     :style="toggleGroupStyle"
@@ -111,7 +127,8 @@ const toggleGroupItemClass = [
     :model-value="currentValue"
     :disabled="disabled"
     :name="name"
-    :aria-label="ariaLabel"
+    :aria-label="label ? undefined : ariaLabel"
+    :aria-labelledby="label ? labelId : undefined"
     :aria-invalid="errorText ? 'true' : undefined"
     :aria-describedby="describedBy"
     @update:model-value="updateValue"

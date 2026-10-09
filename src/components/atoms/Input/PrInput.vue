@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, useAttrs, useId } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrInputProps {
   modelValue?: string | number
+  /** Initial value of a field without `v-model` (a Blade form): the field then keeps what is typed. */
+  defaultValue?: string | number
   label?: string
   /** Keeps the label for screen readers only: a compact form on one line (a search, a filter). */
   hideLabel?: boolean
@@ -19,6 +22,7 @@ export interface PrInputProps {
 
 const props = withDefaults(defineProps<PrInputProps>(), {
   modelValue: undefined,
+  defaultValue: undefined,
   label: undefined,
   hideLabel: false,
   hint: undefined,
@@ -34,10 +38,9 @@ const props = withDefaults(defineProps<PrInputProps>(), {
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
 
-// Without a model-value, a plain Blade `value="{{ old('x') }}"` (in $attrs) fills the field:
-// binding an empty modelValue default after $attrs used to wipe it.
+// A plain Blade `value="{{ old('x') }}"` (in $attrs) also gives the initial value.
 const attrs = useAttrs()
-const fieldValue = computed(() => props.modelValue ?? (attrs.value as string | number | undefined))
+const { value: fieldValue, set: setFieldValue } = useFieldValue(props, () => attrs.value as string | number | undefined)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -70,7 +73,9 @@ const inputMessageClass = computed(() => [
 ])
 
 function updateValue(event: Event) {
-  emit('update:modelValue', (event.target as HTMLInputElement).value)
+  const value = (event.target as HTMLInputElement).value
+  setFieldValue(value)
+  emit('update:modelValue', value)
 }
 
 // The template root is a wrapper <div>, not the <input> — forward fallthrough

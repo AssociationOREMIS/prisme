@@ -2,9 +2,12 @@
 import { computed, useAttrs, useId } from 'vue'
 import { PrLabel } from '../Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { useFieldValue } from '../../fieldValue'
 
 export interface PrTextareaProps {
   modelValue?: string
+  /** Initial value of a field without `v-model` (a Blade form): the field then keeps what is typed. */
+  defaultValue?: string
   label?: string
   hint?: string
   error?: PrFieldError
@@ -19,6 +22,7 @@ export interface PrTextareaProps {
 
 const props = withDefaults(defineProps<PrTextareaProps>(), {
   modelValue: undefined,
+  defaultValue: undefined,
   label: undefined,
   hint: undefined,
   error: undefined,
@@ -34,10 +38,9 @@ const props = withDefaults(defineProps<PrTextareaProps>(), {
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
 
-// Without a model-value, a plain Blade `value="{{ old('x') }}"` (in $attrs) fills the field:
-// binding an empty modelValue default after $attrs used to wipe it.
+// A plain Blade `value="{{ old('x') }}"` (in $attrs) also gives the initial value.
 const attrs = useAttrs()
-const fieldValue = computed(() => props.modelValue ?? (attrs.value as string | number | undefined))
+const { value: fieldValue, set: setFieldValue } = useFieldValue(props, () => attrs.value as string | undefined)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -78,7 +81,9 @@ const fieldMessageClass = computed(() => [
 ])
 
 function updateValue(event: Event) {
-  emit('update:modelValue', (event.target as HTMLTextAreaElement).value)
+  const value = (event.target as HTMLTextAreaElement).value
+  setFieldValue(value)
+  emit('update:modelValue', value)
 }
 
 // The template root is a wrapper <div>, not the <textarea> — forward
