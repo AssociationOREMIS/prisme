@@ -3,20 +3,27 @@ import { provide } from 'vue'
 import { ToastProvider, ToastViewport } from 'reka-ui'
 import { prToastProviderKey } from './context'
 import { usePrMessages } from '../../../i18n/context'
+import { warnDeprecated } from '../../deprecation'
 
 export interface PrToastProviderProps {
   duration?: number
+  /** Name for screen readers (the element shows no text of its own). */
+  ariaLabel?: string
+  /** @deprecated Use `ariaLabel` (`aria-label`) instead: `label` is for visible text. Removed in 1.0. */
   label?: string
   swipeDirection?: 'right' | 'left' | 'up' | 'down'
   swipeThreshold?: number
 }
 
-withDefaults(defineProps<PrToastProviderProps>(), {
+const props = withDefaults(defineProps<PrToastProviderProps>(), {
   duration: 5000,
+  ariaLabel: undefined,
   label: undefined,
   swipeDirection: 'right',
   swipeThreshold: 50,
 })
+
+if (props.label !== undefined) warnDeprecated('PrToastProvider', 'label', 'aria-label')
 
 const messages = usePrMessages()
 
@@ -26,7 +33,7 @@ provide(prToastProviderKey, true)
 <template>
   <ToastProvider
     :duration="duration"
-    :label="label ?? messages.toast.label"
+    :label="ariaLabel ?? label ?? messages.toast.label"
     :swipe-direction="swipeDirection"
     :swipe-threshold="swipeThreshold"
   >

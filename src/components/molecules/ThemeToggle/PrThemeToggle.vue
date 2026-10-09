@@ -3,14 +3,21 @@ import { Moon, Sun } from '@lucide/vue'
 import { computed } from 'vue'
 import { usePrTheme } from '../../../composables/usePrTheme'
 import { usePrMessages } from '../../../i18n/context'
+import { warnDeprecated } from '../../deprecation'
 
 export interface PrThemeToggleProps {
+  /** Name for screen readers (the element shows no text of its own). */
+  ariaLabel?: string
+  /** @deprecated Use `ariaLabel` (`aria-label`) instead: `label` is for visible text. Removed in 1.0. */
   label?: string
 }
 
 const props = withDefaults(defineProps<PrThemeToggleProps>(), {
+  ariaLabel: undefined,
   label: undefined,
 })
+
+if (props.label !== undefined) warnDeprecated('PrThemeToggle', 'label', 'aria-label')
 
 const messages = usePrMessages()
 
@@ -19,7 +26,7 @@ const { resolvedTheme, toggleTheme } = usePrTheme()
 const nextThemeLabel = computed(() => (
   resolvedTheme.value === 'light' ? messages.themeToggle.toDark : messages.themeToggle.toLight
 ))
-const accessibleLabel = computed(() => props.label ?? nextThemeLabel.value)
+const accessibleLabel = computed(() => props.ariaLabel ?? props.label ?? nextThemeLabel.value)
 const icon = computed(() => (resolvedTheme.value === 'light' ? Moon : Sun))
 </script>
 
