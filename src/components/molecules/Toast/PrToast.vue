@@ -11,8 +11,7 @@ export interface PrToastProps {
   description?: string
   /** Milliseconds before closing. Default 5000, except `danger`: stays until dismissed. `Infinity` never closes. */
   duration?: number
-  /** `default` is the deprecated name of `neutral` (removed in 1.0), kept so apps on the old name keep working. */
-  variant?: 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'default'
+  variant?: 'neutral' | 'info' | 'success' | 'warning' | 'danger'
   actionLabel?: string
   closeLabel?: string
 }

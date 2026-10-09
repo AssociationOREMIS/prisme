@@ -5,27 +5,21 @@ import { prToastProviderKey } from './context'
 import PrToastContent from './PrToastContent.vue'
 import { claimToastQueue, dismissToast, releaseToastQueue, toastQueue } from './queue'
 import { usePrMessages } from '../../../i18n/context'
-import { warnDeprecated } from '../../deprecation'
 
 export interface PrToastProviderProps {
   duration?: number
   /** Name for screen readers (the element shows no text of its own). */
   ariaLabel?: string
-  /** @deprecated Use `ariaLabel` (`aria-label`) instead: `label` is for visible text. Removed in 1.0. */
-  label?: string
   swipeDirection?: 'right' | 'left' | 'up' | 'down'
   swipeThreshold?: number
 }
 
-const props = withDefaults(defineProps<PrToastProviderProps>(), {
+withDefaults(defineProps<PrToastProviderProps>(), {
   duration: 5000,
   ariaLabel: undefined,
-  label: undefined,
   swipeDirection: 'right',
   swipeThreshold: 50,
 })
-
-if (props.label !== undefined) warnDeprecated('PrToastProvider', 'label', 'aria-label')
 
 const messages = usePrMessages()
 
@@ -40,7 +34,7 @@ onBeforeUnmount(() => releaseToastQueue(owner))
 <template>
   <ToastProvider
     :duration="duration"
-    :label="ariaLabel ?? label ?? messages.toast.label"
+    :label="ariaLabel ?? messages.toast.label"
     :swipe-direction="swipeDirection"
     :swipe-threshold="swipeThreshold"
   >

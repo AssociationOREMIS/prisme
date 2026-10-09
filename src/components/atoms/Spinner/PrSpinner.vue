@@ -1,23 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePrMessages } from '../../../i18n/context'
-import { warnDeprecated } from '../../deprecation'
 
 export interface PrSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
   /** Name for screen readers (the element shows no text of its own). */
   ariaLabel?: string
-  /** @deprecated Use `ariaLabel` (`aria-label`) instead: `label` is for visible text. Removed in 1.0. */
-  label?: string
 }
 
 const props = withDefaults(defineProps<PrSpinnerProps>(), {
   size: 'md',
   ariaLabel: undefined,
-  label: undefined,
 })
-
-if (props.label !== undefined) warnDeprecated('PrSpinner', 'label', 'aria-label')
 
 const messages = usePrMessages()
 
@@ -37,6 +31,6 @@ const spinnerClass = computed(() => [
   <span
     :class="spinnerClass"
     role="status"
-    :aria-label="ariaLabel ?? label ?? messages.common.loading"
+    :aria-label="ariaLabel ?? messages.common.loading"
   />
 </template>
