@@ -49,16 +49,17 @@ export default defineConfig({
       },
     },
   },
+  // @lucide/vue is pre-bundled into one file: left out, its barrel import fetched ~1900 icon
+  // modules one by one, in each story's iframe. Over 75,000 requests per test run made Chrome
+  // drop some imports ("Failed to fetch dynamically imported module") or close the page in CI.
   optimizeDeps: {
-    include: ['aria-query', 'lz-string', 'pretty-format', 'reka-ui'],
-    exclude: ['@lucide/vue'],
+    include: ['aria-query', 'lz-string', 'pretty-format', 'reka-ui', '@lucide/vue'],
   },
   test: {
     deps: {
       optimizer: {
         web: {
-          include: ['aria-query', 'lz-string', 'pretty-format', 'reka-ui'],
-          exclude: ['@lucide/vue'],
+          include: ['aria-query', 'lz-string', 'pretty-format', 'reka-ui', '@lucide/vue'],
         },
       },
     },
