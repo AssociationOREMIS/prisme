@@ -75,6 +75,10 @@ export const prMessagesEn: PrMessages = {
   descriptionList: {
     empty: 'Not provided',
   },
+  errorSummary: {
+    title: (count) => (count > 1 ? `The form has ${count} errors` : 'The form has an error'),
+    item: (label, message) => `${label}: ${message}`,
+  },
   fileUpload: {
     drop: 'Drag and drop or',
     choose: 'choose a file',

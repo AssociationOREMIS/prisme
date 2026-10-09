@@ -27,6 +27,7 @@ export interface PrComboboxProps {
   defaultValue?: string | string[]
   options?: PrComboboxOption[]
   placeholder?: string
+  /** Shown once the field has the focus, where the user types to search (« Rechercher un bénévole »). Defaults to `placeholder`. */
   searchPlaceholder?: string
   label?: string
   hint?: string
@@ -59,7 +60,7 @@ const props = withDefaults(defineProps<PrComboboxProps>(), {
   defaultValue: undefined,
   options: () => [],
   placeholder: undefined,
-  searchPlaceholder: 'Rechercher...',
+  searchPlaceholder: undefined,
   label: undefined,
   hint: undefined,
   error: undefined,
@@ -183,6 +184,13 @@ const displayValue = computed(() => (val: string | string[]) => {
   return val ? labelFor(val) : ''
 })
 
+const isFocused = ref(false)
+const fieldPlaceholder = computed(() => {
+  const placeholder = props.placeholder ?? messages.common.select
+  if (isFocused.value) return props.searchPlaceholder ?? placeholder
+  return hasValue.value ? undefined : placeholder
+})
+
 const hasValue = computed(() => {
   if (Array.isArray(currentValue.value)) return currentValue.value.length > 0
   return Boolean(currentValue.value)
@@ -237,12 +245,14 @@ function labelFor(value: string) {
           :id="inputId"
           class="pr-combobox__input pr:min-w-0 pr:grow pr:bg-transparent pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
           :display-value="multiple ? undefined : displayValue"
-          :placeholder="hasValue ? undefined : (placeholder ?? messages.common.select)"
+          :placeholder="fieldPlaceholder"
           :required="required && !hasValue"
           :aria-required="required || undefined"
           :aria-invalid="errorText ? 'true' : undefined"
           :aria-describedby="describedBy"
           @update:model-value="onSearchTerm"
+          @focus="isFocused = true"
+          @blur="isFocused = false"
         />
         <button
           v-if="hasValue && !disabled"

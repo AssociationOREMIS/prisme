@@ -67,6 +67,10 @@ export interface PrMessages {
   descriptionList: {
     empty: string
   }
+  errorSummary: {
+    title: (count: number) => string
+    item: (label: string, message: string) => string
+  }
   fileUpload: {
     drop: string
     choose: string
@@ -230,8 +234,8 @@ export const prMessagesFr: PrMessages = {
     rowsPerPage: 'Lignes par page',
     pageOf: (page, pageCount) => `Page ${page} sur ${pageCount}`,
     view: 'Vue',
-    sortAscending: 'Asc',
-    sortDescending: 'Desc',
+    sortAscending: 'Croissant',
+    sortDescending: 'Décroissant',
     hideColumn: 'Masquer',
     firstPage: 'Première page',
     previousPage: 'Page précédente',
@@ -240,6 +244,10 @@ export const prMessagesFr: PrMessages = {
   },
   descriptionList: {
     empty: 'Non renseigné',
+  },
+  errorSummary: {
+    title: (count) => (count > 1 ? `Le formulaire contient ${count} erreurs` : 'Le formulaire contient une erreur'),
+    item: (label, message) => `${label} : ${message}`,
   },
   fileUpload: {
     drop: 'Glisser-déposer ou',

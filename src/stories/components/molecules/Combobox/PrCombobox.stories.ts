@@ -168,3 +168,24 @@ export const SearchUrl: Story = {
     await expect((window as Window & { __requests?: string[] }).__requests?.at(-1)).toBe('?q=bern')
   },
 }
+
+// `placeholder` at rest, `search-placeholder` once the field has the focus, to say what to type.
+export const SearchPlaceholder: Story = {
+  render: () => ({
+    components: { PrCombobox },
+    setup() {
+      return { options }
+    },
+    template: '<PrCombobox label="Pays" :options="options" placeholder="Sélectionner un pays" search-placeholder="Rechercher un pays" />',
+  }),
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: 'Pays' })
+    await expect(input).toHaveAttribute('placeholder', 'Sélectionner un pays')
+
+    await userEvent.click(input)
+    await waitFor(() => expect(input).toHaveAttribute('placeholder', 'Rechercher un pays'))
+
+    await userEvent.tab()
+    await waitFor(() => expect(input).toHaveAttribute('placeholder', 'Sélectionner un pays'))
+  },
+}

@@ -1,4 +1,4 @@
-import { computed, hasInjectionContext, ref, type ComputedRef, type Ref } from 'vue'
+import { computed, hasInjectionContext, nextTick, ref, type ComputedRef, type Ref } from 'vue'
 import { usePrMessages } from '../i18n/context'
 import { prMessagesFr } from '../i18n/messages'
 
@@ -7,6 +7,28 @@ export type PrValidationRule<T = unknown> = (value: T) => string | true
 export interface PrFieldConfig<T = unknown> {
   initialValue: T
   rules?: PrValidationRule<T>[]
+  /** Name of the field in `errorList` (`PrErrorSummary`): « Email : Adresse email invalide ». */
+  label?: string
+}
+
+export interface PrFormOptions {
+  /**
+   * After a refused `handleSubmit` (rules or a 422), moves the focus to the first invalid field,
+   * so keyboard and screen reader users land on what to fix. Default true.
+   */
+  focusOnError?: boolean
+  /**
+   * The form to search for invalid fields (a template ref). Without it, the form holding the
+   * focused element, else the whole page.
+   */
+  form?: Ref<HTMLElement | null | undefined>
+}
+
+/** One message of `errorList`: a field's error (with its `label`), or a general one (`field` null). */
+export interface PrFormError {
+  field: string | null
+  label?: string
+  message: string
 }
 
 // `any`, not `unknown`: each field's rules take that field's value, and a rule for a string
@@ -29,6 +51,20 @@ export interface PrFormReturn<S extends PrFormSchema> {
   isDirty: ComputedRef<boolean>
   /** True while `handleSubmit`'s callback is running — validation failures never set it, since the callback itself never runs. */
   isSubmitting: Ref<boolean>
+  /** Every current message, fields in schema order then `generalErrors`: what `PrErrorSummary` lists. */
+  errorList: ComputedRef<PrFormError[]>
+  /** Moves the focus to the first invalid field (after the DOM shows the errors). `handleSubmit` does it itself. */
+  focusFirstError: () => Promise<void>
+}
+
+const FOCUSABLE = 'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [contenteditable="true"], [tabindex]'
+
+/** The element to focus for an invalid field: itself, or for a group (radios, toggles) its focusable item. */
+function focusTarget(invalid: HTMLElement): HTMLElement | null {
+  if (invalid.matches(FOCUSABLE)) return invalid
+  const candidates = [...invalid.querySelectorAll<HTMLElement>(FOCUSABLE)]
+  // A roving group keeps one item in the tab order (tabindex 0): the selected one.
+  return candidates.find(element => element.tabIndex >= 0) ?? candidates[0] ?? null
 }
 
 /** Deep-clones a field value so mutating a form field never mutates the schema's initial value (or a previous snapshot of it). */
@@ -52,7 +88,7 @@ function isFieldValueEqual(a: unknown, b: unknown): boolean {
   return false
 }
 
-export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
+export function usePrForm<S extends PrFormSchema>(schema: S, options: PrFormOptions = {}): PrFormReturn<S> {
   type Keys = keyof S
 
   const fields = {} as { [K in Keys]: Ref<InferValue<S[K]>> }
@@ -102,9 +138,20 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
     generalErrors.value = []
   }
 
+  async function focusFirstError(): Promise<void> {
+    if (typeof document === 'undefined') return
+    await nextTick()
+    const root = options.form?.value ?? document.activeElement?.closest('form') ?? document
+    const invalid = root.querySelector<HTMLElement>('[aria-invalid="true"]')
+    if (invalid) focusTarget(invalid)?.focus()
+  }
+
   async function handleSubmit(fn: () => Promise<void> | void): Promise<boolean> {
     generalErrors.value = []
-    if (!validate()) return false
+    if (!validate()) {
+      if (options.focusOnError !== false) await focusFirstError()
+      return false
+    }
     isSubmitting.value = true
     try {
       await fn()
@@ -115,6 +162,7 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
         ?.response
       if (response?.status === 422 && response.data?.errors) {
         generalErrors.value = fromLaravelErrors({ errors } as Pick<PrFormReturn<S>, 'errors'>, response.data.errors)
+        if (options.focusOnError !== false) await focusFirstError()
         return false
       }
       throw err
@@ -132,7 +180,15 @@ export function usePrForm<S extends PrFormSchema>(schema: S): PrFormReturn<S> {
     Object.keys(schema).some(key => !isFieldValueEqual(fields[key as Keys].value, initialValues[key as Keys])),
   )
 
-  return { fields, errors, generalErrors, validate, validateField, reset, handleSubmit, isValid, isDirty, isSubmitting }
+  const errorList = computed<PrFormError[]>(() => [
+    ...Object.keys(schema).flatMap((key) => {
+      const message = errors[key as Keys].value
+      return message ? [{ field: key, label: schema[key].label, message }] : []
+    }),
+    ...generalErrors.value.map(message => ({ field: null, message })),
+  ])
+
+  return { fields, errors, generalErrors, validate, validateField, reset, handleSubmit, isValid, isDirty, isSubmitting, errorList, focusFirstError }
 }
 
 // Built-in validation rule helpers. Their default messages come from the app's messages when

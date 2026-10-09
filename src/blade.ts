@@ -9,7 +9,7 @@ export interface RegisterPrismeOptions {
    * page (navbar, sidebar, buttons...), so they render on first paint instead of popping in.
    */
   eager?: Record<string, Component>
-  /** Placeholder shown while a lazy component loads (a skeleton), or undefined for none. */
+  /** Placeholder shown while a lazy component loads (a skeleton), or undefined for none: `prSkeletonFor`. */
   loading?: (name: string) => Component | undefined
   /** Milliseconds before the placeholder shows, so a fast load never flickers. Default 150. */
   delay?: number
@@ -235,3 +235,6 @@ function preloadWhenIdle(loaders: Array<() => Promise<unknown>>): void {
 }
 
 export { componentLoaders }
+
+/** Placeholders for `registerPrisme(app, { loading: prSkeletonFor })`, styled by `getPrSkeletonStyles()`. */
+export { prSkeletonFor } from './skeleton'
