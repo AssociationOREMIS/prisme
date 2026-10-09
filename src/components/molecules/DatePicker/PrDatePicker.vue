@@ -5,6 +5,8 @@ import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrDatePickerProps {
   modelValue?: string
+  /** Initial date (YYYY-MM-DD) of a field without `v-model`. */
+  defaultValue?: string
   label?: string
   hint?: string
   error?: PrFieldError
@@ -17,7 +19,8 @@ export interface PrDatePickerProps {
 }
 
 const props = withDefaults(defineProps<PrDatePickerProps>(), {
-  modelValue: '',
+  modelValue: undefined,
+  defaultValue: undefined,
   label: undefined,
   hint: undefined,
   error: undefined,
@@ -43,13 +46,16 @@ const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 // (day/month/year). A local buffer + focus guard stops that transient ""
 // from clobbering modelValue mid-entry (same fix as PrNumberInput).
 const isFocused = ref(false)
-const internalValue = ref(props.modelValue ?? '')
+const internalValue = ref(props.modelValue ?? props.defaultValue ?? '')
+// The last complete date, restored when the field is left half filled.
+const committedValue = ref(internalValue.value)
 
 watch(
   () => props.modelValue,
   (val) => {
     if (isFocused.value) return
     internalValue.value = val ?? ''
+    committedValue.value = val ?? ''
   },
 )
 
@@ -59,16 +65,20 @@ function onFocusIn() {
 
 function onUpdate(value: string) {
   internalValue.value = value
-  if (ISO_DATE_PATTERN.test(value)) emit('update:modelValue', value)
+  if (ISO_DATE_PATTERN.test(value)) {
+    committedValue.value = value
+    emit('update:modelValue', value)
+  }
 }
 
 function onFocusOut() {
   isFocused.value = false
   if (internalValue.value === '') {
-    if (props.modelValue !== '') emit('update:modelValue', '')
+    committedValue.value = ''
+    if (props.modelValue) emit('update:modelValue', '')
   }
   else if (!ISO_DATE_PATTERN.test(internalValue.value)) {
-    internalValue.value = props.modelValue ?? ''
+    internalValue.value = committedValue.value
   }
 }
 </script>
