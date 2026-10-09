@@ -12,6 +12,7 @@ import PrDataTableViewOptions from './PrDataTableViewOptions.vue'
 import type { PrDataTableColumn, PrDataTableProps, PrDataTableRowAction, PrDataTableSort } from './types'
 import { compareDataTableValues } from './utils'
 import { usePrMessages } from '../../../i18n/context'
+import { warnDeprecated } from '../../deprecation'
 
 const props = withDefaults(defineProps<PrDataTableProps>(), {
   columns: () => [],
@@ -25,9 +26,12 @@ const props = withDefaults(defineProps<PrDataTableProps>(), {
   pageSize: 10,
   pageSizeOptions: () => [10, 20, 30, 40, 50],
   selectable: false,
-  displayPagination: true,
-  displayViewOptions: true,
-  hideSelectedRowsCount: true,
+  hidePagination: false,
+  hideViewOptions: false,
+  showSelectedRowsCount: false,
+  displayPagination: undefined,
+  displayViewOptions: undefined,
+  hideSelectedRowsCount: undefined,
   filterKey: undefined,
   filterPlaceholder: undefined,
   rowActions: () => [],
@@ -64,10 +68,23 @@ const slots = defineSlots<{
   'row-actions'?: (props: { row: Record<string, unknown> }) => unknown
 }>()
 
+if (props.data !== undefined) warnDeprecated('PrDataTable', 'data', 'rows')
+if (props.isLoading) warnDeprecated('PrDataTable', 'is-loading', 'loading')
+if (props.displayPagination !== undefined) warnDeprecated('PrDataTable', 'display-pagination', 'hide-pagination')
+if (props.displayViewOptions !== undefined) warnDeprecated('PrDataTable', 'display-view-options', 'hide-view-options')
+if (props.hideSelectedRowsCount !== undefined) warnDeprecated('PrDataTable', 'hide-selected-rows-count', 'show-selected-rows-count')
+if (props.rowActions.some(action => action.danger)) warnDeprecated('PrDataTable', 'rowActions[].danger', "rowActions[].tone: 'danger'")
+
 const isLoading = computed(() => props.loading || props.isLoading)
 const columns = computed(() => props.columns)
 const sourceRows = computed(() => props.data ?? props.rows)
-const emptyMessage = computed(() => props.noResultsMessage ?? props.emptyText ?? messages.dataTable.empty)
+const displayPagination = computed(() => props.displayPagination ?? !props.hidePagination)
+const displayViewOptions = computed(() => props.displayViewOptions ?? !props.hideViewOptions)
+const isFiltering = computed(() => filterValue.value.trim() !== '')
+// No row at all, or a search that matches none: two different messages.
+const emptyMessage = computed(() => isFiltering.value
+  ? (props.noResultsMessage ?? messages.common.noResults)
+  : (props.emptyText ?? messages.dataTable.empty))
 const filterColumnKey = computed(() => props.filterKey ?? columns.value.find((column) => column.filterable !== false)?.key ?? '')
 const filterLabel = computed(() => props.filterPlaceholder
   ?? messages.dataTable.filter(columns.value.find((column) => column.key === filterColumnKey.value)?.label))
@@ -76,7 +93,7 @@ const pageSizeOptions = computed(() => props.pageSizeOptions.includes(activePage
   ? props.pageSizeOptions
   : [...props.pageSizeOptions, activePageSize.value].sort((a, b) => a - b))
 const hasRowActions = computed(() => Boolean(props.rowActions.length || 'row-actions' in slots))
-const hideSelectedRowsCount = computed(() => props.hideSelectedRowsCount)
+const hideSelectedRowsCount = computed(() => props.hideSelectedRowsCount ?? !props.showSelectedRowsCount)
 
 const visibleColumns = computed(() =>
   columns.value.filter((column) => !hiddenColumnKeys.value.has(column.key)),
@@ -111,7 +128,7 @@ const pageCount = computed(() => {
 })
 const visibleRows = computed(() => {
   if (props.serverSide) return sourceRows.value
-  if (!props.displayPagination) return sortedRows.value
+  if (!displayPagination.value) return sortedRows.value
   const start = (page.value - 1) * activePageSize.value
   return sortedRows.value.slice(start, start + activePageSize.value)
 })
@@ -373,7 +390,7 @@ onBeforeUnmount(() => {
                           :is="item"
                           v-for="action in rowActions"
                           :key="action.label"
-                          :class="action.danger ? dangerItemClass : itemClass"
+                          :class="action.tone === 'danger' || action.danger ? dangerItemClass : itemClass"
                           :disabled="action.disabled"
                           @click="emit('rowAction', action, row)"
                         >

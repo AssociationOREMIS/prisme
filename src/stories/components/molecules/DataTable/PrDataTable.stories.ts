@@ -63,13 +63,13 @@ const meta = {
   tags: ['autodocs'],
   args: {
     columns,
-    data,
+    rows: data,
     selectable: true,
     pageSize: 10,
     filterKey: 'title',
     filterPlaceholder: 'Filter tasks...',
-    hideSelectedRowsCount: false,
-    rowActions: [{ label: 'Edit' }, { label: 'Delete', danger: true }],
+    showSelectedRowsCount: true,
+    rowActions: [{ label: 'Edit' }, { label: 'Delete', tone: 'danger' as const }],
   },
 } satisfies Meta<typeof PrDataTable>
 
@@ -111,14 +111,14 @@ export const Default: Story = {
 
 export const Loading: Story = {
   args: {
-    isLoading: true,
+    loading: true,
   },
   render: Default.render,
 }
 
 export const Empty: Story = {
   args: {
-    data: [],
+    rows: [],
   },
   render: Default.render,
 }
@@ -184,7 +184,7 @@ export const ServerSide: Story = {
         :page-size="state.pageSize"
         :sort="state.sort"
         :filter="state.filter"
-        :is-loading="state.isLoading"
+        :loading="state.isLoading"
         @update:page="onPage"
         @update:page-size="onPageSize"
         @update:sort="onSort"
