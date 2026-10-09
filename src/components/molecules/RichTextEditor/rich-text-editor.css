@@ -27,3 +27,70 @@
   height: 0;
   pointer-events: none;
 }
+
+/*
+ * Tiptap's own base styles (@tiptap/core style.ts), which it injects into the document <head>:
+ * an editor mounted in a shadow root (mountPrismeIsolated) never sees them, and without
+ * `white-space: pre-wrap` ProseMirror collapses spaces. Scoped to Prisme's editor so another
+ * editor on the page is left alone.
+ */
+.pr-rich-text-editor__content .ProseMirror {
+  position: relative;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  white-space: break-spaces;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0;
+}
+
+.pr-rich-text-editor__content .ProseMirror [contenteditable="false"] {
+  white-space: normal;
+}
+
+.pr-rich-text-editor__content .ProseMirror [contenteditable="false"] [contenteditable="true"],
+.pr-rich-text-editor__content .ProseMirror pre {
+  white-space: pre-wrap;
+}
+
+.pr-rich-text-editor__content img.ProseMirror-separator {
+  display: inline !important;
+  border: none !important;
+  margin: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.pr-rich-text-editor__content .ProseMirror-gapcursor {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  margin: 0;
+}
+
+.pr-rich-text-editor__content .ProseMirror-gapcursor::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid var(--pr-color-text);
+  animation: pr-gapcursor-blink 1.1s steps(2, start) infinite;
+}
+
+@keyframes pr-gapcursor-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.pr-rich-text-editor__content .ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}
+
+.pr-rich-text-editor__content .ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+
+.pr-rich-text-editor__content .ProseMirror-hideselection * {
+  caret-color: transparent;
+}

@@ -125,3 +125,20 @@ describe('mountPrismeIsolated', () => {
     })
   })
 })
+
+describe('mountPrismeIsolated @property rules', () => {
+  it('copies them into the document once, where the browser applies them', () => {
+    const styles = '@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid}\n.pr-card{border-style:var(--tw-border-style)}'
+    const first = document.createElement('div')
+    const second = document.createElement('div')
+    document.body.append(first, second)
+
+    mountPrismeIsolated(defineComponent({ render: () => h('p') }), first, { styles })
+    mountPrismeIsolated(defineComponent({ render: () => h('p') }), second, { styles })
+
+    const copies = document.head.querySelectorAll('style[data-prisme-properties]')
+    expect(copies).toHaveLength(1)
+    expect(copies[0].textContent).toContain('@property --tw-border-style')
+    expect(copies[0].textContent).not.toContain('.pr-card')
+  })
+})

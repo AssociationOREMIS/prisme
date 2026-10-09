@@ -2,6 +2,15 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.2 (2026-10-09)
+
+Deuxieme version candidate, sous le tag npm `next`. Corrige deux bugs trouves en passant Formation a la rc.1.
+
+### Corrections
+
+- **`mountPrismeIsolated` : les bordures, ombres et anneaux de focus reviennent.** Les utilitaires Tailwind de Prisme s'appuient sur des regles `@property` pour leurs valeurs par defaut (`--tw-border-style: solid`...), que le navigateur ignore dans un shadow root : un composant isole perdait ses bordures (l'editeur de Formation n'avait plus de cadre). Ces regles, qui ne font que declarer des variables, sont maintenant copiees une fois dans le document de l'element cible.
+- **`PrRichTextEditor` garde les espaces dans un shadow root.** Tiptap injecte `white-space: pre-wrap` et ses autres styles de base dans le `<head>` du document, invisible depuis un shadow root : ProseMirror fusionnait les espaces. Prisme les declare maintenant dans le CSS de l'editeur, limites a sa zone de saisie.
+
 ## 1.0.0-rc.1 (2026-10-09)
 
 Premiere version candidate de la 1.0, publiee sous le tag npm `next` (`npm install @oremis/prisme@next`) : elle fige l'API. Voir le README, « Passer de 0.x a 1.0 » et « Versions et compatibilite ».
