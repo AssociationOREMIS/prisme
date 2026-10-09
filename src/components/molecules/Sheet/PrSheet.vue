@@ -18,6 +18,8 @@ export interface PrSheetProps {
   defaultOpen?: boolean
   side?: 'left' | 'right' | 'top' | 'bottom'
   title?: string
+  /** Accessible name when there is no visible `title`: screen readers announce the dialog by it. */
+  ariaLabel?: string
   description?: string
   closeLabel?: string
 }
@@ -27,11 +29,16 @@ const props = withDefaults(defineProps<PrSheetProps>(), {
   defaultOpen: false,
   side: 'right',
   title: undefined,
+  ariaLabel: undefined,
   description: undefined,
   closeLabel: undefined,
 })
 
 const messages = usePrMessages()
+
+if (!props.title && !props.ariaLabel) {
+  console.warn('[prisme] PrSheet: without `title`, give it an `aria-label`, its name for screen readers.')
+}
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -60,6 +67,7 @@ const sheetSideClass = computed(() => ({
           <!-- min-w-0: a long title wraps instead of pushing the close button out. -->
           <div class="pr:min-w-0 pr:[overflow-wrap:anywhere]">
             <DialogTitle v-if="title" class="pr-sheet__title pr:m-0 pr:text-[length:var(--pr-font-size-xl)] pr:font-[750] pr:leading-[var(--pr-line-height-tight)]">{{ title }}</DialogTitle>
+            <DialogTitle v-else-if="ariaLabel" class="pr:sr-only">{{ ariaLabel }}</DialogTitle>
             <DialogDescription v-if="description" class="pr-sheet__description pr:mt-[var(--pr-space-2)] pr:mb-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text-muted)]">
               {{ description }}
             </DialogDescription>
