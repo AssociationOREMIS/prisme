@@ -12,15 +12,12 @@ import PrDataTableViewOptions from './PrDataTableViewOptions.vue'
 import type { PrDataTableColumn, PrDataTableProps, PrDataTableRowAction, PrDataTableSort } from './types'
 import { compareDataTableValues } from './utils'
 import { usePrMessages } from '../../../i18n/context'
-import { warnDeprecated } from '../../deprecation'
 
 const props = withDefaults(defineProps<PrDataTableProps>(), {
   columns: () => [],
   rows: () => [],
-  data: undefined,
   rowKey: 'id',
   loading: false,
-  isLoading: false,
   emptyText: undefined,
   noResultsMessage: undefined,
   pageSize: 10,
@@ -29,9 +26,6 @@ const props = withDefaults(defineProps<PrDataTableProps>(), {
   hidePagination: false,
   hideViewOptions: false,
   showSelectedRowsCount: false,
-  displayPagination: undefined,
-  displayViewOptions: undefined,
-  hideSelectedRowsCount: undefined,
   filterKey: undefined,
   filterPlaceholder: undefined,
   rowActions: () => [],
@@ -68,18 +62,11 @@ const slots = defineSlots<{
   'row-actions'?: (props: { row: Record<string, unknown> }) => unknown
 }>()
 
-if (props.data !== undefined) warnDeprecated('PrDataTable', 'data', 'rows')
-if (props.isLoading) warnDeprecated('PrDataTable', 'is-loading', 'loading')
-if (props.displayPagination !== undefined) warnDeprecated('PrDataTable', 'display-pagination', 'hide-pagination')
-if (props.displayViewOptions !== undefined) warnDeprecated('PrDataTable', 'display-view-options', 'hide-view-options')
-if (props.hideSelectedRowsCount !== undefined) warnDeprecated('PrDataTable', 'hide-selected-rows-count', 'show-selected-rows-count')
-if (props.rowActions.some(action => action.danger)) warnDeprecated('PrDataTable', 'rowActions[].danger', "rowActions[].tone: 'danger'")
-
-const isLoading = computed(() => props.loading || props.isLoading)
+const isLoading = computed(() => props.loading)
 const columns = computed(() => props.columns)
-const sourceRows = computed(() => props.data ?? props.rows)
-const displayPagination = computed(() => props.displayPagination ?? !props.hidePagination)
-const displayViewOptions = computed(() => props.displayViewOptions ?? !props.hideViewOptions)
+const sourceRows = computed(() => props.rows)
+const displayPagination = computed(() => !props.hidePagination)
+const displayViewOptions = computed(() => !props.hideViewOptions)
 const isFiltering = computed(() => filterValue.value.trim() !== '')
 // No row at all, or a search that matches none: two different messages.
 const emptyMessage = computed(() => isFiltering.value
@@ -93,7 +80,7 @@ const pageSizeOptions = computed(() => props.pageSizeOptions.includes(activePage
   ? props.pageSizeOptions
   : [...props.pageSizeOptions, activePageSize.value].sort((a, b) => a - b))
 const hasRowActions = computed(() => Boolean(props.rowActions.length || 'row-actions' in slots))
-const hideSelectedRowsCount = computed(() => props.hideSelectedRowsCount ?? !props.showSelectedRowsCount)
+const hideSelectedRowsCount = computed(() => !props.showSelectedRowsCount)
 
 const visibleColumns = computed(() =>
   columns.value.filter((column) => !hiddenColumnKeys.value.has(column.key)),
@@ -390,7 +377,7 @@ onBeforeUnmount(() => {
                           :is="item"
                           v-for="action in rowActions"
                           :key="action.label"
-                          :class="action.tone === 'danger' || action.danger ? dangerItemClass : itemClass"
+                          :class="action.tone === 'danger' ? dangerItemClass : itemClass"
                           :disabled="action.disabled"
                           @click="emit('rowAction', action, row)"
                         >
