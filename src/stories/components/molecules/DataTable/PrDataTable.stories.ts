@@ -15,46 +15,47 @@ import { PrBadge } from '../../../../components/atoms/Badge'
 import { PrDataTable } from '../../../../components/molecules/DataTable'
 import '../../../stories.css'
 
+// Requests followed by volunteers: fictional people and situations.
 const labels = [
-  { value: 'bug', label: 'Bug' },
-  { value: 'feature', label: 'Feature' },
-  { value: 'documentation', label: 'Documentation' },
+  { value: 'harcelement', label: 'Harcèlement' },
+  { value: 'handicap', label: 'Handicap' },
+  { value: 'formation', label: 'Formation' },
 ]
 
 const statuses = [
-  { value: 'backlog', label: 'Backlog', icon: CircleDashed },
-  { value: 'todo', label: 'Todo', icon: Circle },
-  { value: 'in progress', label: 'In Progress', icon: Timer },
-  { value: 'done', label: 'Done', icon: CircleCheck },
-  { value: 'canceled', label: 'Canceled', icon: CircleOff },
+  { value: 'backlog', label: 'À qualifier', icon: CircleDashed },
+  { value: 'todo', label: 'À traiter', icon: Circle },
+  { value: 'in progress', label: 'En cours', icon: Timer },
+  { value: 'done', label: 'Terminée', icon: CircleCheck },
+  { value: 'canceled', label: 'Annulée', icon: CircleOff },
 ]
 
 const priorities = [
-  { value: 'low', label: 'Low', icon: ArrowDown },
-  { value: 'medium', label: 'Medium', icon: ArrowRight },
-  { value: 'high', label: 'High', icon: ArrowUp },
+  { value: 'low', label: 'Basse', icon: ArrowDown },
+  { value: 'medium', label: 'Normale', icon: ArrowRight },
+  { value: 'high', label: 'Haute', icon: ArrowUp },
 ]
 
 const data = [
-  { id: 'TASK-8782', title: 'You cannot compress the program without quantifying the open-source SSD pixel!', status: 'in progress', label: 'documentation', priority: 'medium' },
-  { id: 'TASK-7878', title: 'Try to calculate the EXE feed, maybe it will index the multi-byte pixel!', status: 'backlog', label: 'documentation', priority: 'medium' },
-  { id: 'TASK-7839', title: 'We need to bypass the neural TCP card!', status: 'todo', label: 'bug', priority: 'high' },
-  { id: 'TASK-5562', title: 'The SAS interface is down, bypass the open-source pixel so we can back up the PNG bandwidth!', status: 'backlog', label: 'feature', priority: 'medium' },
-  { id: 'TASK-8686', title: 'I will parse the wireless SSL protocol, that should driver the API panel!', status: 'canceled', label: 'feature', priority: 'medium' },
-  { id: 'TASK-1280', title: 'Use the digital TLS panel, then you can transmit the haptic system!', status: 'done', label: 'bug', priority: 'high' },
-  { id: 'TASK-7262', title: 'The UTF8 application is down, parse the neural bandwidth so we can back up the PNG firewall!', status: 'done', label: 'feature', priority: 'high' },
-  { id: 'TASK-1138', title: 'Generating the driver will not do anything, we need to quantify the 1080p SMTP bandwidth!', status: 'in progress', label: 'feature', priority: 'medium' },
-  { id: 'TASK-7184', title: 'We need to program the back-end THX pixel!', status: 'todo', label: 'feature', priority: 'low' },
-  { id: 'TASK-5160', title: 'Calculating the bus will not do anything, we need to navigate the back-end JSON protocol!', status: 'in progress', label: 'documentation', priority: 'high' },
-  { id: 'TASK-5618', title: 'Generating the driver will not do anything, we need to index the online SSL application!', status: 'done', label: 'documentation', priority: 'medium' },
-  { id: 'TASK-6699', title: 'I will transmit the wireless JBOD capacitor, that should hard drive the SSD feed!', status: 'backlog', label: 'documentation', priority: 'medium' },
+  { id: 'DEM-1042', title: 'Accompagner une élève de 5e après des moqueries répétées en récréation', status: 'in progress', label: 'harcelement', priority: 'high' },
+  { id: 'DEM-1039', title: 'Préparer la rencontre avec l\'équipe pédagogique du collège Jean Moulin', status: 'todo', label: 'harcelement', priority: 'medium' },
+  { id: 'DEM-1037', title: 'Trouver un aménagement d\'examen pour un élève dyslexique', status: 'in progress', label: 'handicap', priority: 'high' },
+  { id: 'DEM-1031', title: 'Former trois nouveaux bénévoles de l\'antenne de Lyon', status: 'backlog', label: 'formation', priority: 'medium' },
+  { id: 'DEM-1028', title: 'Relancer la famille pour le dossier MDPH', status: 'canceled', label: 'handicap', priority: 'low' },
+  { id: 'DEM-1024', title: 'Intervention de sensibilisation en classe de CM2', status: 'done', label: 'harcelement', priority: 'medium' },
+  { id: 'DEM-1019', title: 'Mettre en place un tutorat entre élèves pour la rentrée', status: 'done', label: 'handicap', priority: 'medium' },
+  { id: 'DEM-1015', title: 'Répondre à un parent inquiet après un message sur un réseau social', status: 'in progress', label: 'harcelement', priority: 'high' },
+  { id: 'DEM-1011', title: 'Mettre à jour le module de formation sur l\'écoute active', status: 'todo', label: 'formation', priority: 'low' },
+  { id: 'DEM-1008', title: 'Organiser l\'accueil d\'un élève en fauteuil lors d\'une sortie scolaire', status: 'in progress', label: 'handicap', priority: 'high' },
+  { id: 'DEM-1003', title: 'Bilan de fin d\'accompagnement avec Camille MARTIN', status: 'done', label: 'harcelement', priority: 'medium' },
+  { id: 'DEM-0998', title: 'Réunion d\'équipe des bénévoles formateurs', status: 'backlog', label: 'formation', priority: 'low' },
 ]
 
 const columns = [
-  { key: 'id', label: 'Task', sortable: true, hideable: false, width: '7rem' },
-  { key: 'title', label: 'Title', sortable: true, filterable: true, class: 'pr:min-w-[24rem]' },
-  { key: 'status', label: 'Status', sortable: true, width: '10rem' },
-  { key: 'priority', label: 'Priority', sortable: true, width: '9rem' },
+  { key: 'id', label: 'Demande', sortable: true, hideable: false, width: '7rem' },
+  { key: 'title', label: 'Objet', sortable: true, filterable: true, class: 'pr:min-w-[24rem]' },
+  { key: 'status', label: 'Statut', sortable: true, width: '10rem' },
+  { key: 'priority', label: 'Priorité', sortable: true, width: '9rem' },
 ]
 
 const meta = {
@@ -67,9 +68,9 @@ const meta = {
     selectable: true,
     pageSize: 10,
     filterKey: 'title',
-    filterPlaceholder: 'Filter tasks...',
+    filterPlaceholder: 'Filtrer les demandes...',
     showSelectedRowsCount: true,
-    rowActions: [{ label: 'Edit' }, { label: 'Delete', tone: 'danger' as const }],
+    rowActions: [{ label: 'Modifier' }, { label: 'Supprimer', tone: 'danger' as const }],
   },
 } satisfies Meta<typeof PrDataTable>
 
