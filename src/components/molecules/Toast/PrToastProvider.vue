@@ -2,6 +2,7 @@
 import { provide } from 'vue'
 import { ToastProvider, ToastViewport } from 'reka-ui'
 import { prToastProviderKey } from './context'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrToastProviderProps {
   duration?: number
@@ -12,10 +13,12 @@ export interface PrToastProviderProps {
 
 withDefaults(defineProps<PrToastProviderProps>(), {
   duration: 5000,
-  label: 'Notification',
+  label: undefined,
   swipeDirection: 'right',
   swipeThreshold: 50,
 })
+
+const messages = usePrMessages()
 
 provide(prToastProviderKey, true)
 </script>
@@ -23,7 +26,7 @@ provide(prToastProviderKey, true)
 <template>
   <ToastProvider
     :duration="duration"
-    :label="label"
+    :label="label ?? messages.toast.label"
     :swipe-direction="swipeDirection"
     :swipe-threshold="swipeThreshold"
   >

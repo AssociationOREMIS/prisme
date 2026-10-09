@@ -25,7 +25,7 @@ withDefaults(defineProps<PrToastProps>(), {
   duration: undefined,
   variant: 'neutral',
   actionLabel: undefined,
-  closeLabel: 'Fermer',
+  closeLabel: undefined,
 })
 
 const emit = defineEmits<{

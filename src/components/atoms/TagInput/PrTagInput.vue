@@ -2,6 +2,7 @@
 import { X } from '@lucide/vue'
 import { computed, ref, useId, watch } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrTagInputProps {
   modelValue?: string[]
@@ -25,11 +26,13 @@ const props = withDefaults(defineProps<PrTagInputProps>(), {
   error: undefined,
   disabled: false,
   required: false,
-  placeholder: 'Ajouter...',
+  placeholder: undefined,
   maxTags: undefined,
   id: undefined,
   name: undefined,
 })
+
+const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
@@ -161,7 +164,7 @@ defineOptions({ inheritAttrs: false })
           v-if="!disabled"
           type="button"
           class="pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
-          :aria-label="`Supprimer ${tag}`"
+          :aria-label="messages.tagInput.remove(tag)"
           @click.stop="removeTag(index)"
         >
           <X :size="10" aria-hidden="true" />
@@ -174,7 +177,7 @@ defineOptions({ inheritAttrs: false })
         v-model="inputValue"
         class="pr-tag-input__input pr:min-w-[6rem] pr:grow pr:bg-transparent pr:py-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
         type="text"
-        :placeholder="tags.length === 0 ? placeholder : undefined"
+        :placeholder="tags.length === 0 ? (placeholder ?? messages.tagInput.placeholder) : undefined"
         :disabled="disabled || !canAddMore"
         :required="required && tags.length === 0"
         :aria-invalid="errorText ? 'true' : undefined"

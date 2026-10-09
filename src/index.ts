@@ -140,6 +140,13 @@ export type {
 } from './components/registry'
 
 export { default, Prisme } from './plugin'
+export type { PrismeOptions } from './plugin'
+
+export { prMessagesFr } from './i18n/messages'
+export { prMessagesEn } from './i18n/en'
+export { usePrMessages } from './i18n/context'
+export type { PrMessages } from './i18n/messages'
+export type { PrMessagesOverride } from './i18n/context'
 
 export {
   applyPrThemePreference,

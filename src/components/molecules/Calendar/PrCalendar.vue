@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, useId, watch } from 'vue'
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { parseIsoDate, toIsoDate } from './utils'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrCalendarProps {
   modelValue?: string
@@ -12,6 +13,8 @@ const props = withDefaults(defineProps<PrCalendarProps>(), {
   modelValue: undefined,
   defaultValue: undefined,
 })
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -33,12 +36,17 @@ const today = toIsoDate(new Date())
 const focused = ref<Date>(selected.value ? parseIsoDate(selected.value) : new Date())
 const cursor = computed(() => new Date(focused.value.getFullYear(), focused.value.getMonth(), 1))
 
-const monthFormatter = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' })
-const dayFormatter = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-const weekdays = [
-  ['Lun', 'lundi'], ['Mar', 'mardi'], ['Mer', 'mercredi'], ['Jeu', 'jeudi'],
-  ['Ven', 'vendredi'], ['Sam', 'samedi'], ['Dim', 'dimanche'],
-]
+const monthFormatter = new Intl.DateTimeFormat(messages.locale, { month: 'long', year: 'numeric' })
+const dayFormatter = new Intl.DateTimeFormat(messages.locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+// Monday to Sunday (1 January 2024 is a Monday): short name shown ("Lun", without the dot of
+// "lun."), long name read by screen readers.
+const shortWeekday = new Intl.DateTimeFormat(messages.locale, { weekday: 'short' })
+const longWeekday = new Intl.DateTimeFormat(messages.locale, { weekday: 'long' })
+const weekdays = Array.from({ length: 7 }, (_, index) => {
+  const date = new Date(2024, 0, 1 + index)
+  const short = shortWeekday.format(date).replace(/\.$/, '')
+  return [short.charAt(0).toLocaleUpperCase(messages.locale) + short.slice(1), longWeekday.format(date)]
+})
 
 const labelId = `pr-calendar-${useId()}-label`
 const label = computed(() => monthFormatter.format(cursor.value))
@@ -114,11 +122,11 @@ function onKeydown(event: KeyboardEvent) {
 <template>
   <div class="pr-calendar pr:grid pr:w-[min(21rem,100%)] pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)]">
     <div class="pr-calendar__header pr:flex pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)]">
-      <button type="button" class="pr-calendar__nav pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" aria-label="Mois précédent" @click="move(-1)">
+      <button type="button" class="pr-calendar__nav pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="messages.calendar.previousMonth" @click="move(-1)">
         <ChevronLeft :size="16" aria-hidden="true" />
       </button>
       <strong :id="labelId" class="pr-calendar__label pr:capitalize" aria-live="polite">{{ label }}</strong>
-      <button type="button" class="pr-calendar__nav pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" aria-label="Mois suivant" @click="move(1)">
+      <button type="button" class="pr-calendar__nav pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="messages.calendar.nextMonth" @click="move(1)">
         <ChevronRight :size="16" aria-hidden="true" />
       </button>
     </div>

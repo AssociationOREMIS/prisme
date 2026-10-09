@@ -17,6 +17,7 @@ import {
 } from 'reka-ui'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrSelectOption {
   label: string
@@ -46,7 +47,7 @@ const props = withDefaults(defineProps<PrSelectProps>(), {
   options: () => [],
   label: undefined,
   ariaLabel: undefined,
-  placeholder: 'Sélectionner',
+  placeholder: undefined,
   hint: undefined,
   error: undefined,
   disabled: false,
@@ -54,6 +55,8 @@ const props = withDefaults(defineProps<PrSelectProps>(), {
   name: undefined,
   id: undefined,
 })
+
+const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
@@ -113,7 +116,7 @@ const describedBy = computed(() => {
         :aria-invalid="errorText ? 'true' : undefined"
         :aria-describedby="describedBy"
       >
-        <SelectValue :placeholder="placeholder" />
+        <SelectValue :placeholder="placeholder ?? messages.common.select" />
         <SelectIcon class="pr-select__icon pr:inline-flex pr:shrink-0 pr:text-[color:var(--pr-color-text-muted)]">
           <ChevronDown :size="16" aria-hidden="true" />
         </SelectIcon>

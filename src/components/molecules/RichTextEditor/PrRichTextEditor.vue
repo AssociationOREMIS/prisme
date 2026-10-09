@@ -55,6 +55,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 import { Callout } from '../../../tiptap/callout'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrRichTextEditorProps {
   modelValue?: string
@@ -82,11 +83,13 @@ const props = withDefaults(defineProps<PrRichTextEditorProps>(), {
   error: undefined,
   disabled: false,
   required: false,
-  placeholder: 'Rédigez votre contenu…',
+  placeholder: undefined,
   id: undefined,
   name: undefined,
   uploadImage: undefined,
 })
+
+const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
@@ -100,9 +103,9 @@ defineOptions({ inheritAttrs: false })
 const lowlight = createLowlight(common)
 
 const TEXT_ALIGNMENTS = [
-  { align: 'left' as const, label: 'Aligner à gauche', icon: AlignLeft },
-  { align: 'center' as const, label: 'Centrer', icon: AlignCenter },
-  { align: 'right' as const, label: 'Aligner à droite', icon: AlignRight },
+  { align: 'left' as const, label: messages.richTextEditor.alignLeft, icon: AlignLeft },
+  { align: 'center' as const, label: messages.richTextEditor.alignCenter, icon: AlignCenter },
+  { align: 'right' as const, label: messages.richTextEditor.alignRight, icon: AlignRight },
 ]
 
 const EMOJI_PICKER_ITEMS = [
@@ -113,10 +116,10 @@ const EMOJI_PICKER_ITEMS = [
 ]
 
 const CALLOUT_VARIANTS = [
-  { variant: 'info' as const, label: 'Encadré info', icon: Info },
-  { variant: 'success' as const, label: 'Encadré succès', icon: CircleCheck },
-  { variant: 'warning' as const, label: 'Encadré avertissement', icon: TriangleAlert },
-  { variant: 'danger' as const, label: 'Encadré danger', icon: OctagonX },
+  { variant: 'info' as const, label: messages.richTextEditor.calloutInfo, icon: Info },
+  { variant: 'success' as const, label: messages.richTextEditor.calloutSuccess, icon: CircleCheck },
+  { variant: 'warning' as const, label: messages.richTextEditor.calloutWarning, icon: TriangleAlert },
+  { variant: 'danger' as const, label: messages.richTextEditor.calloutDanger, icon: OctagonX },
 ]
 
 // `!` (Tailwind v4 important marker) is required here: these classes are
@@ -176,7 +179,7 @@ onMounted(() => {
 
 async function handleImageUpload(file: File): Promise<string | null> {
   if (!props.uploadImage) {
-    uploadError.value = 'Aucun gestionnaire d\'envoi d\'image n\'est configuré pour cet éditeur.'
+    uploadError.value = messages.richTextEditor.noUploadHandler
 
     return null
   }
@@ -188,7 +191,7 @@ async function handleImageUpload(file: File): Promise<string | null> {
     return await props.uploadImage(file, () => {})
   }
   catch {
-    uploadError.value = 'L\'envoi de l\'image a échoué. Réessayez avec un fichier JPG, PNG ou WebP de moins de 8 Mo.'
+    uploadError.value = messages.richTextEditor.uploadFailed
 
     return null
   }
@@ -210,7 +213,7 @@ const editor = useEditor({
     ImageResize.configure({ minWidth: 80, maxWidth: 1200 }),
     Youtube.configure({ nocookie: true, width: 640, height: 360 }),
     TableKit.configure({ table: { resizable: true } }),
-    Placeholder.configure({ placeholder: props.placeholder }),
+    Placeholder.configure({ placeholder: props.placeholder ?? messages.richTextEditor.placeholder }),
     Highlight,
     TextStyleKit.configure({ fontFamily: false, fontSize: false, lineHeight: false, backgroundColor: false }),
     TextAlign.configure({ types: ['heading', 'paragraph'] }),
@@ -309,7 +312,7 @@ function pickAndUploadImage() {
 }
 
 function promptForYoutubeVideo() {
-  const url = window.prompt('Collez le lien de la vidéo YouTube :')
+  const url = window.prompt(messages.richTextEditor.youtubePrompt)
 
   if (url) {
     editor.value?.chain().focus().setYoutubeVideo({ src: url }).run()
@@ -318,7 +321,7 @@ function promptForYoutubeVideo() {
 
 function promptForLink() {
   const previousUrl = editor.value?.getAttributes('link').href ?? ''
-  const url = window.prompt('URL du lien :', previousUrl)
+  const url = window.prompt(messages.richTextEditor.linkPrompt, previousUrl)
 
   if (url === null) {
     return
@@ -429,49 +432,49 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
         height) on any ancestor of this component to stick the toolbar
         right below it instead; it defaults to `0px` for pages without one.
       -->
-      <div class="pr-rich-text-editor__toolbar pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-t-[var(--pr-radius-lg)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]" role="toolbar" aria-label="Mise en forme du contenu">
+      <div class="pr-rich-text-editor__toolbar pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-t-[var(--pr-radius-lg)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]" role="toolbar" :aria-label="messages.richTextEditor.toolbar">
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('heading', { level: 2 }) ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Titre" aria-label="Titre" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.heading" :aria-label="messages.richTextEditor.heading" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()">
           <Heading2 :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('heading', { level: 3 }) ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Sous-titre" aria-label="Sous-titre" @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.subheading" :aria-label="messages.richTextEditor.subheading" @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()">
           <Heading3 :size="16" aria-hidden="true" />
         </button>
 
         <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('bold') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Gras" aria-label="Gras" @click="editor?.chain().focus().toggleBold().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.bold" :aria-label="messages.richTextEditor.bold" @click="editor?.chain().focus().toggleBold().run()">
           <Bold :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('pr:italic') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Italique" aria-label="Italique" @click="editor?.chain().focus().toggleItalic().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.italic" :aria-label="messages.richTextEditor.italic" @click="editor?.chain().focus().toggleItalic().run()">
           <Italic :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('subscript') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Indice" aria-label="Indice" @click="editor?.chain().focus().toggleSubscript().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.subscript" :aria-label="messages.richTextEditor.subscript" @click="editor?.chain().focus().toggleSubscript().run()">
           <SubscriptIcon :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('superscript') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Exposant" aria-label="Exposant" @click="editor?.chain().focus().toggleSuperscript().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.superscript" :aria-label="messages.richTextEditor.superscript" @click="editor?.chain().focus().toggleSuperscript().run()">
           <SuperscriptIcon :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('link') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Lien" aria-label="Lien" @click="promptForLink">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.link" :aria-label="messages.richTextEditor.link" @click="promptForLink">
           <LinkIcon :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('highlight') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Surligner" aria-label="Surligner" @click="editor?.chain().focus().toggleHighlight().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.highlight" :aria-label="messages.richTextEditor.highlight" @click="editor?.chain().focus().toggleHighlight().run()">
           <Highlighter :size="16" aria-hidden="true" />
         </button>
-        <label class="pr-rich-text-editor__color pr:relative pr:inline-flex pr:h-9 pr:w-9 pr:items-center pr:justify-center pr:rounded-[var(--pr-radius-md)] pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)]" title="Couleur du texte">
+        <label class="pr-rich-text-editor__color pr:relative pr:inline-flex pr:h-9 pr:w-9 pr:items-center pr:justify-center pr:rounded-[var(--pr-radius-md)] pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)]" :title="messages.richTextEditor.textColor">
           <Palette :size="16" aria-hidden="true" />
-          <input type="color" class="pr:absolute pr:inset-0 pr:h-full pr:w-full pr:cursor-pointer pr:opacity-0" aria-label="Couleur du texte" :disabled="!editor || disabled"
+          <input type="color" class="pr:absolute pr:inset-0 pr:h-full pr:w-full pr:cursor-pointer pr:opacity-0" :aria-label="messages.richTextEditor.textColor" :disabled="!editor || disabled"
                  :value="editor?.getAttributes('textStyle').color || '#000000'" @input="setTextColor">
         </label>
         <button type="button" :class="toolbarButtonClass" :disabled="!editor || disabled"
-                title="Retirer la couleur" aria-label="Retirer la couleur du texte" @click="unsetTextColor">
+                :title="messages.richTextEditor.removeTextColorShort" :aria-label="messages.richTextEditor.removeTextColor" @click="unsetTextColor">
           <Eraser :size="16" aria-hidden="true" />
         </button>
 
@@ -487,27 +490,27 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
         <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('bulletList') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Liste à puces" aria-label="Liste à puces" @click="editor?.chain().focus().toggleBulletList().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.bulletList" :aria-label="messages.richTextEditor.bulletList" @click="editor?.chain().focus().toggleBulletList().run()">
           <List :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('orderedList') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Liste numérotée" aria-label="Liste numérotée" @click="editor?.chain().focus().toggleOrderedList().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.orderedList" :aria-label="messages.richTextEditor.orderedList" @click="editor?.chain().focus().toggleOrderedList().run()">
           <ListOrdered :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('taskList') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Liste à cocher" aria-label="Liste à cocher" @click="editor?.chain().focus().toggleTaskList().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.taskList" :aria-label="messages.richTextEditor.taskList" @click="editor?.chain().focus().toggleTaskList().run()">
           <ListChecks :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('blockquote') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Citation" aria-label="Citation" @click="editor?.chain().focus().toggleBlockquote().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.blockquote" :aria-label="messages.richTextEditor.blockquote" @click="editor?.chain().focus().toggleBlockquote().run()">
           <Quote :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('codeBlock') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Bloc de code" aria-label="Bloc de code" @click="editor?.chain().focus().toggleCodeBlock().run()">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.codeBlock" :aria-label="messages.richTextEditor.codeBlock" @click="editor?.chain().focus().toggleCodeBlock().run()">
           <Code :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="[toolbarButtonClass, editor?.isActive('details') ? toolbarButtonActiveClass : '']"
-                :disabled="!editor || disabled" title="Section repliable" aria-label="Section repliable" @click="toggleDetails">
+                :disabled="!editor || disabled" :title="messages.richTextEditor.details" :aria-label="messages.richTextEditor.details" @click="toggleDetails">
           <ChevronsDownUp :size="16" aria-hidden="true" />
         </button>
 
@@ -523,21 +526,21 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
         <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button type="button" :class="toolbarButtonClass" :disabled="!editor || disabled || isUploadingImage"
-                title="Insérer une image" aria-label="Insérer une image" @click="pickAndUploadImage">
+                :title="messages.richTextEditor.image" :aria-label="messages.richTextEditor.image" @click="pickAndUploadImage">
           <Hourglass v-if="isUploadingImage" :size="16" aria-hidden="true" />
           <Image v-else :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="toolbarButtonClass" :disabled="!editor || disabled"
-                title="Intégrer une vidéo YouTube" aria-label="Intégrer une vidéo YouTube" @click="promptForYoutubeVideo">
+                :title="messages.richTextEditor.youtube" :aria-label="messages.richTextEditor.youtube" @click="promptForYoutubeVideo">
           <Clapperboard :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="toolbarButtonClass" :disabled="!editor || disabled"
-                title="Insérer un tableau" aria-label="Insérer un tableau" @click="insertTable">
+                :title="messages.richTextEditor.table" :aria-label="messages.richTextEditor.table" @click="insertTable">
           <Table2 :size="16" aria-hidden="true" />
         </button>
         <div ref="emojiPickerRef" class="pr-rich-text-editor__emoji-picker pr:relative pr:inline-flex">
           <button type="button" :class="toolbarButtonClass" :disabled="!editor || disabled"
-                  title="Insérer un emoji" aria-label="Insérer un emoji"
+                  :title="messages.richTextEditor.emoji" :aria-label="messages.richTextEditor.emoji"
                   :aria-expanded="isEmojiPickerOpen" @click="isEmojiPickerOpen = !isEmojiPickerOpen">
             <Smile :size="16" aria-hidden="true" />
           </button>
@@ -564,11 +567,11 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
         <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
 
         <button type="button" :class="toolbarButtonClass" :disabled="!editor?.can().undo()"
-                title="Annuler" aria-label="Annuler" @click="editor?.chain().focus().undo().run()">
+                :title="messages.richTextEditor.undo" :aria-label="messages.richTextEditor.undo" @click="editor?.chain().focus().undo().run()">
           <Undo2 :size="16" aria-hidden="true" />
         </button>
         <button type="button" :class="toolbarButtonClass" :disabled="!editor?.can().redo()"
-                title="Rétablir" aria-label="Rétablir" @click="editor?.chain().focus().redo().run()">
+                :title="messages.richTextEditor.redo" :aria-label="messages.richTextEditor.redo" @click="editor?.chain().focus().redo().run()">
           <Redo2 :size="16" aria-hidden="true" />
         </button>
       </div>
@@ -584,7 +587,7 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
       </p>
 
       <p v-if="editor" class="pr-rich-text-editor__count pr:m-0 pr:rounded-b-[var(--pr-radius-lg)] pr:border-t pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface-subtle)] pr:px-[var(--pr-space-5)] pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">
-        {{ editor.storage.characterCount.characters() }} caractères · {{ editor.storage.characterCount.words() }} mots
+        {{ messages.richTextEditor.counts(editor.storage.characterCount.characters(), editor.storage.characterCount.words()) }}
       </p>
     </div>
     <input v-if="name" type="hidden" :name="name" :value="html">

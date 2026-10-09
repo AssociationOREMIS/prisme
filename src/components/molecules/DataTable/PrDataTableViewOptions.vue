@@ -3,11 +3,14 @@ import { Check, Settings2 } from '@lucide/vue'
 import { PrButton } from '../../atoms/Button'
 import { PrDropdownMenu } from '../DropdownMenu'
 import type { PrDataTableColumn } from './types'
+import { usePrMessages } from '../../../i18n/context'
 
 defineProps<{
   columns: PrDataTableColumn[]
   hiddenColumnKeys: Set<string>
 }>()
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   toggleColumn: [column: PrDataTableColumn, checked: boolean]
@@ -15,11 +18,11 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <PrDropdownMenu label="Colonnes" align="end">
+  <PrDropdownMenu :label="messages.dataTable.columns" align="end">
     <template #trigger>
       <PrButton class="pr-data-table__view-button pr:ml-auto pr:h-8" variant="secondary" size="sm">
         <Settings2 :size="16" aria-hidden="true" />
-        Vue
+        {{ messages.dataTable.view }}
       </PrButton>
     </template>
     <template #default="{ checkboxItem, itemIndicator, checkboxItemClass }">

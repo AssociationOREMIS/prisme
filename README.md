@@ -71,6 +71,19 @@ Chacun de ces composants accepte aussi un `default-xxx` (`defaultValue`, `defaul
 
 Avant la 0.20, `PrCheckbox` et `PrSwitch` utilisaient `v-model:checked`, `PrToggle` `v-model:pressed`. Ces noms fonctionnent encore jusqu'a la 1.0, avec un avertissement dans la console.
 
+### Textes et langue
+
+Les textes que Prisme ecrit lui-meme (boutons Fermer/Annuler, noms lus par les lecteurs d'ecran, messages vides, erreurs, messages de `usePrForm`) sont en francais par defaut. L'option `messages` les remplace, en entier ou en partie :
+
+```ts
+import { Prisme, prMessagesEn } from '@oremis/prisme'
+
+app.use(Prisme, { messages: prMessagesEn }) // tout en anglais
+app.use(Prisme, { messages: { dataTable: { empty: 'Aucun benevole' } } }) // un seul texte
+```
+
+La meme option existe sur `registerPrisme(app, { messages })` (Blade) et `mountPrismeIsolated(..., { messages })`. `locale` (dans les messages) regle les noms de mois et de jours et le format des nombres. Un prop sur le composant (`close-label`, `placeholder`, `empty-text`...) reste prioritaire pour cette instance. `usePrMessages()` donne ces textes a un composant de l'app, et le type `PrMessages` liste toutes les cles.
+
 ### `PrRichTextEditor`
 
 Editeur de texte riche (Vue 3 + [tiptap](https://tiptap.dev)), avec titres, listes, tableaux, images, video YouTube, blocs de code colores, sections repliables et encadres `Callout` (info/succes/avertissement/danger).

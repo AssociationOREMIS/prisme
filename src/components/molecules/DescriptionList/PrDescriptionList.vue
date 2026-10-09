@@ -2,6 +2,7 @@
 import { provide } from 'vue'
 import PrDescriptionItem from './PrDescriptionItem.vue'
 import { descriptionListKey } from './context'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrDescriptionListItem {
   label: string
@@ -17,10 +18,12 @@ export interface PrDescriptionListProps {
 
 const props = withDefaults(defineProps<PrDescriptionListProps>(), {
   items: () => [],
-  emptyText: 'Non renseigné',
+  emptyText: undefined,
 })
 
-provide(descriptionListKey, { emptyText: () => props.emptyText })
+const messages = usePrMessages()
+
+provide(descriptionListKey, { emptyText: () => props.emptyText ?? messages.descriptionList.empty })
 </script>
 
 <template>

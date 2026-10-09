@@ -2,6 +2,7 @@
 import { computed, ref, useId, watch } from 'vue'
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui'
 import { PrLabel } from '../Label'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrSliderProps {
   modelValue?: number
@@ -28,6 +29,8 @@ const props = withDefaults(defineProps<PrSliderProps>(), {
   name: undefined,
   showValue: true,
 })
+
+const messages = usePrMessages()
 
 const generatedId = useId()
 const sliderId = computed(() => props.id ?? `pr-slider-${generatedId}`)
@@ -83,7 +86,7 @@ function focusThumb() {
       <SliderTrack class="pr-slider__track pr:relative pr:h-1.5 pr:flex-auto pr:overflow-hidden pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-surface-subtle)]">
         <SliderRange class="pr-slider__range pr:absolute pr:h-full pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-primary)]" />
       </SliderTrack>
-      <SliderThumb :id="sliderId" class="pr-slider__thumb pr:block pr:size-4 pr:cursor-grab pr:rounded-[var(--pr-radius-full)] pr:border-2 pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-sm)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:active:cursor-grabbing" :aria-label="label || 'Valeur'" />
+      <SliderThumb :id="sliderId" class="pr-slider__thumb pr:block pr:size-4 pr:cursor-grab pr:rounded-[var(--pr-radius-full)] pr:border-2 pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-sm)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:active:cursor-grabbing" :aria-label="label || messages.slider.value" />
     </SliderRoot>
   </div>
 </template>

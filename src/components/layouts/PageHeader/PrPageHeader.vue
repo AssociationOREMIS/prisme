@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ArrowLeft } from '@lucide/vue'
 import { PrTypography } from '../../atoms/Typography'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrPageHeaderProps {
   /** Title of the page, its `h1` (or the `title` slot). */
@@ -17,8 +18,10 @@ withDefaults(defineProps<PrPageHeaderProps>(), {
   title: undefined,
   description: undefined,
   backHref: undefined,
-  backLabel: 'Retour',
+  backLabel: undefined,
 })
+
+const messages = usePrMessages()
 </script>
 
 <template>
@@ -32,7 +35,7 @@ withDefaults(defineProps<PrPageHeaderProps>(), {
       class="pr-page-header__back pr:inline-flex pr:w-fit pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-sm)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:no-underline pr:hover:text-[color:var(--pr-color-text)] pr:hover:underline pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
     >
       <ArrowLeft :size="16" aria-hidden="true" />
-      {{ backLabel }}
+      {{ backLabel ?? messages.common.back }}
     </a>
     <div class="pr:flex pr:flex-wrap pr:items-start pr:justify-between pr:gap-[var(--pr-space-4)]">
       <div class="pr-page-header__heading pr:grid pr:min-w-0 pr:flex-[1_1_20rem] pr:gap-[var(--pr-space-2)]">

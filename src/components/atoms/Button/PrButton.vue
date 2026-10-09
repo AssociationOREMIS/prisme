@@ -3,6 +3,7 @@ import { computed, useSlots, type Component } from 'vue'
 import { PrSpinner } from '../Spinner'
 import { PrTooltip } from '../../molecules/Tooltip'
 import { prButtonActions, type PrButtonAction } from './actions'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrButtonProps {
   /** Default `primary`, `ghost` with an `action`. */
@@ -43,10 +44,12 @@ const props = withDefaults(defineProps<PrButtonProps>(), {
   action: undefined,
 })
 
+const messages = usePrMessages()
+
 const preset = computed(() => (props.action ? prButtonActions[props.action] : undefined))
 const variant = computed(() => props.variant ?? (props.action ? 'ghost' : 'primary'))
 const icon = computed(() => props.icon ?? preset.value?.icon)
-const label = computed(() => props.label ?? preset.value?.label)
+const label = computed(() => props.label ?? (props.action ? messages.actions[props.action] : undefined))
 const tone = computed(() => props.tone ?? (preset.value && 'tone' in preset.value ? preset.value.tone : 'default'))
 
 const slots = useSlots()
@@ -135,7 +138,7 @@ const buttonClass = computed(() => [
       :data-loading="loading ? 'true' : 'false'"
     >
       <span v-if="loading" class="pr-button__loader pr:absolute pr:inset-0 pr:inline-flex pr:items-center pr:justify-center" aria-hidden="true">
-        <PrSpinner size="sm" label="Chargement" />
+        <PrSpinner size="sm" :label="messages.common.loading" />
       </span>
       <component :is="icon" class="pr-button__icon" :class="{ 'pr:opacity-0': loading }" :size="iconSize[size]" aria-hidden="true" />
     </component>
@@ -158,7 +161,7 @@ const buttonClass = computed(() => [
       class="pr-button__loader pr:absolute pr:inset-0 pr:inline-flex pr:items-center pr:justify-center"
       aria-hidden="true"
     >
-      <PrSpinner size="sm" label="Chargement" />
+      <PrSpinner size="sm" :label="messages.common.loading" />
     </span>
     <!-- Hidden with opacity, not visibility: the label stays the button's accessible name while it loads. -->
     <span

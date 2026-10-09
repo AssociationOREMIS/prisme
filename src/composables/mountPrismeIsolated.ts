@@ -1,4 +1,5 @@
 import { createApp, type App, type Component } from 'vue'
+import { providePrMessages, type PrMessagesOverride } from '../i18n/context'
 import type { PrResolvedTheme } from './usePrTheme'
 
 /**
@@ -32,6 +33,8 @@ export interface PrIsolatedMountOptions {
    * set it yourself, or leave it out to follow the OS/browser preference.
    */
   theme?: PrIsolatedTheme
+  /** Texts Prisme writes itself, French by default: `prMessagesEn`, or a few replaced (see `PrMessagesOverride`). */
+  messages?: PrMessagesOverride
 }
 
 export interface PrIsolatedMountResult {
@@ -77,6 +80,7 @@ export function mountPrismeIsolated(
   shadowRoot.appendChild(mountPoint)
 
   const app = createApp(component, options.props)
+  providePrMessages(app, options.messages)
   app.mount(mountPoint)
 
   return {

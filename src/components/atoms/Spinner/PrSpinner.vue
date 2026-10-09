@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
@@ -8,8 +9,10 @@ export interface PrSpinnerProps {
 
 const props = withDefaults(defineProps<PrSpinnerProps>(), {
   size: 'md',
-  label: 'Chargement',
+  label: undefined,
 })
+
+const messages = usePrMessages()
 
 const spinnerSizeClass: Record<NonNullable<PrSpinnerProps['size']>, string> = {
   sm: 'pr:size-[0.875rem]',
@@ -27,6 +30,6 @@ const spinnerClass = computed(() => [
   <span
     :class="spinnerClass"
     role="status"
-    :aria-label="label"
+    :aria-label="label ?? messages.common.loading"
   />
 </template>

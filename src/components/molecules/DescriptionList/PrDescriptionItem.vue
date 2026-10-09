@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, useSlots } from 'vue'
 import { descriptionListKey } from './context'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrDescriptionItemProps {
   label: string
@@ -12,6 +13,8 @@ const props = withDefaults(defineProps<PrDescriptionItemProps>(), {
   value: undefined,
 })
 
+const messages = usePrMessages()
+
 const slots = useSlots()
 const list = inject(descriptionListKey, null)
 const isEmpty = computed(() => !slots.default && (props.value == null || props.value === ''))
@@ -22,7 +25,7 @@ const isEmpty = computed(() => !slots.default && (props.value == null || props.v
   <div class="pr-description-item pr:grid pr:gap-[var(--pr-space-1)] pr:@sm:col-span-2 pr:@sm:grid-cols-subgrid pr:@sm:gap-[normal]">
     <dt class="pr-description-item__label pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text-muted)]">{{ label }}</dt>
     <dd class="pr-description-item__value pr:m-0 pr:min-w-0 pr:leading-[var(--pr-line-height-normal)] pr:[overflow-wrap:anywhere]" :class="{ 'pr:text-[color:var(--pr-color-text-subtle)]': isEmpty }">
-      <slot>{{ isEmpty ? (list?.emptyText() ?? 'Non renseigné') : value }}</slot>
+      <slot>{{ isEmpty ? (list?.emptyText() ?? messages.descriptionList.empty) : value }}</slot>
     </dd>
   </div>
 </template>

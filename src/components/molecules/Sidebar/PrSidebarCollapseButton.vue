@@ -2,6 +2,7 @@
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { computed, inject } from 'vue'
 import { prSidebarContextKey } from './sidebarContext'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrSidebarCollapseButtonProps {
   collapseLabel?: string
@@ -9,13 +10,15 @@ export interface PrSidebarCollapseButtonProps {
 }
 
 const props = withDefaults(defineProps<PrSidebarCollapseButtonProps>(), {
-  collapseLabel: 'Réduire la navigation',
-  expandLabel: 'Étendre la navigation',
+  collapseLabel: undefined,
+  expandLabel: undefined,
 })
+
+const messages = usePrMessages()
 
 const sidebar = inject(prSidebarContextKey, null)
 const ariaLabel = computed(() => (
-  sidebar?.isNarrow.value ? props.expandLabel : props.collapseLabel
+  sidebar?.isNarrow.value ? (props.expandLabel ?? messages.sidebar.expand) : (props.collapseLabel ?? messages.sidebar.collapse)
 ))
 </script>
 
@@ -31,6 +34,6 @@ const ariaLabel = computed(() => (
   >
     <ChevronRight v-if="sidebar.isNarrow.value" aria-hidden="true" :size="18" />
     <ChevronLeft v-else aria-hidden="true" :size="18" />
-    <span class="pr-sidebar__collapse-label pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap">{{ collapseLabel }}</span>
+    <span class="pr-sidebar__collapse-label pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap">{{ collapseLabel ?? messages.sidebar.collapse }}</span>
   </button>
 </template>

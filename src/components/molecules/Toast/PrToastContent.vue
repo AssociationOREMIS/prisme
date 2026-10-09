@@ -3,6 +3,7 @@ import { AlertCircle, CheckCircle2, Info, TriangleAlert, X } from '@lucide/vue'
 import { computed, ref } from 'vue'
 import { ToastAction, ToastClose, ToastDescription, ToastRoot, ToastTitle } from 'reka-ui'
 import { warnDeprecated } from '../../deprecation'
+import { usePrMessages } from '../../../i18n/context'
 
 interface PrToastContentProps {
   open?: boolean
@@ -25,8 +26,10 @@ const props = withDefaults(defineProps<PrToastContentProps>(), {
   duration: undefined,
   variant: 'neutral',
   actionLabel: undefined,
-  closeLabel: 'Fermer',
+  closeLabel: undefined,
 })
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -113,7 +116,7 @@ const paused = ref(false)
     >
       {{ actionLabel }}
     </ToastAction>
-    <ToastClose class="pr-toast__close pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
+    <ToastClose class="pr-toast__close pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel ?? messages.common.close">
       <X :size="16" aria-hidden="true" />
     </ToastClose>
     <div

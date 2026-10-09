@@ -2,6 +2,7 @@
 import { Minus, Plus } from '@lucide/vue'
 import { computed, ref, useId, watch } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrNumberInputProps {
   modelValue?: number
@@ -34,6 +35,8 @@ const props = withDefaults(defineProps<PrNumberInputProps>(), {
   id: undefined,
   name: undefined,
 })
+
+const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
@@ -153,7 +156,7 @@ defineOptions({ inheritAttrs: false })
         type="button"
         class="pr-number-input__btn pr:flex pr:h-full pr:min-w-[2.375rem] pr:cursor-pointer pr:items-center pr:justify-center pr:border-r pr:border-[var(--pr-color-border-strong)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:disabled:cursor-not-allowed pr:disabled:opacity-50"
         :disabled="!canDecrement"
-        aria-label="Décrémenter"
+        :aria-label="messages.numberInput.decrement"
         tabindex="-1"
         @click="decrement"
       >
@@ -182,7 +185,7 @@ defineOptions({ inheritAttrs: false })
         type="button"
         class="pr-number-input__btn pr:flex pr:h-full pr:min-w-[2.375rem] pr:cursor-pointer pr:items-center pr:justify-center pr:border-l pr:border-[var(--pr-color-border-strong)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:disabled:cursor-not-allowed pr:disabled:opacity-50"
         :disabled="!canIncrement"
-        aria-label="Incrémenter"
+        :aria-label="messages.numberInput.increment"
         tabindex="-1"
         @click="increment"
       >

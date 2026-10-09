@@ -8,6 +8,7 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from 'reka-ui'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrPopoverProps {
   open?: boolean
@@ -24,8 +25,10 @@ withDefaults(defineProps<PrPopoverProps>(), {
   side: 'bottom',
   align: 'start',
   title: undefined,
-  closeLabel: 'Fermer',
+  closeLabel: undefined,
 })
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -52,7 +55,7 @@ const emit = defineEmits<{
           <slot name="header">
             <h2 class="pr-popover__title pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:font-[750] pr:leading-[var(--pr-line-height-tight)]">{{ title }}</h2>
           </slot>
-          <PopoverClose class="pr-popover__close pr:-m-1 pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel">
+          <PopoverClose class="pr-popover__close pr:-m-1 pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel ?? messages.common.close">
             <X :size="16" aria-hidden="true" />
           </PopoverClose>
         </div>

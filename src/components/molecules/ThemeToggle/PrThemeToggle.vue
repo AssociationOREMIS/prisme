@@ -2,6 +2,7 @@
 import { Moon, Sun } from '@lucide/vue'
 import { computed } from 'vue'
 import { usePrTheme } from '../../../composables/usePrTheme'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrThemeToggleProps {
   label?: string
@@ -11,10 +12,12 @@ const props = withDefaults(defineProps<PrThemeToggleProps>(), {
   label: undefined,
 })
 
+const messages = usePrMessages()
+
 const { resolvedTheme, toggleTheme } = usePrTheme()
 
 const nextThemeLabel = computed(() => (
-  resolvedTheme.value === 'light' ? 'Passer en thème sombre' : 'Passer en thème clair'
+  resolvedTheme.value === 'light' ? messages.themeToggle.toDark : messages.themeToggle.toLight
 ))
 const accessibleLabel = computed(() => props.label ?? nextThemeLabel.value)
 const icon = computed(() => (resolvedTheme.value === 'light' ? Moon : Sun))

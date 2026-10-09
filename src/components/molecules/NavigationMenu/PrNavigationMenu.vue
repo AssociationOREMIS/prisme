@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { usePrMessages } from '../../../i18n/context'
 export interface PrNavigationMenuItem {
   label: string
   href: string
@@ -19,8 +20,10 @@ export interface PrNavigationMenuProps {
 
 withDefaults(defineProps<PrNavigationMenuProps>(), {
   items: () => [],
-  label: 'Navigation',
+  label: undefined,
 })
+
+const messages = usePrMessages()
 
 function isActive(item: PrNavigationMenuItem): boolean {
   if (item.active !== undefined) return item.active
@@ -31,7 +34,7 @@ function isActive(item: PrNavigationMenuItem): boolean {
 </script>
 
 <template>
-  <nav class="pr-navigation-menu pr:inline-flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)]" :aria-label="label">
+  <nav class="pr-navigation-menu pr:inline-flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)]" :aria-label="label ?? messages.navigationMenu.label">
     <a
       v-for="item in items"
       :key="item.href"
