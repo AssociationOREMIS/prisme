@@ -113,6 +113,20 @@ Quand `handleSubmit` refuse l'envoi (regles ou 422), le focus va au premier cham
 
 `PrErrorSummary` liste les erreurs au-dessus du formulaire, annoncees des leur apparition (`role="alert"`) : « Email : Adresse email invalide » grace au `label` de chaque champ. En Blade, il prend aussi des messages simples : `<pr-error-summary :errors='@json($errors->all())'></pr-error-summary>`.
 
+### Toasts depuis le code (`usePrToast`)
+
+Placez un `PrToastProvider` dans le layout de l'app, puis affichez un toast depuis n'importe quel code, composant ou non (un store, un intercepteur HTTP) :
+
+```ts
+import { usePrToast } from '@oremis/prisme'
+
+const { toast, dismiss } = usePrToast()
+const id = toast({ title: 'Benevole ajoute', description: 'Camille MARTIN a rejoint l\'equipe.', variant: 'success' })
+toast({ title: 'Connexion perdue', variant: 'danger', actionLabel: 'Reessayer', onAction: reconnect })
+```
+
+Un toast `danger` reste affiche jusqu'a ce qu'on le ferme, les autres disparaissent apres 5 s (`duration`). Au-dela de quatre toasts, les plus anciens se ferment. Avec plusieurs `PrToastProvider` sur la page, seul le premier affiche ces toasts.
+
 ### `PrRichTextEditor`
 
 Editeur de texte riche (Vue 3 + [tiptap](https://tiptap.dev)), avec titres, listes, tableaux, images, video YouTube, blocs de code colores, sections repliables et encadres `Callout` (info/succes/avertissement/danger).
