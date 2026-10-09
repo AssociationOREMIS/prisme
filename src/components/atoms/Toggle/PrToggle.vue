@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Toggle } from 'reka-ui'
+import { warnDeprecated } from '../../deprecation'
 
 export interface PrToggleProps {
+  modelValue?: boolean
+  /** @deprecated Use `modelValue` (`v-model`) instead. Removed in 1.0. */
   pressed?: boolean
   defaultPressed?: boolean
   disabled?: boolean
@@ -12,6 +15,7 @@ export interface PrToggleProps {
 }
 
 const props = withDefaults(defineProps<PrToggleProps>(), {
+  modelValue: undefined,
   pressed: undefined,
   defaultPressed: false,
   disabled: false,
@@ -21,8 +25,18 @@ const props = withDefaults(defineProps<PrToggleProps>(), {
 })
 
 const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+  /** @deprecated Use `update:modelValue` (`v-model`) instead. Removed in 1.0. */
   'update:pressed': [value: boolean]
 }>()
+
+if (props.pressed !== undefined) warnDeprecated('PrToggle', 'pressed', 'modelValue (v-model)')
+const currentValue = computed(() => props.modelValue ?? props.pressed)
+
+function update(value: boolean) {
+  emit('update:modelValue', value)
+  emit('update:pressed', value)
+}
 
 const toggleSizeClass: Record<NonNullable<PrToggleProps['size']>, string> = {
   sm: 'pr:min-h-8 pr:min-w-8 pr:px-[var(--pr-space-2)]',
@@ -39,11 +53,11 @@ const toggleClass = computed(() => [
 <template>
   <Toggle
     :class="toggleClass"
-    :model-value="pressed"
+    :model-value="currentValue"
     :default-value="defaultPressed"
     :disabled="disabled"
     :aria-label="ariaLabel"
-    @update:model-value="emit('update:pressed', $event)"
+    @update:model-value="update"
   >
     <slot />
   </Toggle>

@@ -58,16 +58,18 @@ https://associationoremis.github.io/prisme/
 
 ### Composants controles (v-model)
 
-Chaque composant a etat ouvert/coche reprend le nom de prop de la primitive [reka-ui](https://reka-ui.com) qu'il enveloppe, plutot que d'imposer une convention `modelValue` uniforme. Un `v-model` nu ne fonctionne donc que sur `PrAccordion` :
+La valeur d'un champ passe toujours par un `v-model` nu (`modelValue`). Un etat qui n'est pas une valeur de formulaire (ouvert, page, replie) garde son nom, comme dans la primitive [reka-ui](https://reka-ui.com) enveloppee :
 
 | Composant(s) | Prop | v-model |
 | --- | --- | --- |
-| `PrAccordion` | `modelValue` | `v-model="valeur"` |
-| `PrCheckbox`, `PrSwitch` | `checked` | `v-model:checked="valeur"` |
-| `PrToggle` | `pressed` | `v-model:pressed="valeur"` |
+| Champs (`PrInput`, `PrSelect`, `PrCheckbox`, `PrSwitch`, `PrToggle`...), `PrAccordion`, `PrTabs` | `modelValue` | `v-model="valeur"` |
 | `PrCollapsible`, `PrDialog`, `PrSheet`, `PrPopover`, `PrToast`, `PrAlertDialog`, `PrDropdownMenu` | `open` | `v-model:open="valeur"` |
+| `PrPagination`, `PrDataTable` | `page` | `v-model:page="valeur"` |
+| `PrSidebar`, `PrAppShell` | `collapsed` | `v-model:collapsed="valeur"` |
 
-Chacun de ces composants accepte aussi un `default-xxx` (`defaultValue`, `defaultChecked`, `defaultPressed`, `defaultOpen`) pour un usage non controle, sans avoir a gerer l'etat cote consommateur.
+Chacun de ces composants accepte aussi un `default-xxx` (`defaultValue`, `defaultChecked`, `defaultPressed`, `defaultOpen`) pour un usage non controle, sans avoir a gerer l'etat cote consommateur. Dans une vue Blade, c'est en general ce qu'il faut : `<pr-checkbox name="active" default-checked>`.
+
+Avant la 0.20, `PrCheckbox` et `PrSwitch` utilisaient `v-model:checked`, `PrToggle` `v-model:pressed`. Ces noms fonctionnent encore jusqu'a la 1.0, avec un avertissement dans la console.
 
 ### `PrRichTextEditor`
 

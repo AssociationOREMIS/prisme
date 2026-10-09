@@ -26,7 +26,7 @@ export const Default: Story = {
       const pressed = ref(false)
       return { args, pressed }
     },
-    template: '<PrToggle v-model:pressed="pressed" v-bind="args"><Bold :size="16" /></PrToggle>',
+    template: '<PrToggle v-model="pressed" v-bind="args"><Bold :size="16" /></PrToggle>',
   }),
 }
 
@@ -36,7 +36,7 @@ export const States: Story = {
     template: `
       <div class="story-stack">
         <PrToggle aria-label="Gras"><Bold :size="16" /></PrToggle>
-        <PrToggle pressed aria-label="Italique"><Italic :size="16" /></PrToggle>
+        <PrToggle default-pressed aria-label="Italique"><Italic :size="16" /></PrToggle>
         <PrToggle disabled aria-label="Desactive"><Bold :size="16" /></PrToggle>
       </div>
     `,

@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { SwitchRoot, SwitchThumb } from 'reka-ui'
+import { warnDeprecated } from '../../deprecation'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 
 export interface PrSwitchProps {
+  modelValue?: boolean
+  /** @deprecated Use `modelValue` (`v-model`) instead. Removed in 1.0. */
   checked?: boolean
   defaultChecked?: boolean
   label?: string
@@ -25,6 +28,7 @@ export interface PrSwitchProps {
 }
 
 const props = withDefaults(defineProps<PrSwitchProps>(), {
+  modelValue: undefined,
   checked: undefined,
   defaultChecked: false,
   label: undefined,
@@ -43,8 +47,18 @@ const props = withDefaults(defineProps<PrSwitchProps>(), {
 const errorText = useErrorText(() => props.error)
 
 const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+  /** @deprecated Use `update:modelValue` (`v-model`) instead. Removed in 1.0. */
   'update:checked': [value: boolean]
 }>()
+
+if (props.checked !== undefined) warnDeprecated('PrSwitch', 'checked', 'modelValue (v-model)')
+const currentValue = computed(() => props.modelValue ?? props.checked)
+
+function update(value: boolean) {
+  emit('update:modelValue', value)
+  emit('update:checked', value)
+}
 
 // Multi-root template (label + error/hint message) disables Vue's automatic
 // attrs fallthrough, so extraneous attributes must be forwarded explicitly.
@@ -79,7 +93,7 @@ const switchClass = computed(() => [
       v-bind="$attrs"
       :id="id"
       class="pr-switch__control pr:relative pr:inline-flex pr:h-[1.375rem] pr:w-[2.375rem] pr:shrink-0 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-full)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface-subtle)] pr:p-0.5 pr:transition-[background-color,border-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[state=checked]:border-[var(--pr-color-primary)] pr:data-[state=checked]:bg-[var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
-      :model-value="checked"
+      :model-value="currentValue"
       :default-value="defaultChecked"
       :disabled="disabled"
       :required="required"
@@ -87,7 +101,7 @@ const switchClass = computed(() => [
       :value="value"
       :aria-invalid="errorText ? 'true' : undefined"
       :aria-describedby="describedBy"
-      @update:model-value="emit('update:checked', $event)"
+      @update:model-value="update"
     >
       <SwitchThumb class="pr-switch__thumb pr:block pr:size-4 pr:translate-x-0 pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-xs)] pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:data-[state=checked]:translate-x-4" />
     </SwitchRoot>

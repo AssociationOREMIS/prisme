@@ -281,9 +281,9 @@ onBeforeUnmount(() => {
             <tr class="pr-data-table__row pr:border-b pr:border-[var(--pr-color-border)] pr:transition-colors pr:last:border-b-0">
               <th v-if="selectable" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
                 <PrCheckbox
-                  :checked="selectAllState"
+                  :model-value="selectAllState"
                   aria-label="Sélectionner la page"
-                  @update:checked="togglePageRows(Boolean($event))"
+                  @update:model-value="togglePageRows(Boolean($event))"
                 />
               </th>
               <th
@@ -341,9 +341,9 @@ onBeforeUnmount(() => {
               >
                 <td v-if="selectable" class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle">
                   <PrCheckbox
-                    :checked="selectedKeys.has(rowId(row))"
+                    :model-value="selectedKeys.has(rowId(row))"
                     :aria-label="`Sélectionner ${rowLabel(row)}`"
-                    @update:checked="toggleRow(row, Boolean($event))"
+                    @update:model-value="toggleRow(row, Boolean($event))"
                   />
                 </td>
                 <td
