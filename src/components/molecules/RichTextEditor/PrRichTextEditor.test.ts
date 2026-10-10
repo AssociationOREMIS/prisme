@@ -26,6 +26,12 @@ async function waitForEditor(wrapper: VueWrapper<InstanceType<typeof PrRichTextE
 }
 
 describe('prRichTextEditor', () => {
+  it('keeps a wide image or table within its container (minmax(0, 1fr) column)', () => {
+    const wrapper = mount(PrRichTextEditor, { props: { modelValue: '<p>Texte</p>' } })
+    expect(wrapper.find('.pr-rich-text-editor').classes()).toContain('pr:grid-cols-[minmax(0,1fr)]')
+    wrapper.unmount()
+  })
+
   it('renders the toolbar and the initial content', async () => {
     const wrapper = mount(PrRichTextEditor, {
       props: { modelValue: '<p>Contenu initial</p>', label: 'Contenu' },

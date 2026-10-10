@@ -395,7 +395,9 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
 </script>
 
 <template>
-  <div class="pr-rich-text-editor pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <!-- minmax(0, 1fr): an implicit grid column grows with its widest content, so a large image or table would
+       widen the editor past its container. -->
+  <div class="pr-rich-text-editor pr:grid pr:grid-cols-[minmax(0,1fr)] pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel
       v-if="label"
       :id="labelId"

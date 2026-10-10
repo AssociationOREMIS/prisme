@@ -2,6 +2,15 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.5 (2026-10-10)
+
+Cinquieme version candidate, sous le tag npm `next`. Corrige deux defauts trouves en passant Formation a Prisme.
+
+### Corrections
+
+- **`PrRichTextEditor` reste dans son conteneur** : sa grille avait une colonne implicite, qui s'elargissait avec le contenu le plus large. Une grande image ou un tableau elargissait l'editeur au-dela de la page. La colonne est maintenant `minmax(0, 1fr)`.
+- **Les titres du contenu ont un style** (`editor-content.css`) : `h1` a `h4` ecrits dans l'editeur s'affichaient comme du texte normal, le reset retirant leur taille. Ils ont maintenant une taille, une graisse et des marges, dans l'editeur comme dans un rendu en lecture seule (`.pr-editor-content`). Le premier element du contenu n'a plus de marge en haut.
+
 ## 1.0.0-rc.4 (2026-10-10)
 
 Quatrieme version candidate, sous le tag npm `next`. Ajoute ce qui manquait pour passer Formation a Prisme.
