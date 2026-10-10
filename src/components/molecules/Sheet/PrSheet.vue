@@ -22,6 +22,11 @@ export interface PrSheetProps {
   ariaLabel?: string
   description?: string
   closeLabel?: string
+  /**
+   * Width of a side sheet: `sm` 20rem, `md` 26rem (default), `lg` 36rem for a form with a rich text editor,
+   * `xl` 48rem. Height of a top or bottom one: 20, 28 (default), 36 or 48rem. Always within the screen.
+   */
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
 const props = withDefaults(defineProps<PrSheetProps>(), {
@@ -32,6 +37,7 @@ const props = withDefaults(defineProps<PrSheetProps>(), {
   ariaLabel: undefined,
   description: undefined,
   closeLabel: undefined,
+  size: 'md',
 })
 
 const messages = usePrMessages()
@@ -45,11 +51,31 @@ const emit = defineEmits<{
 }>()
 
 const sheetSideClass = computed(() => ({
-  right: 'pr:right-0 pr:top-0 pr:bottom-0 pr:w-[min(26rem,100vw)] pr:data-[state=open]:animate-[pr-sheet-in-right_500ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-sheet-out-right_300ms_var(--pr-ease-standard)]',
-  left: 'pr:left-0 pr:top-0 pr:bottom-0 pr:w-[min(26rem,100vw)] pr:data-[state=open]:animate-[pr-sheet-in-left_500ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-sheet-out-left_300ms_var(--pr-ease-standard)]',
-  top: 'pr:left-0 pr:right-0 pr:top-0 pr:max-h-[min(28rem,100vh)] pr:data-[state=open]:animate-[pr-sheet-in-top_500ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-sheet-out-top_300ms_var(--pr-ease-standard)]',
-  bottom: 'pr:left-0 pr:right-0 pr:bottom-0 pr:max-h-[min(28rem,100vh)] pr:data-[state=open]:animate-[pr-sheet-in-bottom_500ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-sheet-out-bottom_300ms_var(--pr-ease-standard)]',
+  right: 'pr:right-0 pr:top-0 pr:bottom-0 pr:data-[state=open]:animate-[pr-sheet-in-right_500ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-sheet-out-right_300ms_var(--pr-ease-standard)]',
+  left: 'pr:left-0 pr:top-0 pr:bottom-0 pr:data-[state=open]:animate-[pr-sheet-in-left_500ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-sheet-out-left_300ms_var(--pr-ease-standard)]',
+  top: 'pr:left-0 pr:right-0 pr:top-0 pr:data-[state=open]:animate-[pr-sheet-in-top_500ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-sheet-out-top_300ms_var(--pr-ease-standard)]',
+  bottom: 'pr:left-0 pr:right-0 pr:bottom-0 pr:data-[state=open]:animate-[pr-sheet-in-bottom_500ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-sheet-out-bottom_300ms_var(--pr-ease-standard)]',
 })[props.side])
+
+// Literal classes, so that Tailwind finds them when it scans the component. A side sheet sets its width,
+// a top or bottom one its height (28rem by default, as before).
+const sheetSizeClass = computed(() => {
+  const vertical = props.side === 'top' || props.side === 'bottom'
+
+  return vertical
+    ? {
+        sm: 'pr:max-h-[min(20rem,100vh)]',
+        md: 'pr:max-h-[min(28rem,100vh)]',
+        lg: 'pr:max-h-[min(36rem,100vh)]',
+        xl: 'pr:max-h-[min(48rem,100vh)]',
+      }[props.size]
+    : {
+        sm: 'pr:w-[min(20rem,100vw)]',
+        md: 'pr:w-[min(26rem,100vw)]',
+        lg: 'pr:w-[min(36rem,100vw)]',
+        xl: 'pr:w-[min(48rem,100vw)]',
+      }[props.size]
+})
 </script>
 
 <template>
@@ -61,7 +87,7 @@ const sheetSideClass = computed(() => ({
       <DialogOverlay class="pr-sheet__overlay pr:fixed pr:inset-0 pr:z-[80] pr:bg-[var(--pr-color-overlay)] pr:data-[state=open]:animate-[pr-fade-in_150ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-fade-out_150ms_var(--pr-ease-standard)]" />
       <DialogContent
         class="pr-sheet pr:fixed pr:z-[90] pr:grid pr:max-h-screen pr:max-w-screen pr:overflow-hidden pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)]"
-        :class="sheetSideClass"
+        :class="[sheetSideClass, sheetSizeClass]"
       >
         <div class="pr-sheet__header pr:flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-4)] pr:border-b pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-5)]">
           <!-- min-w-0: a long title wraps instead of pushing the close button out. -->

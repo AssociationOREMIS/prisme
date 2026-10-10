@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { X } from '@lucide/vue'
+import { computed } from 'vue'
 import {
   DialogClose,
   DialogContent,
@@ -20,6 +21,8 @@ export interface PrDialogProps {
   ariaLabel?: string
   description?: string
   closeLabel?: string
+  /** Width: `sm` 24rem, `md` 34rem (default), `lg` 48rem for a form with a sample or a table, `xl` 64rem for an image or a preview. Always within the screen. */
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
 const props = withDefaults(defineProps<PrDialogProps>(), {
@@ -29,7 +32,16 @@ const props = withDefaults(defineProps<PrDialogProps>(), {
   ariaLabel: undefined,
   description: undefined,
   closeLabel: undefined,
+  size: 'md',
 })
+
+// Literal classes, so that Tailwind finds them when it scans the component.
+const dialogSizeClass = computed(() => ({
+  sm: 'pr:w-[min(24rem,calc(100vw-var(--pr-space-6)))]',
+  md: 'pr:w-[min(34rem,calc(100vw-var(--pr-space-6)))]',
+  lg: 'pr:w-[min(48rem,calc(100vw-var(--pr-space-6)))]',
+  xl: 'pr:w-[min(64rem,calc(100vw-var(--pr-space-6)))]',
+})[props.size])
 
 const messages = usePrMessages()
 
@@ -49,7 +61,10 @@ const emit = defineEmits<{
     </DialogTrigger>
     <DialogPortal>
       <DialogOverlay class="pr-dialog__overlay pr:fixed pr:inset-0 pr:z-[80] pr:bg-[var(--pr-color-overlay)] pr:data-[state=open]:animate-[pr-fade-in_150ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-fade-out_150ms_var(--pr-ease-standard)]" />
-      <DialogContent class="pr-dialog pr:fixed pr:left-1/2 pr:top-1/2 pr:z-[90] pr:grid pr:max-h-[calc(100vh-var(--pr-space-8))] pr:w-[min(34rem,calc(100vw-var(--pr-space-6)))] pr:-translate-x-1/2 pr:-translate-y-1/2 pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-dialog-in_200ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-dialog-out_200ms_var(--pr-ease-standard)]">
+      <DialogContent
+        class="pr-dialog pr:fixed pr:left-1/2 pr:top-1/2 pr:z-[90] pr:grid pr:max-h-[calc(100vh-var(--pr-space-8))] pr:-translate-x-1/2 pr:-translate-y-1/2 pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-dialog-in_200ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-dialog-out_200ms_var(--pr-ease-standard)]"
+        :class="dialogSizeClass"
+      >
         <div class="pr-dialog__header pr:flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-4)] pr:border-b pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-5)]">
           <!-- min-w-0: a long title wraps instead of pushing the close button out. -->
           <div class="pr:min-w-0 pr:[overflow-wrap:anywhere]">
