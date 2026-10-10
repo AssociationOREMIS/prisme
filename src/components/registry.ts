@@ -101,6 +101,9 @@ export type { PrScrollAreaProps } from './molecules/ScrollArea'
 import { PrSheet } from './molecules/Sheet'
 export type { PrSheetProps } from './molecules/Sheet'
 
+import { PrSortableList } from './molecules/SortableList'
+export type { PrSortableListChange, PrSortableListProps } from './molecules/SortableList'
+
 import { PrSkeleton } from './atoms/Skeleton'
 export type { PrSkeletonProps } from './atoms/Skeleton'
 
@@ -220,6 +223,7 @@ export const componentRegistry = {
   PrSidebar,
   PrSidebarItem,
   PrSidebarSubItem,
+  PrSortableList,
   PrSkeleton,
   PrSlider,
   PrSpinner,

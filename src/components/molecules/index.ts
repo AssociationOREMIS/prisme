@@ -54,6 +54,8 @@ export type { PrScrollAreaProps } from './ScrollArea'
 
 export { PrSheet } from './Sheet'
 export type { PrSheetProps } from './Sheet'
+export { PrSortableList } from './SortableList'
+export type { PrSortableListChange, PrSortableListProps } from './SortableList'
 
 export {
   PrSidebar,

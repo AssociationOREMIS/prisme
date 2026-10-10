@@ -156,6 +156,15 @@ export const prMessagesEn: PrMessages = {
   slider: {
     value: 'Value',
   },
+  sortableList: {
+    handle: (label) => `Move ${label}`,
+    instructions: 'Space to pick up, up and down arrows to move, Space to drop, Escape to cancel.',
+    grabbed: (label, position, total) => `Moving ${label}, position ${position} of ${total}.`,
+    moved: (position, total, list) => (list ? `${list}, position ${position} of ${total}.` : `Position ${position} of ${total}.`),
+    dropped: (label, position, total) => `Move done: ${label}, position ${position} of ${total}.`,
+    cancelled: (label) => `Move cancelled: ${label} is back in place.`,
+    empty: 'No items.',
+  },
   tagInput: {
     placeholder: 'Add...',
     remove: (tag) => `Remove ${tag}`,

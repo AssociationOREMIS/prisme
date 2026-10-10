@@ -2,6 +2,15 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## Non publie
+
+### Ajouts
+
+Trouves en preparant le passage de Formation a Prisme.
+
+- **`PrSortableList`** : une liste a reordonner a la souris, au doigt ou au clavier (poignee nommee, Espace pour saisir, fleches pour deplacer, Espace pour deposer, Echap pour annuler, chaque etape lue par les lecteurs d'ecran). Les listes d'un meme `group` s'echangent leurs elements, comme les lecons entre les modules d'une formation. `v-model` (ou `default-value` et `name` dans un formulaire Blade), evenement `change` une fois l'element depose. Voir le README, « Listes a reordonner ».
+- **`size` sur `PrDialog` et `PrSheet`** : `sm`, `md` (par defaut, la largeur d'avant), `lg` ou `xl`, pour une fenetre qui montre un exemple ou une image, ou un volet qui contient un editeur de texte riche.
+
 ## 1.0.0-rc.3 (2026-10-09)
 
 Troisieme version candidate, sous le tag npm `next`.
