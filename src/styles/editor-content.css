@@ -19,6 +19,45 @@
   color: var(--pr-color-text);
 }
 
+/*
+ * Headings written in the editor (h1 to h4): the reset turns them into plain text. Smaller than a page title,
+ * since the content sits under one; the two larger levels take the heading font, like PrTypography.
+ */
+.pr-editor-content h1,
+.pr-editor-content h2,
+.pr-editor-content h3,
+.pr-editor-content h4 {
+  margin: var(--pr-space-6) 0 var(--pr-space-3);
+  color: inherit;
+  font-weight: 700;
+  line-height: var(--pr-line-height-tight);
+}
+
+.pr-editor-content h1,
+.pr-editor-content h2 {
+  font-family: var(--pr-font-heading);
+}
+
+.pr-editor-content h1 {
+  font-size: 1.5rem;
+}
+
+.pr-editor-content h2 {
+  font-size: var(--pr-font-size-xl);
+}
+
+.pr-editor-content h3 {
+  font-size: 1.125rem;
+}
+
+.pr-editor-content h4 {
+  font-size: var(--pr-font-size-lg);
+}
+
+.pr-editor-content > :first-child {
+  margin-top: 0;
+}
+
 /* Bullet and numbered lists: the reset removes their markers and indent. Task lists are styled below. */
 .pr-editor-content ul:not([data-type="taskList"]),
 .pr-editor-content ol {
