@@ -148,6 +148,18 @@ export interface PrMessages {
   slider: {
     value: string
   }
+  sortableList: {
+    /** Name of the grip that moves an item, e.g. "Déplacer Les formes du harcèlement". */
+    handle: (label: string) => string
+    /** How to move an item with the keyboard, read by screen readers on the grip. */
+    instructions: string
+    grabbed: (label: string, position: number, total: number) => string
+    /** `list`: the list's `aria-label`, given when the item has just changed lists. */
+    moved: (position: number, total: number, list?: string) => string
+    dropped: (label: string, position: number, total: number) => string
+    cancelled: (label: string) => string
+    empty: string
+  }
   tagInput: {
     placeholder: string
     remove: (tag: string) => string
@@ -325,6 +337,15 @@ export const prMessagesFr: PrMessages = {
   },
   slider: {
     value: 'Valeur',
+  },
+  sortableList: {
+    handle: (label) => `Déplacer ${label}`,
+    instructions: 'Espace pour saisir, flèches haut et bas pour déplacer, Espace pour déposer, Échap pour annuler.',
+    grabbed: (label, position, total) => `Déplacement de ${label}, position ${position} sur ${total}.`,
+    moved: (position, total, list) => (list ? `${list}, position ${position} sur ${total}.` : `Position ${position} sur ${total}.`),
+    dropped: (label, position, total) => `Déplacement terminé : ${label}, position ${position} sur ${total}.`,
+    cancelled: (label) => `Déplacement annulé : ${label} reprend sa place.`,
+    empty: 'Aucun élément.',
   },
   tagInput: {
     placeholder: 'Ajouter...',

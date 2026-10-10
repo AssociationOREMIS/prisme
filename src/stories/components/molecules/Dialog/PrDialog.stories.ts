@@ -9,7 +9,14 @@ const meta = {
   title: 'Overlays/Dialog',
   component: PrDialog,
   tags: ['autodocs'],
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg', 'xl'],
+    },
+  },
   args: {
+    size: 'md',
     title: 'Modifier le dossier',
     description: 'Mettez a jour les informations principales.',
   },

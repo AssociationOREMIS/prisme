@@ -38,6 +38,7 @@ export { PrSelect } from './components/molecules/Select'
 export { PrSheet } from './components/molecules/Sheet'
 export { PrSidebar, PrSidebarItem, PrSidebarSubItem } from './components/molecules/Sidebar'
 export { PrSkeleton } from './components/atoms/Skeleton'
+export { PrSortableList } from './components/molecules/SortableList'
 export { PrSlider } from './components/atoms/Slider'
 export { PrSpinner } from './components/atoms/Spinner'
 export { PrStepper } from './components/molecules/Stepper'
@@ -108,6 +109,8 @@ export type {
   PrSidebarItemProps,
   PrSidebarProps,
   PrSidebarSubItemProps,
+  PrSortableListChange,
+  PrSortableListProps,
   PrSkeletonProps,
   PrSliderProps,
   PrSpinnerProps,

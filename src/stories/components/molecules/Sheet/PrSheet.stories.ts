@@ -14,9 +14,14 @@ const meta = {
       control: 'select',
       options: ['left', 'right', 'top', 'bottom'],
     },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg', 'xl'],
+    },
   },
   args: {
     side: 'right',
+    size: 'md',
     title: 'Parametres',
     description: 'Ajustez les preferences de ce module.',
   },

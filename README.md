@@ -66,7 +66,7 @@ La valeur d'un champ passe toujours par un `v-model` nu (`modelValue`). Un etat 
 
 | Composant(s) | Prop | v-model |
 | --- | --- | --- |
-| Champs (`PrInput`, `PrSelect`, `PrCheckbox`, `PrSwitch`, `PrToggle`...), `PrAccordion`, `PrTabs` | `modelValue` | `v-model="valeur"` |
+| Champs (`PrInput`, `PrSelect`, `PrCheckbox`, `PrSwitch`, `PrToggle`...), `PrAccordion`, `PrTabs`, `PrSortableList` (les elements, dans l'ordre) | `modelValue` | `v-model="valeur"` |
 | `PrCollapsible`, `PrDialog`, `PrSheet`, `PrPopover`, `PrToast`, `PrAlertDialog`, `PrDropdownMenu` | `open` | `v-model:open="valeur"` |
 | `PrPagination`, `PrDataTable` | `page` | `v-model:page="valeur"` |
 | `PrSidebar`, `PrAppShell` | `collapsed` | `v-model:collapsed="valeur"` |
@@ -237,6 +237,27 @@ Actions disponibles (`prButtonActions`) : `view`, `edit`, `delete`, `remove`, `r
 ```
 
 La route recoit `?q=...` (`search-param`) et renvoie un tableau de `{ label, value }` ou une collection de ressources Laravel (`{ data: [...] }`). La recherche part apres `debounce` ms sans frappe (250) et a partir de `min-chars` caracteres (2) ; la requete precedente est annulee. `options` ne sert plus qu'a donner le libelle des valeurs deja choisies. En Vue, `:search="(query, signal) => ..."` remplace `search-url`.
+
+### Listes a reordonner (`PrSortableList`)
+
+Une liste dont on change l'ordre a la souris, au doigt ou au clavier. Chaque element a une poignee (un bouton nomme « Deplacer ... ») : on la saisit avec Espace ou Entree, on deplace l'element avec les fleches haut et bas, on le depose avec Espace ou Entree, Echap annule. Chaque etape est lue par les lecteurs d'ecran. Les listes qui partagent un `group` s'echangent leurs elements : a la souris en glissant de l'une a l'autre, au clavier en depassant le bout d'une liste.
+
+```vue
+<PrSortableList v-for="module in modules" :key="module.id" v-model="module.lessons" group="lessons"
+    :list-id="module.id" :aria-label="module.title" @change="save">
+  <template #default="{ item }"><PrListItem :title="item.title" /></template>
+</PrSortableList>
+```
+
+- `item-key` (`id` par defaut) identifie chaque element ; `item-label` le nomme pour les lecteurs d'ecran (`label`, `title` ou `name` par defaut).
+- `change` part une fois l'element depose, depuis la liste ou il arrive : `{ item, from, to, oldIndex, newIndex }`, ou `from` et `to` sont les `list-id`. C'est le moment d'enregistrer l'ordre.
+- Dans un formulaire Blade, sans `v-model` : `default-value` donne les elements, `name` envoie leurs cles dans l'ordre (`name[]`).
+- Une liste vide montre ou deposer (`empty-text` ou slot `empty`). Pres du bord de la fenetre, ou d'un conteneur qui defile, la page defile pendant le glisser.
+- Les listes sont verticales ; deux listes d'un meme groupe ne s'imbriquent pas l'une dans l'autre (des modules qui se reordonnent et contiennent des lecons : deux groupes differents).
+
+### Largeur des fenetres et des volets (`size`)
+
+`PrDialog` et `PrSheet` prennent `size="sm" | "md" | "lg" | "xl"` (`md` par defaut, leur largeur d'avant). Une fenetre : 24, 34, 48 ou 64rem, par exemple `lg` pour un formulaire avec un exemple ou un tableau, `xl` pour agrandir une image. Un volet lateral : 20, 26, 36 ou 48rem, par exemple `lg` pour un formulaire avec un editeur de texte riche ; en haut ou en bas, `size` regle sa hauteur. Les deux restent dans l'ecran sur mobile.
 
 ### Empiler plusieurs composants Prisme verticalement
 
