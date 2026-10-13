@@ -6,6 +6,7 @@ export { PrAccordion } from './components/molecules/Accordion'
 export { PrAlert } from './components/atoms/Alert'
 export { PrAlertDialog } from './components/molecules/AlertDialog'
 export { PrAppShell } from './components/layouts/AppShell'
+export { PrAvatar } from './components/atoms/Avatar'
 export { PrBadge } from './components/atoms/Badge'
 export { PrButton, prButtonActions } from './components/atoms/Button'
 export { PrCalendar } from './components/molecules/Calendar'
@@ -63,6 +64,7 @@ export type {
   PrAlertDialogProps,
   PrAlertProps,
   PrAppShellProps,
+  PrAvatarProps,
   PrBadgeProps,
   PrButtonAction,
   PrButtonActionPreset,

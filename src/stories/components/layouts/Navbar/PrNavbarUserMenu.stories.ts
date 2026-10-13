@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { History, LogOut, MapPin } from '@lucide/vue'
 import { PrNavbar, PrNavbarUserMenu } from '../../../../index'
 import '../../navigation.stories.css'
+import { IDENTICON, PHOTO } from '../../atoms/Avatar/avatarSamples'
 
 const meta = {
   title: 'Navigation/NavbarUserMenu',
@@ -111,5 +112,51 @@ export const WithoutIdentifier: Story = {
         </PrNavbar>
       </div>
     `,
+  }),
+}
+
+const logoutOnly = `
+  <div class="nav-story-navbar-frame">
+    <PrNavbar brand-label="OREMIS">
+      <template #user>
+        <PrNavbarUserMenu v-bind="args">
+          <template #default="{ item, dangerItemClass }">
+            <component :is="item" :class="dangerItemClass">
+              <LogOut :size="16" aria-hidden="true" />
+              Déconnexion
+            </component>
+          </template>
+        </PrNavbarUserMenu>
+      </template>
+    </PrNavbar>
+  </div>
+`
+
+export const WithPhoto: Story = {
+  args: {
+    avatarUrl: PHOTO,
+  },
+  render: (args) => ({
+    components: { LogOut, PrNavbar, PrNavbarUserMenu },
+    setup() {
+      return { args }
+    },
+    template: logoutOnly,
+  }),
+}
+
+export const WithIdenticon: Story = {
+  args: {
+    name: 'Camille MARTIN',
+    identifier: 'CM1234',
+    email: 'camille.martin@oremis.fr',
+    avatarUrl: IDENTICON,
+  },
+  render: (args) => ({
+    components: { LogOut, PrNavbar, PrNavbarUserMenu },
+    setup() {
+      return { args }
+    },
+    template: logoutOnly,
   }),
 }
