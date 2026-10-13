@@ -1,6 +1,9 @@
 export { PrAlert } from './Alert'
 export type { PrAlertProps } from './Alert'
 
+export { PrAvatar } from './Avatar'
+export type { PrAvatarProps } from './Avatar'
+
 export { PrBadge } from './Badge'
 export type { PrBadgeProps } from './Badge'
 

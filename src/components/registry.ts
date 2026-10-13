@@ -9,6 +9,9 @@ export type { PrAlertProps } from './atoms/Alert'
 import { PrAlertDialog } from './molecules/AlertDialog'
 export type { PrAlertDialogProps } from './molecules/AlertDialog'
 
+import { PrAvatar } from './atoms/Avatar'
+export type { PrAvatarProps } from './atoms/Avatar'
+
 import { PrBadge } from './atoms/Badge'
 export type { PrBadgeProps } from './atoms/Badge'
 
@@ -189,6 +192,7 @@ export const componentRegistry = {
   PrAlert,
   PrAlertDialog,
   PrAppShell,
+  PrAvatar,
   PrBadge,
   PrButton,
   PrCalendar,

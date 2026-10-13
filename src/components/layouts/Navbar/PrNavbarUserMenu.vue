@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ChevronDown, CircleUser } from '@lucide/vue'
+import { ChevronDown } from '@lucide/vue'
 import { computed, ref, type Component } from 'vue'
+import PrAvatar from '../../atoms/Avatar/PrAvatar.vue'
 import PrDropdownMenu from '../../molecules/DropdownMenu/PrDropdownMenu.vue'
 import { usePrMessages } from '../../../i18n/context'
 
@@ -15,6 +16,11 @@ export interface PrNavbarUserMenuProps {
   roles?: string[]
   /** Shown instead of `roles` when it's empty. */
   rolesFallback?: string
+  /**
+   * The user's picture (PIO's `avatar_url`: their photo, or their identicon).
+   * Without it, or if it fails to load, the generic person icon shows.
+   */
+  avatarUrl?: string | null
 }
 
 const props = withDefaults(defineProps<PrNavbarUserMenuProps>(), {
@@ -22,6 +28,7 @@ const props = withDefaults(defineProps<PrNavbarUserMenuProps>(), {
   email: undefined,
   roles: () => [],
   rolesFallback: undefined,
+  avatarUrl: undefined,
 })
 
 const messages = usePrMessages()
@@ -56,7 +63,7 @@ const rolesLabel = computed(() => (
         type="button"
         class="pr-navbar-user-menu__trigger pr:inline-flex pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-lg)] pr:border-0 pr:bg-transparent pr:px-[var(--pr-space-3)] pr:py-[var(--pr-space-2)] pr:text-[color:var(--pr-color-navbar-text)] pr:transition-[background-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:bg-[var(--pr-color-navbar-muted)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
       >
-        <CircleUser class="pr:shrink-0" :size="22" :stroke-width="1.75" aria-hidden="true" />
+        <PrAvatar :src="avatarUrl" :size="28" />
         <span class="pr:hidden pr:max-w-[12rem] pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-sm)] pr:font-medium pr:md:inline">{{ displayName }}</span>
         <ChevronDown
           class="pr:shrink-0 pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
