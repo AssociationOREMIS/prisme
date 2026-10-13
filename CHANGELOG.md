@@ -2,6 +2,15 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.6 (2026-10-13)
+
+Sixieme version candidate, sous le tag npm `next`. Affiche la photo de l'utilisateur dans la navbar.
+
+### Ajouts
+
+- **`PrAvatar`** : une image ronde de la taille voulue (`size`, 28 px par defaut), pour la photo d'un utilisateur ou son identicon. Decorative par defaut (`alt` vide), puisqu'un nom l'accompagne toujours. Sans image, ou si elle ne se charge pas, elle laisse la place a l'icone de personne, jamais a l'icone d'image cassee du navigateur.
+- **`avatarUrl` sur `PrNavbarUserMenu`** : la photo de l'utilisateur (l'`avatar_url` de PIO : sa photo, ou son identicon) remplace l'icone de personne devant son nom. Sans `avatarUrl`, rien ne change.
+
 ## 1.0.0-rc.5 (2026-10-10)
 
 Cinquieme version candidate, sous le tag npm `next`. Corrige deux defauts trouves en passant Formation a Prisme.
