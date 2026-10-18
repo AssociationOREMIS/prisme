@@ -2,7 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.7 (2026-10-18)
+
+Septieme version candidate, sous le tag npm `next`. Des titres de groupes dans la sidebar, et des tableaux sans cadre pour les tableaux de bord.
 
 ### Ajouts
 
