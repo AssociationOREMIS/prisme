@@ -110,10 +110,11 @@ export type { PrSortableListChange, PrSortableListProps } from './molecules/Sort
 import { PrSkeleton } from './atoms/Skeleton'
 export type { PrSkeletonProps } from './atoms/Skeleton'
 
-import { PrSidebar, PrSidebarItem, PrSidebarSubItem } from './molecules/Sidebar'
+import { PrSidebar, PrSidebarItem, PrSidebarSection, PrSidebarSubItem } from './molecules/Sidebar'
 export type {
   PrSidebarItemProps,
   PrSidebarProps,
+  PrSidebarSectionProps,
   PrSidebarSubItemProps,
 } from './molecules/Sidebar'
 
@@ -226,6 +227,7 @@ export const componentRegistry = {
   PrSheet,
   PrSidebar,
   PrSidebarItem,
+  PrSidebarSection,
   PrSidebarSubItem,
   PrSortableList,
   PrSkeleton,

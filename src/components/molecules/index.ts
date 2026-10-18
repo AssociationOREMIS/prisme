@@ -60,6 +60,7 @@ export type { PrSortableListChange, PrSortableListProps } from './SortableList'
 export {
   PrSidebar,
   PrSidebarItem,
+  PrSidebarSection,
   PrSidebarSubItem,
 } from './Sidebar'
 export type {
@@ -67,6 +68,7 @@ export type {
   PrSidebarIconProps,
   PrSidebarItemProps,
   PrSidebarProps,
+  PrSidebarSectionProps,
   PrSidebarSubItemProps,
 } from './Sidebar'
 

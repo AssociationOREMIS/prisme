@@ -2,6 +2,12 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## Non publie
+
+### Ajouts
+
+- **`PrSidebarSection`** : un titre au-dessus d'un groupe d'entrees de la sidebar (`label`). Dans une sidebar etroite (repliee, ou menu ferme sur telephone), le titre devient un trait entre les groupes, et reste lu par les lecteurs d'ecran. Voir le README, « Groupes d'entrees dans la sidebar ».
+
 ## 1.0.0-rc.6 (2026-10-13)
 
 Sixieme version candidate, sous le tag npm `next`. Affiche la photo de l'utilisateur dans la navbar.
