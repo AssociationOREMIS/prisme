@@ -37,7 +37,7 @@ export { PrRadioGroup } from './components/molecules/RadioGroup'
 export { PrScrollArea } from './components/molecules/ScrollArea'
 export { PrSelect } from './components/molecules/Select'
 export { PrSheet } from './components/molecules/Sheet'
-export { PrSidebar, PrSidebarItem, PrSidebarSubItem } from './components/molecules/Sidebar'
+export { PrSidebar, PrSidebarItem, PrSidebarSection, PrSidebarSubItem } from './components/molecules/Sidebar'
 export { PrSkeleton } from './components/atoms/Skeleton'
 export { PrSortableList } from './components/molecules/SortableList'
 export { PrSlider } from './components/atoms/Slider'
@@ -110,6 +110,7 @@ export type {
   PrSheetProps,
   PrSidebarItemProps,
   PrSidebarProps,
+  PrSidebarSectionProps,
   PrSidebarSubItemProps,
   PrSortableListChange,
   PrSortableListProps,

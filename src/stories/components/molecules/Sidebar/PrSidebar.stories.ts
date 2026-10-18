@@ -22,6 +22,7 @@ import {
   PrNavbar,
   PrSidebar,
   PrSidebarItem,
+  PrSidebarSection,
 } from '../../../../index'
 import '../../navigation.stories.css'
 
@@ -86,6 +87,7 @@ function shellStory(sidebar: string, content = defaultContent(), initialPath = '
       PrNavbar,
       PrSidebar,
       PrSidebarItem,
+      PrSidebarSection,
     },
     setup() {
       return createNavigationStorySetup(initialPath)
@@ -189,6 +191,23 @@ export const WithSubmenu: Story = {
       </PrSidebarItem>
     </PrSidebar>
   `, defaultContent(), '/settings/security'),
+}
+
+export const WithSections: Story = {
+  name: 'With sections',
+  render: () => shellStory(`
+    <PrSidebar>
+      <PrSidebarSection label="Association">
+        <PrSidebarItem :icon="House" label="Tableau de bord" href="/" :active="isActive('/')" />
+        <PrSidebarItem :icon="Users" label="Membres" href="/members" :active="isActive('/members')" />
+        <PrSidebarItem :icon="CalendarDays" label="Evénements" href="/events" :active="isActive('/events')" />
+      </PrSidebarSection>
+      <PrSidebarSection label="Administration">
+        <PrSidebarItem :icon="Shield" label="Utilisateurs" href="/admin/users" :active="isActive('/admin/users')" />
+        <PrSidebarItem :icon="Settings" label="Paramètres" href="/settings" :active="isActive('/settings')" />
+      </PrSidebarSection>
+    </PrSidebar>
+  `),
 }
 
 export const WithBadges: Story = {

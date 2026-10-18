@@ -2,6 +2,15 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.7 (2026-10-18)
+
+Septieme version candidate, sous le tag npm `next`. Des titres de groupes dans la sidebar, et des tableaux sans cadre pour les tableaux de bord.
+
+### Ajouts
+
+- **`PrSidebarSection`** : un titre au-dessus d'un groupe d'entrees de la sidebar (`label`). Dans une sidebar etroite (repliee, ou menu ferme sur telephone), le titre devient un trait entre les groupes, et reste lu par les lecteurs d'ecran. Voir le README, « Groupes d'entrees dans la sidebar ».
+- **`variant="borderless"` sur `PrTable`** : un tableau sans cadre ni bandeau d'en-tete, pour les listes des tableaux de bord : en-tetes en gris, trait leger entre les lignes (pas sous la derniere), ligne survolee mise en avant. Par defaut (`variant="default"`), rien ne change.
+
 ## 1.0.0-rc.6 (2026-10-13)
 
 Sixieme version candidate, sous le tag npm `next`. Affiche la photo de l'utilisateur dans la navbar.
