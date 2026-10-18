@@ -255,6 +255,16 @@ Une liste dont on change l'ordre a la souris, au doigt ou au clavier. Chaque ele
 - Une liste vide montre ou deposer (`empty-text` ou slot `empty`). Pres du bord de la fenetre, ou d'un conteneur qui defile, la page defile pendant le glisser.
 - Les listes sont verticales ; deux listes d'un meme groupe ne s'imbriquent pas l'une dans l'autre (des modules qui se reordonnent et contiennent des lecons : deux groupes differents).
 
+### Tableaux sans cadre (`PrTable variant="borderless"`)
+
+Pour les listes d'un tableau de bord, posees directement sur une carte ou sur la page : ni cadre ni bandeau d'en-tete, des en-tetes en gris, un trait leger entre les lignes (pas sous la derniere), la ligne survolee mise en avant. `variant="default"` garde le tableau encadre.
+
+```vue
+<PrTable variant="borderless">...</PrTable>
+```
+
+En Blade : `<table is="vue:pr-table" variant="borderless">`.
+
 ### Groupes d'entrees dans la sidebar (`PrSidebarSection`)
 
 Pour ranger les entrees d'une sidebar sous des titres (« Chat », « Administration »...). Quand la sidebar est etroite (repliee sur ordinateur, ou menu ferme sur telephone), le titre laisse la place a un trait entre les groupes, sans trait au-dessus du premier. Les lecteurs d'ecran lisent toujours le titre : chaque section est un groupe nomme (`role="group"`).
