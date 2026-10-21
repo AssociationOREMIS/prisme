@@ -165,6 +165,9 @@ export const prMessagesEn: PrMessages = {
     cancelled: (label) => `Move cancelled: ${label} is back in place.`,
     empty: 'No items.',
   },
+  stepper: {
+    step: 'Step',
+  },
   tagInput: {
     placeholder: 'Add...',
     remove: (tag) => `Remove ${tag}`,
