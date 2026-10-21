@@ -1,0 +1,33 @@
+# Dependabot only opens pull requests: nothing is ever merged automatically.
+#
+# Supply chain safety: a new version is proposed only once it has been public for a while
+# (cooldown), the time for a hijacked release to be spotted and pulled. Security updates
+# (a known vulnerability in package-lock.json) skip the cooldown and come
+# right away, whatever the settings below.
+version: 2
+updates:
+  # Actions of the CI, publish and Storybook workflows, pinned by commit SHA.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: [ "*" ]
+    commit-message:
+      prefix: chore
+
+  # JS packages: security updates only (no routine version bumps).
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    groups:
+      npm-security:
+        applies-to: security-updates
+        patterns: [ "*" ]
+    commit-message:
+      prefix: fix
