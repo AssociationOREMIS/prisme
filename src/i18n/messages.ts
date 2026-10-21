@@ -160,6 +160,10 @@ export interface PrMessages {
     cancelled: (label: string) => string
     empty: string
   }
+  stepper: {
+    /** Read before the step number on its button, e.g. "Étape 1 Identité". */
+    step: string
+  }
   tagInput: {
     placeholder: string
     remove: (tag: string) => string
@@ -346,6 +350,9 @@ export const prMessagesFr: PrMessages = {
     dropped: (label, position, total) => `Déplacement terminé : ${label}, position ${position} sur ${total}.`,
     cancelled: (label) => `Déplacement annulé : ${label} reprend sa place.`,
     empty: 'Aucun élément.',
+  },
+  stepper: {
+    step: 'Étape',
   },
   tagInput: {
     placeholder: 'Ajouter...',
