@@ -18,6 +18,8 @@ export interface PrTabsProps {
   defaultValue?: string
   tabs?: PrTab[]
   orientation?: 'horizontal' | 'vertical'
+  /** Name of the list of tabs for screen readers (« Sections du dossier »). */
+  ariaLabel?: string
 }
 
 withDefaults(defineProps<PrTabsProps>(), {
@@ -25,6 +27,7 @@ withDefaults(defineProps<PrTabsProps>(), {
   defaultValue: undefined,
   tabs: () => [],
   orientation: 'horizontal',
+  ariaLabel: undefined,
 })
 
 const emit = defineEmits<{
@@ -42,12 +45,15 @@ const emit = defineEmits<{
     @update:model-value="emit('update:modelValue', $event)"
   >
     <TabsList
+      :aria-label="ariaLabel"
       class="pr-tabs__list pr:relative pr:flex pr:shrink-0 pr:border-[var(--pr-color-border)]"
       :class="orientation === 'vertical' ? 'pr:flex-col pr:border-r' : 'pr:flex-row pr:overflow-x-auto pr:border-b'"
     >
       <TabsIndicator
         class="pr-tabs__indicator pr:absolute pr:bg-[var(--pr-color-primary)] pr:transition-all pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
-        :class="orientation === 'vertical' ? 'pr:right-0 pr:w-0.5 pr:translate-x-px' : 'pr:bottom-0 pr:h-0.5'"
+        :class="orientation === 'vertical'
+          ? 'pr:right-0 pr:top-0 pr:w-0.5 pr:h-[var(--reka-tabs-indicator-size)] pr:translate-x-px pr:translate-y-[var(--reka-tabs-indicator-position)]'
+          : 'pr:bottom-0 pr:left-0 pr:h-0.5 pr:w-[var(--reka-tabs-indicator-size)] pr:translate-x-[var(--reka-tabs-indicator-position)]'"
       />
       <TabsTrigger
         v-for="tab in tabs"

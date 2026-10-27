@@ -55,6 +55,16 @@ Testé le 2026-09-09 via une page de démo dédiée dans `forge` (`/dev/a11y-tes
 - [x] **Bug distinct trouvé le 2026-09-09** (par l'utilisateur, en testant `/dev/a11y-test` à la main) : `PrSlider` utilisé sans `v-model` (seulement `default-value`, exactement le cas de la démo a11y) ne pouvait pas du tout être déplacé — le curseur revenait à sa position de départ dès qu'on le glissait. Cause : `sliderValue` était calculé comme `modelValue ?? defaultValue` et bindé tel quel sur `SliderRoot`, qui restait donc en permanence "contrôlé" sur une valeur constante (rien ne fait jamais évoluer `defaultValue`). Corrigé en gardant un état interne qui suit le drag en l'absence de `v-model`, tout en laissant `modelValue` prioritaire dès qu'il est fourni. Voir `BACKLOG.md`.
 - [x] `PrThemeToggle` avec une prop `label` custom : vérifier que le lecteur d'écran annonce ce label plutôt que le message dynamique par défaut. Déjà correct dans le code (`accessibleLabel = props.label ?? nextThemeLabel.value`) : vérifié, le `aria-label` est exactement le label custom fourni quand il est présent.
 
+## Audit d'accessibilité de la 1.0.0-rc.7 (corrections du 2026-10-27) : à vérifier à la main
+
+Vérifié automatiquement : axe (WCAG 2.2 AA et bonnes pratiques, `target-size` compris) sur chaque story en clair et en sombre, à 1360 et 320 px de large ; parcours clavier et focus dans les `play` des stories et `src/components/accessibility.test.ts` ; captures en émulation `forced-colors` de Chromium. Reste à faire sans émulation :
+
+- [ ] **NVDA + Firefox, JAWS + Chrome, VoiceOver macOS et iOS** : lien « Aller au contenu » (le focus arrive bien sur le contenu, la tabulation suivante repart de là) ; annonces polies de `PrDataTable` (« Chargement », « 12 résultats. Page 1 sur 2 », « Page 2 sur 2 ») sans doublon avec la région de la navigation Blade ; ajout et retrait des puces de `PrTagInput` et `PrCombobox` ; fichiers refusés et envoyés de `PrFileUpload` ; statut « Étape 2 sur 4 » de `PrStepper` ; toasts info et succès en poli, avertissement et erreur en assertif ; menu utilisateur (le nom, l'email et les rôles lus comme description du menu) ; cases et radios avec description (nom = libellé, description lue après) ; boutons « Monter » / « Descendre » de `PrSortableList`.
+- [ ] **Mode contraste élevé Windows réel** (thèmes « Désert », « Crépuscule », « Aquatique ») et Firefox avec couleurs forcées : interrupteur, groupe de boutons (choix unique et multiple), onglet actif, page courante, jour choisi, étapes du stepper, barre de progression et curseur, entrée active de la sidebar, option surlignée des listes, anneaux de focus.
+- [ ] **Safari** (macOS, iOS) : le bouton en chargement de `PrAlertDialog` garde le focus ; « Page suivante » sur la dernière page ; zones défilantes (`PrScrollArea`, bloc de code de `PrTypography`) atteignables au clavier ; lien d'évitement.
+- [ ] **Commande vocale** (Voice Control, Dragon) : « Cliquer sur Camille MARTIN » ouvre le menu utilisateur, y compris sous 768 px ; boutons « Monter Les formes ».
+- [ ] **Dans une vraie app** (forge, PIO) : navbar collante et `scroll-padding-top` (Maj+Tab ne laisse aucun élément focalisé sous la navbar), pied de page avec la mention « Accessibilité : ... », zoom 200 % et 400 %.
+
 ## Responsive (testé le 2026-09-09 via `forge`, Chromium/Playwright headless)
 
 - [x] Pas de scroll horizontal de page à 360px, 390px, 780px et 1440px de large sur une page avec `PrDataTable` + formulaire complexe (`PrToggleGroup` 7 items, `PrSelect`) + `PrDialog`. Un bug d'app consommatrice (wrapper `display:grid` sans colonnes explicites, cf. `BACKLOG.md`) faisait déborder la page et sortir `PrNavbar` du cadre au scroll horizontal — corrigé côté `forge`, pas un bug Prisme, mais bon réflexe à vérifier sur toute nouvelle page.
@@ -94,6 +104,17 @@ Extrait le 2026-09-12 de `LessonEditor.vue` (Formation) vers `PrRichTextEditor`.
 - [ ] Chaque variante `Callout` (info/succès/avertissement/danger) : insertion, bascule vers une autre variante sans dupliquer l'encadré, et retrait (toggle sur la même variante) qui "délift" le contenu sans le perdre. Vérifier aussi que `editor-content.css` rend les callouts à l'identique en édition et dans la vue étudiant en lecture seule (couleurs, icône, retrait `border-left`).
 - [ ] Comparaison visuelle du rendu HTML avant/après migration entre l'ancien `_lesson_content.scss` (Bootstrap) et `@oremis/prisme/styles/editor-content.css` (tokens `--pr-*`) sur un contenu de leçon existant représentatif (tableaux, code, callouts, détails) — les tokens de couleur ont changé de valeurs exactes (palette Prisme vs Bootstrap), un écart de nuance est attendu, seule une régression de lisibilité/contraste serait un bug.
 - [ ] Prop `disabled` : vérifier que l'éditeur devient réellement non éditable (`editor.isEditable === false`), que tous les boutons de la toolbar sont désactivés, et qu'aucune image ne peut être déposée (drag & drop) pendant que l'éditeur est désactivé.
+
+### Accessibilité de l'éditeur (2026-10-27)
+
+Automatisé : `PrRichTextEditor.test.ts` (alt à l'insertion et case « décorative », aller-retour `getHTML`/`setContent` de `alt`, `title` d'iframe, `scope` des `th`, `aria-label` des cases, préfixe des encadrés, `aria-pressed` dont Italique, flèches/Début/Fin de la barre d'outils, menu emoji au clavier, bouton image en `aria-disabled` pendant l'envoi) et stories `ToolbarKeyboard`, `EmojiPickerKeyboard`, `ColorPickerFocus`, `AccessibleContent`, `ImageAlternativeText` (axe en clair et en sombre). Reste à valider à la main :
+
+- [ ] NVDA + Firefox et VoiceOver : la barre d'outils est annoncée comme telle, un seul arrêt de tabulation, état « enfoncé » des boutons bascule, menu emoji (noms français, Échap), panneau du texte alternatif (titre du groupe, erreur lue).
+- [ ] Statut d'envoi d'image (« Envoi de l'image en cours… », « Image envoyée. ») lu une fois, sans doublon avec l'erreur (`role="alert"`).
+- [ ] Vue élève (lecture seule, `editor-content.css`) : cases à cocher lues avec le texte de la tâche, préfixe des encadrés lu (« Attention : »), `th` reliés aux cellules, titre de la vidéo, images décoratives ignorées.
+- [ ] Le nettoyeur HTML de Formation garde `alt`, `title`, `scope`, `aria-label`, `class="pr-editor-sr-only"` et `data-callout-*`.
+- [ ] Contenu existant : les encadrés enregistrés avant le préfixe s'ouvrent et se réenregistrent sans perte ; les images sans `alt` sont signalées sous l'éditeur et se corrigent par le bouton « Texte alternatif et taille de l'image ».
+- [ ] Sélection d'une image au clavier (flèches autour de l'image) pour activer ce bouton, dans Chrome et Firefox.
 
 ## Sidebar — badges de notification + réalignement visuel sur `data`/`formation` (2026-09-13)
 

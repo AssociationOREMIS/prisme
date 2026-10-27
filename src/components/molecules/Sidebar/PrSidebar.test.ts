@@ -20,7 +20,7 @@ function mountPage() {
     template: '<div><PrSidebar><a href="/benevoles">Bénévoles</a></PrSidebar><button id="outside">Contenu</button></div>',
   })
   const wrapper = mount(Page, { attachTo: document.body })
-  const aside = () => wrapper.find('aside').attributes('data-mobile-expanded')
+  const aside = () => wrapper.find('.pr-sidebar').attributes('data-mobile-expanded')
   return { wrapper, aside }
 }
 
@@ -30,7 +30,7 @@ describe('PrSidebar mobile flyout', () => {
     await wrapper.find('.pr-sidebar__collapse').trigger('click')
     expect(aside()).toBe('true')
 
-    await wrapper.find('aside').trigger('focusout', { relatedTarget: wrapper.find('#outside').element })
+    await wrapper.find('.pr-sidebar').trigger('focusout', { relatedTarget: wrapper.find('#outside').element })
 
     expect(aside()).toBe('false')
   })
@@ -39,7 +39,7 @@ describe('PrSidebar mobile flyout', () => {
     const { wrapper, aside } = mountPage()
     await wrapper.find('.pr-sidebar__collapse').trigger('click')
 
-    await wrapper.find('aside').trigger('focusout', { relatedTarget: wrapper.find('a').element })
+    await wrapper.find('.pr-sidebar').trigger('focusout', { relatedTarget: wrapper.find('a').element })
 
     expect(aside()).toBe('true')
   })

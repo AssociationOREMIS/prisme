@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { ProgressIndicator, ProgressRoot } from 'reka-ui'
+import { warnWithoutName } from '../../accessibleName'
 
 export interface PrProgressProps {
   modelValue?: number
@@ -19,6 +20,8 @@ const props = withDefaults(defineProps<PrProgressProps>(), {
   showValue: false,
 })
 
+warnWithoutName('PrProgress', props.label)
+
 const progressValue = computed(() => props.modelValue ?? 0)
 const progressMax = computed(() => props.max ?? 100)
 // The bar and the displayed number are a share of `max`, not the raw value (max=10, value=5 is 50%).
@@ -36,7 +39,7 @@ const labelId = `pr-progress-${useId()}-label`
       <span v-if="label" :id="labelId" class="pr-progress__label pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)]">{{ label }}</span>
       <span v-if="showValue" class="pr-progress__value pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)] pr:tabular-nums">{{ percent }}%</span>
     </div>
-    <ProgressRoot class="pr-progress__root pr:h-2 pr:overflow-hidden pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-surface-subtle)]" :model-value="progressValue" :max="progressMax" :aria-labelledby="label ? labelId : undefined" :aria-label="label ? undefined : ariaLabel">
+    <ProgressRoot class="pr-progress__root pr:h-2 pr:overflow-hidden pr:rounded-[var(--pr-radius-full)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface-subtle)]" :model-value="progressValue" :max="progressMax" :aria-labelledby="label ? labelId : undefined" :aria-label="label ? undefined : ariaLabel">
       <ProgressIndicator
         class="pr-progress__indicator pr:h-full pr:w-full pr:rounded-[inherit] pr:bg-[var(--pr-color-primary)] pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
         :style="{ transform: progressTransform }"

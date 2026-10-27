@@ -4,6 +4,7 @@ import { computed, ref, useId, watch } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { useFieldValue } from '../../fieldValue'
 import { usePrMessages } from '../../../i18n/context'
+import { warnWithoutName } from '../../accessibleName'
 
 export interface PrNumberInputProps {
   /** `null` when the field is empty. */
@@ -38,6 +39,8 @@ const props = withDefaults(defineProps<PrNumberInputProps>(), {
   name: undefined,
 })
 
+warnWithoutName('PrNumberInput', props.label)
+
 const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
@@ -51,11 +54,12 @@ const generatedId = useId()
 const inputId = computed(() => props.id ?? `pr-number-input-${generatedId}`)
 const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
-// Only the message actually shown: the error replaces the hint.
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+// The error, then the hint: the hint stays shown with the error, the format it gives is what
+// fixing the error needs (RGAA 11.10).
+const describedBy = computed(() => [
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+].filter(Boolean).join(' ') || undefined)
 
 // Without a v-model (a plain Blade form), the +/- buttons and typing must still change the
 // value: the field keeps it, while a real v-model controls it.
@@ -171,7 +175,7 @@ defineOptions({ inheritAttrs: false })
       <input
         :id="inputId"
         v-bind="$attrs"
-        class="pr-number-input__field pr:min-w-0 pr:grow pr:bg-transparent pr:px-[var(--pr-space-3)] pr:text-center pr:text-[length:var(--pr-font-size-md)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed pr:disabled:text-[color:var(--pr-color-text-muted)] pr:[appearance:textfield] pr:[&::-webkit-inner-spin-button]:appearance-none pr:[&::-webkit-outer-spin-button]:appearance-none"
+        class="pr-number-input__field pr:min-w-0 pr:grow pr:border-0 pr:bg-transparent pr:px-[var(--pr-space-3)] pr:text-center pr:text-[length:var(--pr-font-size-md)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed pr:disabled:text-[color:var(--pr-color-text-muted)] pr:[appearance:textfield] pr:[&::-webkit-inner-spin-button]:appearance-none pr:[&::-webkit-outer-spin-button]:appearance-none"
         type="number"
         :value="inputValue"
         :min="min"
@@ -198,7 +202,7 @@ defineOptions({ inheritAttrs: false })
         <Plus :size="14" aria-hidden="true" />
       </button>
     </div>
+    <p v-if="hint" :id="hintId" class="pr-number-input__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
     <p v-if="errorText" :id="errorId" class="pr-number-input__message pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-number-input__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

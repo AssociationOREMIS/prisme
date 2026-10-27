@@ -29,7 +29,8 @@
   display: grid;
   min-height: 100svh;
   grid-template-columns: minmax(var(--pr-sidebar-collapsed-width), auto) minmax(0, 1fr);
-  grid-template-rows: var(--pr-navbar-height) minmax(0, 1fr);
+  /* The third row only takes room when the page has a footer. */
+  grid-template-rows: var(--pr-navbar-height) minmax(0, 1fr) auto;
 }
 
 .pr-shell-grid__content {
@@ -40,6 +41,65 @@
   padding: var(--pr-space-6);
 }
 
+/* The skip link and Prisme's page navigation focus the content itself: no ring around the whole
+   page, the next Tab goes on from there. */
+.pr-shell-grid__content:focus {
+  outline: none;
+}
+
+.pr-shell-grid__footer {
+  grid-column: 2;
+  grid-row: 3;
+  min-width: 0;
+  padding: var(--pr-space-4) var(--pr-space-6);
+  border-top: 1px solid var(--pr-color-border);
+  font-size: var(--pr-font-size-sm);
+  color: var(--pr-color-text-muted);
+}
+
+.pr-shell-grid__footer a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.pr-shell-grid__footer a:hover {
+  color: var(--pr-color-text);
+}
+
+.pr-shell-grid__footer a:focus-visible {
+  outline: 2px solid var(--pr-color-focus);
+  outline-offset: 2px;
+  border-radius: var(--pr-radius-sm);
+}
+
+/* The sticky navbar must never hide the element that has the focus (WCAG 2.4.11): scrolling to a
+   focused element (Tab, Shift+Tab, a link to an anchor) stops below it. */
+html:has(.pr-navbar) {
+  scroll-padding-top: calc(var(--pr-navbar-height) + var(--pr-space-2));
+}
+
+/* Skip link (PrAppShell): out of sight until it has the keyboard focus, then above the navbar. */
+.pr-skip-link {
+  position: fixed;
+  top: var(--pr-space-2);
+  left: var(--pr-space-2);
+  z-index: 110;
+  padding: var(--pr-space-2) var(--pr-space-4);
+  border-radius: var(--pr-radius-md);
+  background: var(--pr-color-surface);
+  color: var(--pr-color-primary);
+  font-weight: 700;
+  text-decoration: underline;
+  box-shadow: var(--pr-shadow-md);
+  transform: translateY(calc(-100% - var(--pr-space-4)));
+}
+
+.pr-skip-link:focus {
+  transform: none;
+  outline: 2px solid var(--pr-color-focus);
+  outline-offset: 2px;
+}
+
 @media (min-width: 1024px) {
   .pr-shell-grid__content {
     padding: var(--pr-space-8);
@@ -48,6 +108,10 @@
 
 @media (max-width: 780px) {
   .pr-shell-grid__content {
+    padding: var(--pr-space-4);
+  }
+
+  .pr-shell-grid__footer {
     padding: var(--pr-space-4);
   }
 }

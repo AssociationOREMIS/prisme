@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { CircleCheck, CircleX, FileUp, RotateCw, X } from '@lucide/vue'
-import { computed, reactive, ref, useId, watch } from 'vue'
+import { computed, nextTick, reactive, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 import { PrProgress } from '../../atoms/Progress'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { usePrMessages } from '../../../i18n/context'
+import { useLiveAnnouncer } from '../../liveAnnouncer'
+import { warnWithoutName } from '../../accessibleName'
 
 export interface PrRejectedFile {
   file: File
@@ -40,6 +42,11 @@ export interface PrFileUploadProps {
    * PrFileUpload only ever collects File[] for a native/manual form submission.
    */
   upload?: (file: File, onProgress: (percent: number) => void) => Promise<void>
+  /**
+   * Hides the list of refused files (too large, wrong type, too many) shown under the drop zone,
+   * for an app that shows them itself from the `reject` event.
+   */
+  hideRejected?: boolean
 }
 
 const props = withDefaults(defineProps<PrFileUploadProps>(), {
@@ -57,9 +64,18 @@ const props = withDefaults(defineProps<PrFileUploadProps>(), {
   name: undefined,
   id: undefined,
   upload: undefined,
+  hideRejected: false,
 })
 
+warnWithoutName('PrFileUpload', props.label)
+
 const messages = usePrMessages()
+const { message: liveMessage, announce } = useLiveAnnouncer()
+const rootRef = ref<HTMLElement | null>(null)
+const dropzoneRef = ref<HTMLElement | null>(null)
+// The files refused at the last pick or drop, shown under the drop zone: refusing them silently
+// left the person wondering why nothing happened (RGAA 11.10).
+const rejectedFiles = ref<PrRejectedFile[]>([])
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
@@ -96,11 +112,13 @@ async function startUpload(file: File) {
       if (current) current.progress = Math.min(Math.max(percent, 0), 100)
     })
     uploadStates.set(file, { status: 'success', progress: 100 })
+    announce(messages.fileUpload.uploadedFile(file.name))
     emit('uploaded', file)
   }
   catch (err) {
     const message = extractUploadErrorMessage(err)
     uploadStates.set(file, { status: 'error', progress: 0, error: message })
+    announce(messages.fileUpload.rejected(file.name, message))
     emit('upload-error', { file, error: message })
   }
 }
@@ -116,15 +134,15 @@ const instructionsId = computed(() => `${fieldId.value}-instructions`)
 const hintId = computed(() => `${fieldId.value}-hint`)
 const constraintsId = computed(() => `${fieldId.value}-constraints`)
 const errorId = computed(() => `${fieldId.value}-error`)
-// Only the message actually shown: the error replaces the hint.
 // Everything written inside the dropzone is in its name, the accepted types and size included,
 // so a voice command that says what is shown reaches it (WCAG 2.5.3).
 const labelledBy = computed(() => [labelId.value, instructionsId.value, ...(props.accept || props.maxSize ? [constraintsId.value] : [])].join(' '))
-
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+// The error, then the hint: the hint stays shown with the error, the format it gives is what
+// fixing the error needs (RGAA 11.10).
+const describedBy = computed(() => [
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+].filter(Boolean).join(' ') || undefined)
 
 const inputRef = ref<HTMLInputElement | null>(null)
 const isDraggingOver = ref(false)
@@ -211,7 +229,11 @@ function validateFiles(files: File[]): { accepted: File[]; rejected: PrRejectedF
 function processFiles(rawFiles: FileList | null) {
   if (!rawFiles || props.disabled) return
   const { accepted, rejected } = validateFiles(Array.from(rawFiles))
-  if (rejected.length) emit('reject', rejected)
+  rejectedFiles.value = rejected
+  if (rejected.length) {
+    announce(rejected.map(({ file, reason }) => messages.fileUpload.rejected(file.name, reason)).join('. '))
+    emit('reject', rejected)
+  }
   if (accepted.length) {
     setFiles(props.multiple ? [...currentFiles.value, ...accepted] : accepted.slice(0, 1))
     for (const file of accepted) startUpload(file)
@@ -248,24 +270,36 @@ function onDrop(event: DragEvent) {
 function removeFile(index: number) {
   const updated = [...currentFiles.value]
   const [removed] = updated.splice(index, 1)
-  if (removed) uploadStates.delete(removed)
+  if (removed) {
+    uploadStates.delete(removed)
+    announce(messages.fileUpload.removed(removed.name))
+  }
   setFiles(updated)
+  // The pressed button left with its file: the next file's button takes the focus, or the
+  // previous one, or the drop zone (the focus fell on <body> otherwise).
+  void nextTick(() => {
+    const buttons = Array.from(rootRef.value?.querySelectorAll<HTMLElement>('.pr-file-upload__remove') ?? [])
+    const target = buttons[index] ?? buttons[index - 1] ?? dropzoneRef.value
+    target?.focus()
+  })
 }
 
 const hasFiles = computed(() => currentFiles.value.length > 0)
 </script>
 
 <template>
-  <div class="pr-file-upload pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div ref="rootRef" class="pr-file-upload pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :id="labelId" :for="fieldId" :disabled="disabled">{{ label }}</PrLabel>
     <!-- Outside the dropzone (a role="button" cannot hold another control) and out of the tab
-         order: the dropzone is the keyboard target, this input only opens the picker and posts. -->
+         order: the dropzone is the keyboard target, this input only opens the picker and posts.
+         Hidden from screen readers too, which otherwise met a second button with the same name. -->
     <input
       :id="fieldId"
       ref="inputRef"
       type="file"
       class="pr:sr-only"
       tabindex="-1"
+      aria-hidden="true"
       :multiple="multiple"
       :accept="accept"
       :disabled="disabled"
@@ -274,7 +308,8 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       @change="onInputChange"
     >
     <div
-      class="pr-file-upload__dropzone pr:flex pr:cursor-pointer pr:flex-col pr:items-center pr:justify-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border-2 pr:border-dashed pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-6)] pr:py-[var(--pr-space-8)] pr:text-center pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
+      ref="dropzoneRef"
+      class="pr-file-upload__dropzone pr:flex pr:cursor-pointer pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:flex-col pr:items-center pr:justify-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border-2 pr:border-dashed pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-6)] pr:py-[var(--pr-space-8)] pr:text-center pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
       :class="{
         'pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-surface-subtle)]': isDraggingOver,
         'pr:cursor-not-allowed pr:opacity-60': disabled,
@@ -307,7 +342,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         <p v-if="accept || maxSize" :id="constraintsId" class="pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">
           <span v-if="accept">{{ accept }}</span>
           <span v-if="accept && maxSize"> · </span>
-          <span v-if="maxSize">Max {{ formatSize(maxSize) }}</span>
+          <span v-if="maxSize">{{ messages.fileUpload.maxSize(formatSize(maxSize)) }}</span>
         </p>
       </div>
     </div>
@@ -335,12 +370,14 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
             {{ stateFor(file).error }}
           </p>
         </div>
-        <CircleCheck
-          v-if="upload && stateFor(file).status === 'success'"
-          class="pr:shrink-0 pr:text-[color:var(--pr-color-success)]"
-          :size="16"
-          aria-hidden="true"
-        />
+        <template v-if="upload && stateFor(file).status === 'success'">
+          <CircleCheck
+            class="pr:shrink-0 pr:text-[color:var(--pr-color-success)]"
+            :size="16"
+            aria-hidden="true"
+          />
+          <span class="pr:sr-only">{{ messages.fileUpload.uploaded }}</span>
+        </template>
         <button
           v-if="upload && stateFor(file).status === 'error'"
           type="button"
@@ -352,7 +389,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         </button>
         <button
           type="button"
-          class="pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+          class="pr-file-upload__remove pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[var(--pr-radius-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="messages.fileUpload.remove(file.name)"
           @click="removeFile(index)"
         >
@@ -360,7 +397,18 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         </button>
       </li>
     </ul>
+    <ul v-if="rejectedFiles.length && !hideRejected" class="pr-file-upload__rejected pr:m-0 pr:grid pr:list-none pr:gap-[var(--pr-space-1)] pr:p-0">
+      <li
+        v-for="({ file, reason }, index) in rejectedFiles"
+        :key="`${file.name}-${index}`"
+        class="pr:flex pr:items-center pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]"
+      >
+        <CircleX class="pr:shrink-0" :size="14" aria-hidden="true" />
+        {{ messages.fileUpload.rejected(file.name, reason) }}
+      </li>
+    </ul>
+    <p class="pr:sr-only" role="status">{{ liveMessage }}</p>
+    <p v-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
     <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

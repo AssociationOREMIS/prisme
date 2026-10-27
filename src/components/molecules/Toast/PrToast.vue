@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject } from 'vue'
+import { usePrMessages } from '../../../i18n/context'
 import { ToastProvider, ToastViewport } from 'reka-ui'
 import { prToastProviderKey } from './context'
 import PrToastContent from './PrToastContent.vue'
@@ -33,6 +34,7 @@ const emit = defineEmits<{
 }>()
 
 const isInToastProvider = inject(prToastProviderKey, false)
+const messages = usePrMessages()
 </script>
 
 <template>
@@ -52,7 +54,7 @@ const isInToastProvider = inject(prToastProviderKey, false)
     <slot />
   </PrToastContent>
 
-  <ToastProvider v-else>
+  <ToastProvider v-else :label="messages.toast.label">
     <PrToastContent
       :open="open"
       :default-open="defaultOpen"
@@ -67,6 +69,6 @@ const isInToastProvider = inject(prToastProviderKey, false)
     >
       <slot />
     </PrToastContent>
-    <ToastViewport class="pr-toast__viewport pr:fixed pr:left-0 pr:right-0 pr:top-0 pr:z-[100] pr:m-0 pr:flex pr:max-h-screen pr:w-full pr:list-none pr:flex-col-reverse pr:gap-[var(--pr-space-3)] pr:p-[var(--pr-space-4)] pr:sm:bottom-0 pr:sm:left-auto pr:sm:right-0 pr:sm:top-auto pr:sm:w-[min(26.25rem,calc(100vw-var(--pr-space-8)))] pr:sm:flex-col" />
+    <ToastViewport :label="messages.toast.region" class="pr-toast__viewport pr:fixed pr:left-0 pr:right-0 pr:top-0 pr:z-[100] pr:m-0 pr:flex pr:max-h-screen pr:w-full pr:list-none pr:flex-col-reverse pr:gap-[var(--pr-space-3)] pr:p-[var(--pr-space-4)] pr:sm:bottom-0 pr:sm:left-auto pr:sm:right-0 pr:sm:top-auto pr:sm:w-[min(26.25rem,calc(100vw-var(--pr-space-8)))] pr:sm:flex-col" />
   </ToastProvider>
 </template>

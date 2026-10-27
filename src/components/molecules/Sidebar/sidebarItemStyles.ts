@@ -14,10 +14,10 @@ export const sidebarItemLinkDisabledClass =
   'pr:cursor-not-allowed pr:opacity-[0.55]'
 
 export const sidebarItemLabelBaseClass =
-  'pr-sidebar-item__label pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[color:var(--pr-color-text)]'
+  'pr-sidebar-item__label pr:line-clamp-2 pr:break-words pr:text-[color:var(--pr-color-text)]'
 
 export const sidebarItemLabelActiveClass =
   'pr:font-[750] pr:text-[color:var(--pr-color-text)]'
 
 export const sidebarItemDescriptionClass =
-  'pr-sidebar-item__description pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[0.8125rem] pr:font-normal pr:text-[color:var(--pr-color-text-subtle)]'
+  'pr-sidebar-item__description pr:line-clamp-2 pr:break-words pr:text-[0.8125rem] pr:font-normal pr:text-[color:var(--pr-color-text-subtle)]'

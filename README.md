@@ -192,6 +192,19 @@ Comme `PrCombobox`/`PrTagInput`, le contenu de l'editeur n'est pas un `<textarea
 <PrRichTextEditor v-model="content" name="body" />
 ```
 
+#### Accessibilite de l'editeur et du contenu produit
+
+- **Barre d'outils** : un seul arret de tabulation (motif "toolbar" de l'APG), fleches gauche/droite, Debut et Fin entre les boutons, Tab revient au dernier bouton utilise. Les boutons bascule (gras, italique, listes, encadres...) portent `aria-pressed`. Le bouton emoji ouvre un menu (fleches, Debut/Fin, Echap rend le focus au bouton), avec des noms d'emoji en francais (`messages.richTextEditor.emojiName`).
+- **Images** : apres l'envoi, un panneau sous la barre d'outils demande le texte alternatif, ou la case "Image decorative" (`alt=""`). Aucune image n'est inseree sans `alt`. Le bouton "Texte alternatif et taille de l'image" (actif quand une image est selectionnee) modifie l'`alt` et la largeur (petite 240 px, moyenne 480 px, pleine largeur) : c'est l'alternative au clavier des poignees de redimensionnement, qui restent a la souris. Une image sans `alt` (contenu plus ancien) est signalee sous l'editeur. `insertImageFromFile(file)` ouvre ce panneau ; `insertImageFromFile(file, alt)` insere directement avec cet `alt`.
+- **Videos YouTube** : le titre de l'iframe est demande a l'insertion ("Video YouTube" par defaut).
+- **Tableaux** : les cellules d'en-tete ont `scope="col"` (ligne d'en-tete) ou `scope="row"` (colonne d'en-tete). Pas encore de legende (`caption`).
+- **Listes a cocher** : chaque case a un `aria-label` (le texte de la tache), dans l'editeur et dans le HTML enregistre, et une cible de 24 px.
+- **Encadres** : le HTML contient le sens de l'encadre en texte ("Attention :"), masque visuellement par la classe `pr-editor-sr-only` d'`editor-content.css`. Une page qui affiche ce HTML sans `editor-content.css` montre ce prefixe en clair.
+- **Liens** : soulignes dans `.pr-editor-content`.
+- **Couleur du texte** : le selecteur est libre, l'auteur peut donc choisir une couleur peu contrastee (jaune pale, ou noir illisible en theme sombre). A eviter, ou a reserver a des mots deja mis en valeur autrement.
+
+Les noeuds tiptap accessibles (`AccessibleImage`, `AccessibleYoutube`, `AccessibleTaskItem`, `ScopedTableHeader`) sont exportes par `@oremis/prisme/editor` (et `@oremis/prisme/tiptap/<nom>`), pour une app qui monte son propre editeur. Un nettoyeur HTML cote serveur (HTMLPurifier...) doit garder `alt`, `title` (iframe), `scope`, `aria-label` (cases), `class` et `data-callout-prefix`/`data-callout-content`, sinon ces informations sont perdues a l'affichage.
+
 ### Boutons d'action (`action`)
 
 Pour les actions courantes, `action` regle l'icone, le libelle et le ton en une prop : un bouton discret (`ghost`), carre avec seulement l'icone, dont le libelle est le nom accessible et l'infobulle.
@@ -281,6 +294,52 @@ Pour ranger les entrees d'une sidebar sous des titres (« Chat », « Administra
 ```
 
 A preferer aux sous-items (`PrSidebarSubItem`) pour regrouper des pages qu'on ouvre souvent : une sidebar etroite cache les sous-items, alors que les entrees d'une section restent a un clic.
+
+### Accessibilite (RGAA 4.1.2, WCAG 2.2 AA)
+
+Prisme rend la plupart des criteres conformes par defaut. Ce qui reste a la charge de l'app, et les briques fournies pour le faire :
+
+**Mise en page (`PrAppShell`, `PrNavbar`)**
+
+- **Lien d'evitement** : `PrAppShell` commence par un lien « Aller au contenu », invisible jusqu'a la premiere tabulation, qui envoie le focus sur le `<main>` (`id="main-content"`). `main-id` change cet id, `skip-link-label` son texte, `hide-skip-link` le retire (page qui a deja le sien). Sans `PrAppShell`, ajoutez un lien `<a class="pr-skip-link" href="#...">` en tete de page : la classe suffit pour le style.
+- **Pied de page** : le slot `footer` de `PrAppShell` est rendu en `<footer>` (repere `contentinfo`). C'est la place de la mention obligatoire « Accessibilite : non / partiellement / totalement conforme », lien vers la declaration d'accessibilite, avec les mentions legales et le plan du site.
+- **Lien vers l'accueil** : `home-href` sur `PrNavbar` fait du logo et du titre un lien vers la page d'accueil. `logo-alt` donne l'alternative du logo (par defaut `brand-label`), laissee vide quand le titre a cote dit deja la meme chose.
+- La navbar collante ne cache plus l'element qui a le focus : la page defile en tenant compte de sa hauteur (`scroll-padding-top`).
+
+```vue
+<PrAppShell>
+  <template #navbar><PrNavbar title="Formation" home-href="/" /></template>
+  <template #sidebar>...</template>
+  ...
+  <template #footer>
+    <a href="/accessibilite">Accessibilite : partiellement conforme</a>
+    · <a href="/plan-du-site">Plan du site</a>
+    · <a href="/mentions-legales">Mentions legales</a>
+  </template>
+</PrAppShell>
+```
+
+**Ce que l'app doit fournir**
+
+- La langue (`<html lang="fr">`) et un titre de page unique (`<title>`). La navigation sans rechargement de Prisme met a jour les deux.
+- Un nom a chaque champ : `label`, ou `aria-label`. Un champ sans nom, un `PrDataTable` ou un `PrTable` sans `caption` (ni `aria-label`) le signalent dans la console.
+- Le texte des badges (`PrBadge`) porte le statut, pas seulement sa couleur.
+- `aria-busy="true"` sur le conteneur de squelettes de chargement que l'app affiche elle-meme (`PrDataTable` le fait seul).
+- Une mention « * champ obligatoire » en tete d'un formulaire qui utilise l'asterisque.
+- `PrHoverCard` seulement pour un contenu non essentiel et non interactif : il s'ouvre au survol et au focus, mais son contenu n'est pas atteignable au clavier. Sinon, `PrPopover`.
+- Le contenu ecrit dans `PrRichTextEditor` (voir plus haut) : textes alternatifs, sous-titres des videos, titres dans l'ordre.
+
+**Props ajoutees pour l'accessibilite**
+
+- `PrDataTable` : `caption` (et `caption-hidden` pour ne la garder que pour les lecteurs d'ecran), `aria-label`, `row-header-key` (la colonne qui nomme chaque ligne devient un en-tete de ligne), `actions-label` (nom du bouton d'actions de chaque ligne, « Actions pour » et la premiere colonne par defaut). Le tableau annonce le chargement, le nombre de resultats d'un filtre et la page atteinte.
+- `PrTable` : `caption-hidden`, `aria-label`.
+- `PrTabs`, `PrStepper`, `PrScrollArea` : `aria-label`. `PrAccordion`, `PrPopover` : `heading-level`. `PrTypography` : `as` (le style d'un `h2` sur un `h3`, par exemple).
+- `PrSortableList` : `move-buttons` (actif par defaut), des boutons « Monter » / « Descendre » pour deplacer un element d'un seul clic, sans glisser (WCAG 2.5.7).
+- `PrFileUpload` : `hide-rejected`, pour masquer la liste des fichiers refuses quand l'app les affiche elle-meme.
+
+**Mode contraste eleve (Windows)** : les etats portes par un fond (interrupteur, choix d'un groupe de boutons, onglet actif, page courante, jour choisi, barre de progression, entree active de la sidebar) prennent les couleurs systeme (`src/styles/forced-colors.css`).
+
+**Tests** : chaque story passe axe (WCAG 2.0 a 2.2 A et AA, dont `target-size`, et les bonnes pratiques) en theme clair et en theme sombre (`npm run test`).
 
 ### Largeur des fenetres et des volets (`size`)
 

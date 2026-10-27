@@ -35,19 +35,19 @@ function move(delta: number) {
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- a focusable carousel region: arrow keys move between slides -->
   <section
     class="pr-carousel pr:grid pr:grid-cols-[auto_1fr_auto] pr:items-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
-    aria-roledescription="carousel"
+    :aria-roledescription="messages.carousel.roleDescription"
     :aria-label="ariaLabel ?? messages.carousel.label"
     tabindex="0"
     @keydown.left.prevent="move(-1)"
     @keydown.right.prevent="move(1)"
   >
-    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]" type="button" :aria-label="messages.carousel.previous" @click="move(-1)">
-      <ChevronLeft :size="16" />
+    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" type="button" :aria-label="messages.carousel.previous" @click="move(-1)">
+      <ChevronLeft :size="16" aria-hidden="true" />
     </button>
     <div
       class="pr-carousel__item pr:grid pr:min-w-0 pr:gap-[var(--pr-space-1)] pr:text-center pr:[&_span]:text-[length:var(--pr-font-size-sm)] pr:[&_span]:text-[color:var(--pr-color-text-muted)]"
       role="group"
-      aria-roledescription="slide"
+      :aria-roledescription="messages.carousel.slideRoleDescription"
       :aria-label="positionLabel"
       aria-live="polite"
       aria-atomic="true"
@@ -55,8 +55,8 @@ function move(delta: number) {
       <strong>{{ current?.title }}</strong>
       <span v-if="current?.description">{{ current.description }}</span>
     </div>
-    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]" type="button" :aria-label="messages.carousel.next" @click="move(1)">
-      <ChevronRight :size="16" />
+    <button class="pr-carousel__button pr:inline-grid pr:size-8 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" type="button" :aria-label="messages.carousel.next" @click="move(1)">
+      <ChevronRight :size="16" aria-hidden="true" />
     </button>
   </section>
 </template>

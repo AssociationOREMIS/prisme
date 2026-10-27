@@ -3,10 +3,13 @@ import { ScrollAreaRoot, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewpor
 
 export interface PrScrollAreaProps {
   maxHeight?: string
+  /** Name of the scrolling area (a `region` landmark), when its content has no title of its own. */
+  ariaLabel?: string
 }
 
 withDefaults(defineProps<PrScrollAreaProps>(), {
   maxHeight: '16rem',
+  ariaLabel: undefined,
 })
 
 // Absolutely positioned (overlay) rather than laid out in normal flow: `ScrollAreaRoot`
@@ -25,7 +28,14 @@ const scrollbarClass = 'pr-scroll-area__scrollbar pr:absolute pr:flex pr:touch-n
     class="pr-scroll-area pr:group/scroll-area pr:flex pr:flex-col pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)]"
     :style="{ maxHeight }"
   >
-    <ScrollAreaViewport class="pr-scroll-area__viewport pr:min-h-0 pr:min-w-0 pr:flex-1 pr:p-[var(--pr-space-4)]">
+    <!-- Focusable: the keyboard scrolls it even when its content has nothing to focus (Safari and
+         Firefox do not make a scrolling area focusable on their own). -->
+    <ScrollAreaViewport
+      class="pr-scroll-area__viewport pr:min-h-0 pr:min-w-0 pr:flex-1 pr:p-[var(--pr-space-4)] pr:focus-visible:outline-2 pr:focus-visible:-outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+      tabindex="0"
+      :role="ariaLabel ? 'region' : undefined"
+      :aria-label="ariaLabel"
+    >
       <slot />
     </ScrollAreaViewport>
     <ScrollAreaScrollbar :class="[scrollbarClass, 'pr:group-has-[[data-orientation=horizontal]]/scroll-area:[--reka-scroll-area-corner-height:0.625rem]']" orientation="vertical">

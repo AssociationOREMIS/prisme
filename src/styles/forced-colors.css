@@ -1,0 +1,126 @@
+/*
+ * Windows high contrast and other forced color modes (WCAG 1.4.1, 1.4.11; RGAA 3.1, 10.5).
+ * The browser then replaces every background with the system background (Canvas): states that
+ * Prisme draws with a background alone (the switch thumb, the chosen item of a toggle group, the
+ * active tab, the current page, the selected day, a progress bar, the active sidebar entry)
+ * disappeared. Each one gets a system color here, with `forced-color-adjust: none` so the browser
+ * keeps it: Highlight / HighlightText for a selected or "on" state, CanvasText for a shape that must
+ * stay visible, GrayText for a disabled one. Borders and focus outlines survive on their own.
+ * Only Prisme class names: safe in the scoped stylesheet too.
+ */
+@media (forced-colors: active) {
+  /* PrSwitch: the track takes Highlight when on, the thumb is always drawn. */
+  .pr-switch__thumb {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .pr-switch__control[data-state="checked"] {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+  }
+
+  .pr-switch__control[data-state="checked"] .pr-switch__thumb {
+    background: HighlightText;
+  }
+
+  .pr-switch__control[data-disabled] .pr-switch__thumb {
+    background: GrayText;
+  }
+
+  /* PrToggleGroup type="single": its sliding indicator is a background (::before). */
+  .pr-toggle-group--single::before {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  .pr-toggle-group--single .pr-toggle-group__item[data-state="on"] {
+    forced-color-adjust: none;
+    color: HighlightText;
+  }
+
+  /* PrToggleGroup type="multiple" and PrToggle: the pressed items. */
+  .pr-toggle-group:not(.pr-toggle-group--single) .pr-toggle-group__item[data-state="on"],
+  .pr-toggle[data-state="on"] {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* PrTabs: the line under (or beside) the active tab. */
+  .pr-tabs__indicator {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  /* PrPagination: the current page. */
+  .pr-pagination__button--active {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* PrCalendar: the selected day. */
+  .pr-calendar__day[data-selected="true"] {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* PrStepper: the current and completed steps. */
+  .pr-stepper__item[data-state="active"] .pr-stepper__indicator,
+  .pr-stepper__item[data-state="completed"] .pr-stepper__indicator {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* PrProgress and PrSlider: the track keeps an outline, the filled part is Highlight. */
+  .pr-progress__root,
+  .pr-slider__track {
+    border: 1px solid CanvasText;
+  }
+
+  .pr-progress__indicator,
+  .pr-slider__range {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  .pr-slider__thumb {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  /* PrSidebar: the icon box of the current page. */
+  .pr-sidebar-item__icon-box--active {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* Checked boxes: the box itself is filled with the primary color. */
+  .pr-checkbox__control[data-state="checked"],
+  .pr-checkbox__control[data-state="indeterminate"] {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* Highlighted options of a listbox or a menu (the keyboard position): a visible outline. */
+  .pr-select__item[data-highlighted],
+  .pr-combobox__item[data-highlighted],
+  .pr-dropdown-menu__item[data-highlighted],
+  .pr-dropdown-menu__checkbox-item[data-highlighted],
+  .pr-command__item--highlighted {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}

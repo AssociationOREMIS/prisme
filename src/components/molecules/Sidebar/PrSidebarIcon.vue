@@ -8,7 +8,6 @@ import {
   sidebarIconBaseClass,
   sidebarIconInactiveClass,
 } from './sidebarIconStyles'
-import { usePrMessages } from '../../../i18n/context'
 
 export interface PrSidebarIconProps {
   icon: Component
@@ -31,8 +30,6 @@ const props = withDefaults(defineProps<PrSidebarIconProps>(), {
   badgeDot: false,
 })
 
-const messages = usePrMessages()
-
 const iconBoxClass = computed(() => [
   sidebarIconBaseClass,
   props.active ? sidebarIconActiveClass : sidebarIconInactiveClass,
@@ -44,9 +41,6 @@ const badgeLabel = computed(() => {
   if (!hasCount.value) return ''
   return props.badgeCount! > props.badgeMax ? `${props.badgeMax}+` : String(props.badgeCount)
 })
-const badgeAriaLabel = computed(() =>
-  messages.sidebar.notifications(hasCount.value ? props.badgeCount : undefined),
-)
 </script>
 
 <template>
@@ -61,8 +55,7 @@ const badgeAriaLabel = computed(() =>
     <span
       v-if="showBadge"
       :class="hasCount ? sidebarIconBadgeCountClass : sidebarIconBadgeDotClass"
-      role="status"
-      :aria-label="badgeAriaLabel"
+      aria-hidden="true"
     >
       {{ badgeLabel }}
     </span>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useSlots, type Component } from 'vue'
+import { computed, useAttrs, useSlots, type Component } from 'vue'
 import { PrSpinner } from '../Spinner'
 import { PrTooltip } from '../../molecules/Tooltip'
 import { prButtonActions, type PrButtonAction } from './actions'
@@ -61,6 +61,23 @@ if (icon.value && !slots.default && !label.value) {
 
 const isUnavailable = computed(() => props.disabled || props.loading)
 
+// A loading button keeps the focus: `disabled` would drop it on <body> (a keyboard or screen reader
+// user pressing « Confirmer » lost their place while the request ran). It is announced as
+// unavailable (aria-disabled) and ignores clicks instead. An `aria-disabled` given by the app works
+// the same way, for a button that must stay focusable (the last page's « Page suivante »).
+const attrs = useAttrs()
+const isAriaDisabled = computed(() => {
+  const value = attrs['aria-disabled']
+  return props.loading || (Boolean(props.href) && props.disabled) || value === true || value === 'true'
+})
+const isNativeDisabled = computed(() => !props.href && props.disabled)
+
+function blockWhenAriaDisabled(event: Event) {
+  if (!isAriaDisabled.value) return
+  event.preventDefault()
+  event.stopImmediatePropagation()
+}
+
 const buttonBaseClass = [
   'pr-button',
   // Fits its label on one line when there is room, wraps between words instead of overflowing on a
@@ -73,7 +90,8 @@ const buttonBaseClass = [
   'pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]',
   'pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]',
   'pr:disabled:cursor-not-allowed pr:disabled:opacity-[0.58]',
-  // A link has no `disabled`: aria-disabled, and no pointer events so neither hover nor click.
+  // A link has no `disabled`, and a loading button keeps the focus: aria-disabled, and no pointer
+  // events so neither hover nor click.
   'pr:aria-disabled:pointer-events-none pr:aria-disabled:opacity-[0.58]',
   'pr:[&_svg]:shrink-0',
 ]
@@ -129,13 +147,14 @@ const buttonClass = computed(() => [
       v-bind="$attrs"
       :class="buttonClass"
       :type="href ? undefined : type"
-      :disabled="href ? undefined : isUnavailable"
+      :disabled="isNativeDisabled || undefined"
       :href="href && !isUnavailable ? href : undefined"
       :role="href && isUnavailable ? 'link' : undefined"
-      :aria-disabled="href && isUnavailable ? 'true' : undefined"
+      :aria-disabled="isAriaDisabled ? 'true' : undefined"
       :aria-busy="loading ? 'true' : undefined"
       :aria-label="label"
       :data-loading="loading ? 'true' : 'false'"
+      @click.capture="blockWhenAriaDisabled"
     >
       <span v-if="loading" class="pr-button__loader pr:absolute pr:inset-0 pr:inline-flex pr:items-center pr:justify-center" aria-hidden="true">
         <PrSpinner size="sm" :aria-label="messages.common.loading" />
@@ -149,12 +168,13 @@ const buttonClass = computed(() => [
     v-bind="$attrs"
     :class="buttonClass"
     :type="href ? undefined : type"
-    :disabled="href ? undefined : isUnavailable"
+    :disabled="isNativeDisabled || undefined"
     :href="href && !isUnavailable ? href : undefined"
     :role="href && isUnavailable ? 'link' : undefined"
-    :aria-disabled="href && isUnavailable ? 'true' : undefined"
+    :aria-disabled="isAriaDisabled ? 'true' : undefined"
     :aria-busy="loading ? 'true' : undefined"
     :data-loading="loading ? 'true' : 'false'"
+    @click.capture="blockWhenAriaDisabled"
   >
     <span
       v-if="loading"

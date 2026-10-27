@@ -67,7 +67,7 @@ function focusThumb() {
     <div v-if="label || showValue" class="pr-slider__header pr:flex pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)]">
       <PrLabel v-if="label" :for="sliderId" :disabled="disabled" @click="focusThumb">{{ label }}</PrLabel>
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -- a visual echo of the value, which the slider thumb already announces -->
-      <output v-if="showValue" class="pr-slider__value pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)] pr:tabular-nums">{{ sliderValue[0] }}</output>
+      <output v-if="showValue" aria-hidden="true" class="pr-slider__value pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)] pr:tabular-nums">{{ sliderValue[0] }}</output>
     </div>
     <SliderRoot
       class="pr-slider__root pr:relative pr:flex pr:h-5 pr:touch-none pr:select-none pr:items-center pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
@@ -79,7 +79,7 @@ function focusThumb() {
       :name="name"
       @update:model-value="updateValue"
     >
-      <SliderTrack class="pr-slider__track pr:relative pr:h-1.5 pr:flex-auto pr:overflow-hidden pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-surface-subtle)]">
+      <SliderTrack class="pr-slider__track pr:relative pr:h-1.5 pr:flex-auto pr:overflow-hidden pr:rounded-[var(--pr-radius-full)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface-subtle)]">
         <SliderRange class="pr-slider__range pr:absolute pr:h-full pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-primary)]" />
       </SliderTrack>
       <SliderThumb :id="sliderId" class="pr-slider__thumb pr:block pr:size-4 pr:cursor-grab pr:rounded-[var(--pr-radius-full)] pr:border-2 pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-sm)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:active:cursor-grabbing" :aria-label="label || messages.slider.value" />

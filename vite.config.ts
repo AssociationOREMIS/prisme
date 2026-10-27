@@ -1,4 +1,3 @@
-/// <reference types="vitest/config" />
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
@@ -6,8 +5,47 @@ import vue from '@vitejs/plugin-vue'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig } from 'vite'
+import type { TestProjectInlineConfiguration } from 'vitest/config'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
+
+/**
+ * The browser tests of the stories (play functions and axe on each story). `theme` forces the Prisme
+ * theme of every story (.storybook/preview.ts reads `__PRISME_TEST_THEME__`).
+ */
+function storybookProject(name: string, theme?: 'light' | 'dark'): TestProjectInlineConfiguration {
+  return {
+    extends: true,
+    plugins: [
+      storybookTest({
+        configDir: path.join(dirname, '.storybook'),
+      }),
+      {
+        // Stories with a `template` string use Vue's runtime compiler. Storybook points `vue` to
+        // its bundler build, whose compiler-core the browser tests' dependency optimizer took in its
+        // Node build: every story warned "decodeEntities option is passed but will be ignored".
+        // The browser build carries its own compiler. After Storybook's alias, which it replaces.
+        name: 'prisme:vue-browser-build',
+        enforce: 'post',
+        config: () => ({ resolve: { alias: { vue: path.join(dirname, 'node_modules/vue/dist/vue.esm-browser.js') } } }),
+      },
+    ],
+    define: theme ? { __PRISME_TEST_THEME__: JSON.stringify(theme) } : {},
+    test: {
+      name,
+      browser: {
+        enabled: true,
+        headless: true,
+        provider: playwright({}),
+        instances: [
+          {
+            browser: 'chromium',
+          },
+        ],
+      },
+    },
+  }
+}
 
 export default defineConfig({
   plugins: [tailwindcss(), vue()],
@@ -75,36 +113,9 @@ export default defineConfig({
           execArgv: ['--no-experimental-webstorage'],
         },
       },
-      {
-        extends: true,
-        plugins: [
-          storybookTest({
-            configDir: path.join(dirname, '.storybook'),
-          }),
-          {
-            // Stories with a `template` string use Vue's runtime compiler. Storybook points `vue` to
-            // its bundler build, whose compiler-core the browser tests' dependency optimizer took in its
-            // Node build: every story warned "decodeEntities option is passed but will be ignored".
-            // The browser build carries its own compiler. After Storybook's alias, which it replaces.
-            name: 'prisme:vue-browser-build',
-            enforce: 'post',
-            config: () => ({ resolve: { alias: { vue: path.join(dirname, 'node_modules/vue/dist/vue.esm-browser.js') } } }),
-          },
-        ],
-        test: {
-          name: 'storybook',
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright({}),
-            instances: [
-              {
-                browser: 'chromium',
-              },
-            ],
-          },
-        },
-      },
+      storybookProject('storybook'),
+      // The same stories in the dark theme: its contrast failures went unseen otherwise.
+      storybookProject('storybook-dark', 'dark'),
     ],
   },
 })

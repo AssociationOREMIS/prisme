@@ -121,15 +121,14 @@ provide(prSidebarContextKey, {
     aria-hidden="true"
     @click="closeMobileFlyout"
   />
-  <aside
+  <div
     class="pr-sidebar pr:sticky pr:top-[var(--pr-navbar-height)] pr:col-[1] pr:row-[2] pr:z-[40] pr:flex pr:h-[calc(100svh-var(--pr-navbar-height))] pr:w-[var(--pr-sidebar-width)] pr:flex-col pr:border-r pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-background)] pr:text-[color:var(--pr-color-text)] pr:transition-[width] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:data-[collapsed=true]:w-[var(--pr-sidebar-collapsed-width)] pr:data-[collapsed=true]:[&_.pr-sidebar-item\_\_link]:min-h-12 pr:data-[collapsed=true]:[&_.pr-sidebar-item\_\_link]:justify-center pr:data-[collapsed=true]:[&_.pr-sidebar-item\_\_link]:px-0 pr:data-[collapsed=true]:[&_.pr-sidebar-item\_\_link]:py-0 pr:data-[collapsed=true]:[&_.pr-sidebar-item\_\_body]:hidden pr:data-[collapsed=true]:[&_.pr-sidebar-item\_\_chevron]:hidden pr:data-[collapsed=true]:[&_.pr-sidebar-item\_\_subitems]:hidden pr:data-[collapsed=true]:[&_.pr-sidebar\_\_collapse-label]:hidden pr:max-[780px]:w-[var(--pr-sidebar-collapsed-width)] pr:max-[780px]:[&_.pr-sidebar-item\_\_link]:min-h-12 pr:max-[780px]:[&_.pr-sidebar-item\_\_link]:justify-center pr:max-[780px]:[&_.pr-sidebar-item\_\_link]:px-0 pr:max-[780px]:[&_.pr-sidebar-item\_\_link]:py-0 pr:max-[780px]:[&_.pr-sidebar-item\_\_body]:hidden pr:max-[780px]:[&_.pr-sidebar-item\_\_chevron]:hidden pr:max-[780px]:[&_.pr-sidebar-item\_\_subitems]:hidden pr:max-[780px]:[&_.pr-sidebar\_\_collapse-label]:hidden pr:max-[780px]:data-[mobile-expanded=true]:fixed pr:max-[780px]:data-[mobile-expanded=true]:inset-[var(--pr-navbar-height)_auto_0_0] pr:max-[780px]:data-[mobile-expanded=true]:z-[45] pr:max-[780px]:data-[mobile-expanded=true]:h-[calc(100svh-var(--pr-navbar-height))] pr:max-[780px]:data-[mobile-expanded=true]:w-[min(var(--pr-sidebar-width),calc(100vw-3rem))] pr:max-[780px]:data-[mobile-expanded=true]:shadow-[var(--pr-shadow-md)] pr:max-[780px]:data-[mobile-expanded=true]:[&_.pr-sidebar-item\_\_link]:justify-start pr:max-[780px]:data-[mobile-expanded=true]:[&_.pr-sidebar-item\_\_body]:grid pr:max-[780px]:data-[mobile-expanded=true]:[&_.pr-sidebar-item\_\_chevron]:block pr:max-[780px]:data-[mobile-expanded=true]:[&_.pr-sidebar-item\_\_subitems]:grid pr:max-[780px]:data-[mobile-expanded=true]:[&_.pr-sidebar\_\_collapse-label]:inline"
-    :aria-label="ariaLabel ?? messages.sidebar.label"
     :data-collapsed="collapsed ? 'true' : 'false'"
     :data-mobile-expanded="mobileExpanded ? 'true' : 'false'"
     @focusout="handleFocusOut"
   >
     <div class="pr-sidebar__scroll pr:min-h-0 pr:flex-auto pr:overflow-y-auto pr:px-[var(--pr-space-4)] pr:py-[var(--pr-space-5)]">
-      <nav class="pr-sidebar__nav pr:grid pr:gap-[var(--pr-space-2)]">
+      <nav class="pr-sidebar__nav pr:grid pr:gap-[var(--pr-space-2)]" :aria-label="ariaLabel ?? messages.sidebar.label">
         <slot />
       </nav>
     </div>
@@ -138,5 +137,5 @@ provide(prSidebarContextKey, {
       <slot name="footer" />
     </div>
     <PrSidebarCollapseButton v-if="collapsible" />
-  </aside>
+  </div>
 </template>

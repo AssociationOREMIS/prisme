@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { PrInput } from '../../atoms/Input'
 import { useErrorText, type PrFieldError } from '../../fieldError'
+import { useControlAttrs } from '../../controlAttrs'
 
 export interface PrDatePickerProps {
   modelValue?: string
@@ -34,6 +35,10 @@ const props = withDefaults(defineProps<PrDatePickerProps>(), {
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
+
+// `autocomplete="bday"`, `aria-*`... reach the date field, class and style stay on the wrapper.
+defineOptions({ inheritAttrs: false })
+const { rootAttrs, controlAttrs } = useControlAttrs()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -84,8 +89,9 @@ function onFocusOut() {
 </script>
 
 <template>
-  <div class="pr-date-picker" @focusin="onFocusIn" @focusout="onFocusOut">
+  <div class="pr-date-picker" v-bind="rootAttrs()" @focusin="onFocusIn" @focusout="onFocusOut">
     <PrInput
+      v-bind="controlAttrs()"
       :id="id"
       :model-value="internalValue"
       :label="label"

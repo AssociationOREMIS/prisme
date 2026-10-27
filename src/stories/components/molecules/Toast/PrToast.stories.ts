@@ -17,11 +17,13 @@ const meta = {
   },
   parameters: {
     a11y: {
-      config: {
-        // Reka's toast viewport surrounds the toasts with two aria-hidden "focus proxy" spans
-        // (tabindex 0) that send keyboard focus into the region and back out: a deliberate
-        // pattern (inherited from Radix) that axe flags, not a missing name or hidden control.
-        rules: [{ id: 'aria-hidden-focus', enabled: false }],
+      // Reka's toast viewport surrounds the toasts with two aria-hidden "focus proxy" spans
+      // (tabindex 0) that send keyboard focus into the region and back out: a deliberate
+      // pattern (inherited from Radix) that axe flags, not a missing name or hidden control.
+      // Only these two spans are left out; aria-hidden-focus still checks everything else.
+      context: {
+        include: ['body'],
+        exclude: ['[role="region"] > span[aria-hidden="true"][tabindex="0"]'],
       },
     },
   },

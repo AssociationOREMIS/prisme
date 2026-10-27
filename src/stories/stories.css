@@ -7,6 +7,9 @@
 
 .story-column {
   display: grid;
+  /* One explicit column: an implicit one grows with its widest child (a stepper that should scroll
+     sideways overflowed the page at 320 px). */
+  grid-template-columns: minmax(0, 1fr);
   max-width: 34rem;
   gap: var(--pr-space-4);
 }

@@ -76,6 +76,7 @@ const variantProgressClass = computed(() => ({
 // showing a depleting bar for a toast that never closes would be misleading.
 // Without an explicit duration, an error stays until dismissed (WCAG 2.2.1: someone reading
 // slowly or using a screen reader must not lose it); other toasts close after 5 s.
+// Only an error or a warning interrupts a screen reader (assertive): the others wait their turn (polite).
 const effectiveDuration = computed(() => props.duration ?? (props.variant === 'danger' ? Infinity : 5000))
 const showProgress = computed(() => Number.isFinite(effectiveDuration.value) && effectiveDuration.value > 0)
 
@@ -92,6 +93,7 @@ const paused = ref(false)
     :open="open"
     :default-open="defaultOpen"
     :duration="effectiveDuration"
+    :type="variant === 'danger' || variant === 'warning' ? 'foreground' : 'background'"
     @update:open="emit('update:open', $event)"
     @pause="paused = true"
     @resume="paused = false"
