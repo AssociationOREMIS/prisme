@@ -2,7 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Unreleased
+## 1.0.0-rc.8 (2026-10-27)
+
+Huitieme version candidate, sous le tag npm `next`.
 
 Accessibilite : corrige les non-conformites de l'audit RGAA 4.1.2 / WCAG 2.2 AA de la rc.7. Aucun changement cassant ; quelques changements visibles, listes plus bas.
 
