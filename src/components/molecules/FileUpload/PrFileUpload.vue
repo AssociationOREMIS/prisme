@@ -132,7 +132,11 @@ const fieldId = computed(() => props.id ?? `pr-file-upload-${generatedId}`)
 const labelId = computed(() => `${fieldId.value}-label`)
 const instructionsId = computed(() => `${fieldId.value}-instructions`)
 const hintId = computed(() => `${fieldId.value}-hint`)
+const constraintsId = computed(() => `${fieldId.value}-constraints`)
 const errorId = computed(() => `${fieldId.value}-error`)
+// Everything written inside the dropzone is in its name, the accepted types and size included,
+// so a voice command that says what is shown reaches it (WCAG 2.5.3).
+const labelledBy = computed(() => [labelId.value, instructionsId.value, ...(props.accept || props.maxSize ? [constraintsId.value] : [])].join(' '))
 // The error, then the hint: the hint stays shown with the error, the format it gives is what
 // fixing the error needs (RGAA 11.10).
 const describedBy = computed(() => [
@@ -314,7 +318,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
       }"
       :aria-disabled="disabled"
       :aria-invalid="errorText ? 'true' : undefined"
-      :aria-labelledby="label ? `${labelId} ${instructionsId}` : undefined"
+      :aria-labelledby="label ? labelledBy : undefined"
       :aria-describedby="describedBy"
       tabindex="0"
       role="button"
@@ -335,7 +339,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
         <p :id="instructionsId" class="pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text)]">
           {{ messages.fileUpload.drop }} <span class="pr:text-[color:var(--pr-color-primary)]">{{ messages.fileUpload.choose }}</span>
         </p>
-        <p v-if="accept || maxSize" class="pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">
+        <p v-if="accept || maxSize" :id="constraintsId" class="pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">
           <span v-if="accept">{{ accept }}</span>
           <span v-if="accept && maxSize"> · </span>
           <span v-if="maxSize">{{ messages.fileUpload.maxSize(formatSize(maxSize)) }}</span>

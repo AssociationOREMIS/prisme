@@ -9,6 +9,7 @@ import {
   StepperTitle,
   StepperTrigger,
 } from 'reka-ui'
+import { useId } from 'vue'
 import { usePrMessages } from '../../../i18n/context'
 
 export interface PrStep {
@@ -36,11 +37,13 @@ withDefaults(defineProps<PrStepperProps>(), {
   ariaLabel: undefined,
 })
 
-const messages = usePrMessages()
-
 const emit = defineEmits<{
   'update:modelValue': [value: number]
 }>()
+
+const messages = usePrMessages()
+const generatedId = useId()
+const stepId = (index: number): string => `pr-stepper-${generatedId}-${index}`
 </script>
 
 <template>
@@ -74,14 +77,17 @@ const emit = defineEmits<{
         <!-- A real <button> around the indicator (as-child made the indicator a focusable <span>
              with no role). Indicator text uses primary-contrast: white was invisible on the
              dark theme's near-white primary. -->
+        <!-- Named "Étape 1 Identité": the visible number, then the title, so a voice command
+             that says what is shown on the button ("1") reaches it (WCAG 2.5.3). -->
         <StepperTrigger
+          :aria-labelledby="`${stepId(index)}-number ${stepId(index)}-title`"
           class="pr-stepper__trigger pr:flex pr:cursor-pointer pr:items-center pr:justify-center pr:rounded-full pr:border-0 pr:bg-transparent pr:p-0 pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:group-data-[disabled]/item:cursor-not-allowed pr:group-data-[disabled]/item:opacity-50"
         >
           <StepperIndicator
             class="pr-stepper__indicator pr:flex pr:h-8 pr:w-8 pr:shrink-0 pr:items-center pr:justify-center pr:rounded-full pr:border-2 pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:group-data-[state=active]/item:border-[var(--pr-color-primary)] pr:group-data-[state=active]/item:bg-[var(--pr-color-primary)] pr:group-data-[state=active]/item:text-[color:var(--pr-color-primary-contrast)] pr:group-data-[state=completed]/item:border-[var(--pr-color-primary)] pr:group-data-[state=completed]/item:bg-[var(--pr-color-primary)] pr:group-data-[state=completed]/item:text-[color:var(--pr-color-primary-contrast)] pr:group-data-[state=incomplete]/item:border-[var(--pr-color-border-strong)] pr:group-data-[state=incomplete]/item:bg-[var(--pr-color-surface)] pr:group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
           >
             <Check :size="14" aria-hidden="true" class="pr:hidden pr:group-data-[state=completed]/item:block" />
-            <span class="pr:group-data-[state=completed]/item:hidden">{{ index + 1 }}</span>
+            <span :id="`${stepId(index)}-number`" class="pr:group-data-[state=completed]/item:hidden"><span class="pr:sr-only">{{ `${messages.stepper.step} ` }}</span>{{ index + 1 }}</span>
           </StepperIndicator>
         </StepperTrigger>
         <StepperSeparator
@@ -96,6 +102,7 @@ const emit = defineEmits<{
       >
         <!-- A span, not reka's <h4>: steps are not sections of the page. Block, with the h4's margins, so the layout stays the same. -->
         <StepperTitle
+          :id="`${stepId(index)}-title`"
           as="span"
           class="pr-stepper__title pr:block pr:my-[1.33em] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
         >

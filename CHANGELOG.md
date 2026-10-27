@@ -2,6 +2,16 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.9 (2026-10-27)
+
+Neuvieme version candidate, sous le tag npm `next`. Le nom accessible de `PrStepper` et de `PrFileUpload` contient tout le texte qu'ils affichent (WCAG 2.5.3). Aucun changement cassant, rien ne change a l'ecran.
+
+### Corrections
+
+- **`PrStepper` : le nom de chaque etape contient son numero** : le bouton rond affichait « 1 », mais s'appelait seulement « Identite » pour les outils d'assistance. Une commande vocale qui dit ce qui est affiche (« clique sur 1 ») ne le trouvait pas. Il s'appelle maintenant « Etape 1 Identite » (nouveau message `stepper.step` : « Etape », « Step » en anglais). Rien ne change a l'ecran.
+- **`PrFileUpload` : le nom de la zone de depot contient tout ce qu'elle affiche** : les types acceptes et la taille maximale (`accept`, `maxSize`) etaient ecrits dans la zone, mais absents de son nom. Ils en font maintenant partie, apres le libelle et la consigne.
+- Les tests d'accessibilite passent a axe-core 4.14, qui a detecte ces deux defauts (regle `label-content-name-mismatch`, WCAG 2.5.3).
+
 ## 1.0.0-rc.8 (2026-10-27)
 
 Huitieme version candidate, sous le tag npm `next`.
