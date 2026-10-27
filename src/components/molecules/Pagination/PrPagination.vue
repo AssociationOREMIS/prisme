@@ -53,8 +53,8 @@ const isDisabled = computed(() => props.disabled ?? false)
 // Show first/last plus a window around the current page, with ellipses.
 const pages = computed(() => buildPaginationItems(currentPageCount.value, currentPage.value))
 // A disabled link has no `disabled` state: `aria-disabled` carries the same look.
-const paginationButtonClass = 'pr-pagination__button pr:inline-grid pr:min-h-[2.375rem] pr:min-w-[2.375rem] pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:font-[650] pr:text-[color:var(--pr-color-text)] pr:no-underline pr:transition-[background-color,border-color,color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:not-disabled:not-aria-disabled:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:opacity-[0.58] pr:aria-disabled:cursor-not-allowed pr:aria-disabled:opacity-[0.58]'
-const paginationActiveClass = 'pr-pagination__button--active pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-primary)] pr:text-[color:var(--pr-color-primary-contrast)] pr:hover:not-disabled:not-aria-disabled:border-[var(--pr-color-primary-hover)] pr:hover:not-disabled:not-aria-disabled:bg-[var(--pr-color-primary-hover)]'
+const paginationButtonClass = 'pr-pagination__button pr:inline-grid pr:min-h-[2.375rem] pr:min-w-[2.375rem] pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:font-[650] pr:text-[color:var(--pr-color-text)] pr:no-underline pr:transition-[background-color,border-color,color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:not-aria-disabled:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:aria-disabled:cursor-not-allowed pr:aria-disabled:opacity-[0.58]'
+const paginationActiveClass = 'pr-pagination__button--active pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-primary)] pr:text-[color:var(--pr-color-primary-contrast)] pr:hover:not-aria-disabled:border-[var(--pr-color-primary-hover)] pr:hover:not-aria-disabled:bg-[var(--pr-color-primary-hover)]'
 
 const asLinks = computed(() => props.pageParam !== undefined && props.pageParam !== '')
 
@@ -64,9 +64,12 @@ const controlTag = computed(() => (asLinks.value ? 'a' : 'button'))
  * Attributes of the control leading to `target`: a button, or with
  * `pageParam` a link the browser (or Prisme's navigation) follows.
  */
-function control(target: number, unavailable: boolean): Record<string, string | boolean> {
+function control(target: number, unavailable: boolean): Record<string, string | boolean | undefined> {
+  // aria-disabled rather than disabled: « Page suivante » pressed on the second to last page must
+  // keep the focus once it reaches the last one (a disabled button drops it on <body>). `go()`
+  // ignores the press.
   if (!asLinks.value) {
-    return { type: 'button', disabled: unavailable }
+    return { type: 'button', 'aria-disabled': unavailable ? 'true' : undefined }
   }
 
   if (unavailable || typeof window === 'undefined') {
@@ -97,6 +100,7 @@ function go(nextPage: number) {
         v-bind="control(item, isDisabled)"
         :class="[paginationButtonClass, item === currentPage ? paginationActiveClass : '']"
         :aria-current="item === currentPage ? 'page' : undefined"
+        :aria-label="messages.pagination.page(item)"
         @click="go(item)"
       >
         {{ item }}

@@ -25,6 +25,23 @@ export interface PrDataTableSort {
 }
 
 export interface PrDataTableProps {
+  /**
+   * Title of the table (its `<caption>`), which screen readers announce with it: « Bénévoles
+   * inscrits ». Shown above the table, or read only with `captionHidden`. A table without a caption
+   * nor an `aria-label` warns in the console.
+   */
+  caption?: string
+  /** Keeps the `caption` for screen readers only, when a visible title already sits above the table. */
+  captionHidden?: boolean
+  /** Name of the table when it has no `caption` (prefer `caption`). */
+  ariaLabel?: string
+  /**
+   * Key of the column that names each row (the person's name): its cells become row headers
+   * (`<th scope="row">`), read with every other cell of the row.
+   */
+  rowHeaderKey?: string
+  /** Name of a row's actions button. Defaults to « Actions pour » and the row's first visible column. */
+  actionsLabel?: (row: Record<string, unknown>) => string
   columns?: PrDataTableColumn[]
   rows?: Record<string, unknown>[]
   rowKey?: string

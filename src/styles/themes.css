@@ -40,7 +40,12 @@
   --pr-color-navbar-text: var(--pr-neutral-0);
   --pr-color-navbar-border: rgb(255 255 255 / 20%);
   --pr-color-navbar-muted: rgb(255 255 255 / 12%);
-  --pr-color-sidebar-active: #31c48d;
+  /* The active sidebar entry: its icon box must reach 3:1 against the sidebar and the inactive
+     boxes, and its icon 3:1 against it (WCAG 1.4.11). #31c48d gave 2.04 and 2.23 here. */
+  --pr-color-sidebar-active: var(--pr-green-600);
+  --pr-color-sidebar-active-contrast: var(--pr-neutral-0);
+  /* Hovered field border: hovering must not lower the contrast (neutral-400 gave 2.56). */
+  --pr-color-border-hover: var(--pr-neutral-600);
 
   --pr-color-primary: var(--pr-blue-600);
   --pr-color-primary-contrast: var(--pr-neutral-0);
@@ -95,6 +100,9 @@
   --pr-color-navbar-border: rgb(255 255 255 / 14%);
   --pr-color-navbar-muted: rgb(182 197 249 / 14%);
   --pr-color-sidebar-active: #31c48d;
+  /* A dark icon on the light green: white gave 2.23. */
+  --pr-color-sidebar-active-contrast: var(--pr-neutral-900);
+  --pr-color-border-hover: var(--pr-neutral-400);
 
   --pr-color-primary: #fafaff;
   --pr-color-primary-contrast: #21212e;
@@ -147,6 +155,9 @@
     --pr-color-navbar-border: rgb(255 255 255 / 14%);
     --pr-color-navbar-muted: rgb(182 197 249 / 14%);
     --pr-color-sidebar-active: #31c48d;
+    /* A dark icon on the light green: white gave 2.23. */
+    --pr-color-sidebar-active-contrast: var(--pr-neutral-900);
+    --pr-color-border-hover: var(--pr-neutral-400);
 
     --pr-color-primary: #fafaff;
     --pr-color-primary-contrast: #21212e;

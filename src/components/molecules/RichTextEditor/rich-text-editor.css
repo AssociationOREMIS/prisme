@@ -94,3 +94,60 @@
 .pr-rich-text-editor__content .ProseMirror-hideselection * {
   caret-color: transparent;
 }
+
+/*
+ * The text color input is transparent over its palette icon (`opacity: 0`), so its own focus ring
+ * is invisible: draw Prisme's focus ring on the label around it instead (RGAA 10.7, WCAG 2.4.7).
+ */
+.pr-rich-text-editor__color:has(input:focus-visible) {
+  outline: 2px solid var(--pr-color-focus);
+  outline-offset: 2px;
+}
+
+/*
+ * The open/close button tiptap's details node view puts before the summary: unstyled, it was a
+ * few pixels wide. A 24px target (WCAG 2.5.8) with a chevron that turns when the section is open.
+ */
+.pr-rich-text-editor__content div[data-type="details"] {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pr-space-2);
+}
+
+.pr-rich-text-editor__content div[data-type="details"] > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.pr-rich-text-editor__content div[data-type="details"] > button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--pr-radius-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pr-rich-text-editor__content div[data-type="details"] > button::before {
+  content: "\25B8";
+  transition: transform var(--pr-duration-fast) var(--pr-ease-standard);
+}
+
+.pr-rich-text-editor__content div[data-type="details"].is-open > button::before {
+  transform: rotate(90deg);
+}
+
+.pr-rich-text-editor__content div[data-type="details"] > button:hover {
+  background: var(--pr-color-surface);
+}
+
+.pr-rich-text-editor__content div[data-type="details"] > button:focus-visible {
+  outline: 2px solid var(--pr-color-focus);
+  outline-offset: 2px;
+}

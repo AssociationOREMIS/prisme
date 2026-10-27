@@ -119,6 +119,10 @@ export const Keyboard: Story = {
     await waitFor(() => expect(body.getByRole('menuitem', { name: 'Modifier' })).toHaveFocus())
     await userEvent.keyboard('{ArrowDown}')
     await waitFor(() => expect(body.getByRole('menuitem', { name: 'Dupliquer' })).toHaveFocus())
+    // The focused item shows Prisme's focus ring (outline-none used to set it to none).
+    const ring = getComputedStyle(body.getByRole('menuitem', { name: 'Dupliquer' }))
+    await expect(ring.outlineStyle).toBe('solid')
+    await expect(ring.outlineWidth).toBe('2px')
 
     await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(body.queryByRole('menu')).toBeNull())

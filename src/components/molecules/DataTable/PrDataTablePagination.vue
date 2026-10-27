@@ -45,17 +45,18 @@ const emit = defineEmits<{
         {{ messages.dataTable.pageOf(page, pageCount) }}
       </div>
 
+      <!-- aria-disabled, not disabled: the button just pressed keeps the focus on the first or last page. -->
       <div class="pr:flex pr:items-center pr:gap-[var(--pr-space-2)]">
-        <PrButton class="pr:hidden pr:size-8 pr:p-0 pr:lg:inline-flex" variant="secondary" size="sm" :disabled="page <= 1" :aria-label="messages.dataTable.firstPage" @click="emit('update:page', 1)">
+        <PrButton class="pr:hidden pr:size-8 pr:p-0 pr:lg:inline-flex" variant="secondary" size="sm" :aria-disabled="page <= 1 ? 'true' : undefined" :aria-label="messages.dataTable.firstPage" @click="page > 1 && emit('update:page', 1)">
           <ChevronsLeft :size="16" aria-hidden="true" />
         </PrButton>
-        <PrButton class="pr:size-8 pr:p-0" variant="secondary" size="sm" :disabled="page <= 1" :aria-label="messages.dataTable.previousPage" @click="emit('update:page', page - 1)">
+        <PrButton class="pr:size-8 pr:p-0" variant="secondary" size="sm" :aria-disabled="page <= 1 ? 'true' : undefined" :aria-label="messages.dataTable.previousPage" @click="page > 1 && emit('update:page', page - 1)">
           <ChevronLeft :size="16" aria-hidden="true" />
         </PrButton>
-        <PrButton class="pr:size-8 pr:p-0" variant="secondary" size="sm" :disabled="page >= pageCount" :aria-label="messages.dataTable.nextPage" @click="emit('update:page', page + 1)">
+        <PrButton class="pr:size-8 pr:p-0" variant="secondary" size="sm" :aria-disabled="page >= pageCount ? 'true' : undefined" :aria-label="messages.dataTable.nextPage" @click="page < pageCount && emit('update:page', page + 1)">
           <ChevronRight :size="16" aria-hidden="true" />
         </PrButton>
-        <PrButton class="pr:hidden pr:size-8 pr:p-0 pr:lg:inline-flex" variant="secondary" size="sm" :disabled="page >= pageCount" :aria-label="messages.dataTable.lastPage" @click="emit('update:page', pageCount)">
+        <PrButton class="pr:hidden pr:size-8 pr:p-0 pr:lg:inline-flex" variant="secondary" size="sm" :aria-disabled="page >= pageCount ? 'true' : undefined" :aria-label="messages.dataTable.lastPage" @click="page < pageCount && emit('update:page', pageCount)">
           <ChevronsRight :size="16" aria-hidden="true" />
         </PrButton>
       </div>

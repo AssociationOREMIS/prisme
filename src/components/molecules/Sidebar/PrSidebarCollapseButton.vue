@@ -30,6 +30,7 @@ const ariaLabel = computed(() => (
     class="pr-sidebar__collapse pr:inline-grid pr:w-full pr:grid-flow-col pr:cursor-pointer pr:place-items-center pr:justify-center pr:gap-[var(--pr-space-2)] pr:border-t pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface-subtle)] pr:p-[0.875rem] pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:text-[color:var(--pr-color-text-subtle)] pr:transition-[background-color,color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:bg-[var(--pr-color-border)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:-outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
     type="button"
     :aria-label="ariaLabel"
+    :aria-expanded="sidebar.isMobile.value ? !sidebar.isNarrow.value : undefined"
     @click="sidebar.toggle"
   >
     <ChevronRight v-if="sidebar.isNarrow.value" aria-hidden="true" :size="18" />

@@ -80,3 +80,20 @@ Reste ouvert :
 - Les composants à portail (`PrDialog`, `PrPopover`, `PrTooltip`, `PrSelect`, `PrDropdownMenu`...) téléportent leur contenu dans `document.body`, donc hors du shadow root de `mountPrismeIsolated()` : ce contenu n'a alors pas les styles de Prisme. Non vérifié en conditions réelles ; à traiter si une app en a besoin (cible de portail configurable, par ex. via le `to` de `Teleport`/`ConfigProvider` de reka-ui).
 - Fournir les polices avec Prisme (par ex. `@oremis/prisme/fonts.css` basé sur `@fontsource/roboto`) plutôt que de laisser chaque app les installer : non fait, à décider.
 - Après publication : retirer les contournements côté data (`replaceAll(':root', ':root,:host')`, `dataset.prTheme = 'light'`), chat (`data-pr-theme="light"` dans `ChatLauncher.vue`, imports par chemin) et ca (imports par chemin, optionnel).
+
+## Accessibilité : reste de l'audit de la 1.0.0-rc.7 (2026-10-27)
+
+Corrigé dans la version qui suit la rc.7 (voir `CHANGELOG.md`). Reste ouvert, volontairement :
+
+- **`PrRichTextEditor`, légende des tableaux (RGAA 5.4)** : le nœud `table` de tiptap n'accepte que des lignes (`tableRow+`) et prosemirror-tables suppose que tous ses enfants sont des lignes. Une `caption` demande un nœud dédié et de revérifier toutes les commandes de tableau.
+- **`PrRichTextEditor`, redimensionnement des colonnes de tableau à la souris seulement** (WCAG 2.1.1, 2.5.7) : proposer des largeurs au clavier, ou retirer `resizable`. Les images ont désormais des largeurs prédéfinies.
+- **`PrRichTextEditor`, couleur du texte libre** (EN 301 549 11.8.2) : remplacer `<input type="color">` par une palette fermée de couleurs contrastées en clair et en sombre.
+- **`PrRichTextEditor`, légende d'image** (RGAA 1.9, `figure`/`figcaption`) et **vérificateur plus complet** (EN 11.8.4 : niveaux de titre sautés, tableau sans en-tête ; seules les images sans `alt` sont signalées).
+- **`@tiptap/pm` en `peerDependencies`** : à ajouter si un nœud Prisme a besoin d'un plugin ProseMirror.
+- **`PrSiteFooter`** (proposé par l'audit) : un composant de pied de page avec les liens attendus (Accessibilité, Plan du site, Mentions légales, Contact) et l'état de conformité en prop. Pour l'instant, le slot `footer` de `PrAppShell`, stylé, et un exemple dans le README.
+- **Sidebar en rail** : les libellés ne s'affichent qu'en `title` (infobulle du navigateur, pas au clavier). Une infobulle `PrTooltip` au focus serait mieux (RGAA 10.4, réserve).
+- **`PrNavbarUserMenu`** : l'en-tête (nom, email, rôles) est un `div` dans le `role="menu"` ; il décrit maintenant le menu (`aria-describedby`), mais sa place dans le menu reste à valider avec un validateur ARIA strict (RGAA 8.2).
+- **`PrErrorSummary`** : liens d'ancre vers les champs en erreur (modèle GOV.UK), et option pour le focaliser à l'apparition.
+- **Filtre de `PrDataTable`** : étiqueté par son placeholder (`aria-label`), sans étiquette visible persistante (RGAA 11.2, à trancher).
+- **`PrCheckboxGroup`** : pas de composant groupe de cases à cocher ; l'app pose `fieldset`/`legend` (RGAA 11.5).
+

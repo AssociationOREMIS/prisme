@@ -79,6 +79,8 @@ export const WithoutVModel: Story = {
     await userEvent.type(canvas.getByLabelText('Fruit'), 'Poi')
     await userEvent.click(await within(document.body).findByRole('option', { name: 'Poire' }))
     await waitFor(() => expect(data().get('fruit')).toBe('pear'))
+    // Closed, the field no longer points at an option that left the page (axe aria-valid-attr-value).
+    await waitFor(() => expect(canvas.getByLabelText('Fruit')).not.toHaveAttribute('aria-activedescendant'))
 
     // File upload: files dropped in two goes are all posted (drag and drop used to post nothing).
     const dropzone = canvasElement.querySelector<HTMLElement>('.pr-file-upload__dropzone') as HTMLElement

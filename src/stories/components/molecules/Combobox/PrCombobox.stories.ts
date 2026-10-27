@@ -121,7 +121,7 @@ export const ServerSearch: Story = {
     const input = canvas.getByRole('combobox', { name: 'Bénévole' })
 
     await userEvent.type(input, 'c')
-    await waitFor(() => expect(body.getByRole('status')).toHaveTextContent('Tapez au moins 2 caractères'))
+    await waitFor(() => expect(body.getAllByRole('status')[0]).toHaveTextContent('Tapez au moins 2 caractères'))
 
     await userEvent.type(input, 'am')
     await waitFor(() => expect(body.getByRole('option', { name: 'Camille MARTIN' })).toBeTruthy())
@@ -187,5 +187,32 @@ export const SearchPlaceholder: Story = {
 
     await userEvent.tab()
     await waitFor(() => expect(input).toHaveAttribute('placeholder', 'Sélectionner un pays'))
+  },
+}
+
+// Removing a chip with its button: the focus goes to the next chip, then to the field, never to
+// <body>, and the removal is announced.
+export const RemoveChipsWithKeyboard: Story = {
+  render: () => ({
+    components: { PrCombobox },
+    setup() {
+      const value = ref(['fr', 'be'])
+      return { value, options }
+    },
+    template: `
+      <div class="story-column">
+        <PrCombobox v-model="value" :options="options" label="Pays d'intervention" multiple />
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    canvas.getByRole('button', { name: 'Retirer France' }).focus()
+    await userEvent.keyboard('{Enter}')
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Retirer Belgique' })).toHaveFocus())
+    await waitFor(() => expect(canvas.getAllByRole('status').some(region => region.textContent?.includes('France retiré'))).toBe(true))
+
+    await userEvent.keyboard('{Enter}')
+    await waitFor(() => expect(canvas.getByRole('combobox', { name: 'Pays d\'intervention' })).toHaveFocus())
   },
 }

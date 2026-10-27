@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 import { PrTabs } from '../../../../components/molecules/Tabs'
 import '../../../stories.css'
@@ -92,4 +92,36 @@ export const Playground: Story = {
       </PrTabs>
     `,
   }),
+}
+
+// The active tab is underlined, not only colored (its indicator stayed 0 px wide), and a tab
+// list can be named.
+export const ActiveIndicator: Story = {
+  render: (args) => ({
+    components: { PrTabs },
+    setup() {
+      return { args }
+    },
+    template: `
+      <PrTabs v-bind="args" aria-label="Sections du dossier" default-value="activity">
+        <template #overview>Vue d'ensemble</template>
+        <template #activity>Activité</template>
+        <template #documents>Documents</template>
+      </PrTabs>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole('tablist', { name: 'Sections du dossier' })).toBeTruthy()
+    const active = canvas.getByRole('tab', { name: 'Activité' })
+    // reka measures the active tab after mounting, then sizes the indicator.
+    await waitFor(() => {
+      const indicator = canvasElement.querySelector<HTMLElement>('.pr-tabs__indicator')
+      expect(indicator).not.toBeNull()
+      expect(Math.round(indicator!.getBoundingClientRect().width)).toBe(Math.round(active.getBoundingClientRect().width))
+      expect(Math.round(indicator!.getBoundingClientRect().left)).toBe(Math.round(active.getBoundingClientRect().left))
+    })
+    // No grey browser button face behind the tab (1.93:1 in the dark theme).
+    await expect(getComputedStyle(active).backgroundColor).toBe('rgba(0, 0, 0, 0)')
+  },
 }

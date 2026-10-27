@@ -23,6 +23,10 @@ export interface PrMessages {
     confirm: string
     cancel: string
   }
+  appShell: {
+    /** The skip link, first stop of the keyboard on every page (RGAA 12.7). */
+    skipLink: string
+  }
   calendar: {
     previousMonth: string
     nextMonth: string
@@ -32,6 +36,9 @@ export interface PrMessages {
     previous: string
     next: string
     position: (current: number, total: number) => string
+    /** What screen readers call the carousel and each of its slides (`aria-roledescription`). */
+    roleDescription: string
+    slideRoleDescription: string
   }
   combobox: {
     typeToSearch: string
@@ -40,6 +47,11 @@ export interface PrMessages {
     searchFailed: string
     remove: (label: string) => string
     clear: string
+    /** Read to screen readers once a value is picked or removed in a multiple combobox. */
+    selected: (label: string) => string
+    removed: (label: string) => string
+    /** Read to screen readers as the list of options changes. */
+    results: (count: number) => string
   }
   command: {
     placeholder: string
@@ -51,6 +63,10 @@ export interface PrMessages {
     selectPage: string
     selectRow: (label: string) => string
     actions: string
+    /** Name of a row's actions button, from the row's first visible column: « Actions pour Camille MARTIN ». */
+    rowActions: (label: string) => string
+    /** Read to screen readers once the rows have been filtered or loaded. */
+    results: (count: number) => string
     columns: string
     selectedRows: (selected: number, total: number) => string
     rowsPerPage: string
@@ -81,12 +97,22 @@ export interface PrMessages {
     uploading: (fileName: string) => string
     retry: (fileName: string) => string
     remove: (fileName: string) => string
+    /** Shown under the drop zone, before the maximum size. */
+    maxSize: (size: string) => string
+    /** Shown next to a file once it has been sent. */
+    uploaded: string
+    /** Read to screen readers once a file has been sent, removed or refused. */
+    uploadedFile: (fileName: string) => string
+    removed: (fileName: string) => string
+    rejected: (fileName: string, reason: string) => string
     bytes: string
     kilobytes: string
     megabytes: string
   }
   navbar: {
     unknownRole: string
+    /** Added for screen readers to the brand link of `homeHref`. */
+    home: string
   }
   navigationMenu: {
     label: string
@@ -99,6 +125,8 @@ export interface PrMessages {
     label: string
     previous: string
     next: string
+    /** Name of a page's link or button (« Page 2 »), its visible text being the number alone. */
+    page: (page: number) => string
   }
   richTextEditor: {
     placeholder: string
@@ -138,6 +166,41 @@ export interface PrMessages {
     counts: (characters: number, words: number) => string
     noUploadHandler: string
     uploadFailed: string
+    /** Live status while an image uploads, and once it is uploaded. */
+    imageUploading: string
+    imageUploaded: string
+    /** Toolbar button that opens the alternative text and width of the selected image. */
+    imageProperties: string
+    /** Title of the panel asking for the image's alternative text. */
+    imagePanelTitle: string
+    imageAlt: string
+    imageAltHint: string
+    /** Checkbox for an image that brings no information: it is inserted with `alt=""`. */
+    imageDecorative: string
+    imageAltRequired: string
+    imageWidth: string
+    imageWidthSmall: string
+    imageWidthMedium: string
+    imageWidthFull: string
+    imageInsert: string
+    imageSave: string
+    cancel: string
+    /** Author-facing warning under the editor, e.g. "1 image sans texte alternatif". */
+    imagesMissingAlt: (count: number) => string
+    youtubeTitlePrompt: string
+    /** `title` of a YouTube iframe whose author gave none. */
+    youtubeDefaultTitle: string
+    /** Accessible name of a task list checkbox, from the task's text. */
+    taskCheckbox: (text: string) => string
+    detailsExpand: string
+    detailsCollapse: string
+    /** Text prefix of each callout box, hidden visually, read by screen readers and without CSS. */
+    calloutPrefixInfo: string
+    calloutPrefixSuccess: string
+    calloutPrefixWarning: string
+    calloutPrefixDanger: string
+    /** Name of an emoji of the emoji picker, from its tiptap shortcode (`white_check_mark`). */
+    emojiName: (name: string) => string
   }
   sidebar: {
     label: string
@@ -159,10 +222,24 @@ export interface PrMessages {
     dropped: (label: string, position: number, total: number) => string
     cancelled: (label: string) => string
     empty: string
+    /** The move buttons, for a single click or tap instead of a drag (`moveButtons`). */
+    moveUp: (label: string) => string
+    moveDown: (label: string) => string
+  }
+  stepper: {
+    /** Name of the group of steps. */
+    label: string
+    /** Read to screen readers when the current step changes. */
+    status: (current: number, total: number) => string
   }
   tagInput: {
     placeholder: string
     remove: (tag: string) => string
+    /** Read to screen readers once a tag is added or removed. */
+    added: (tag: string) => string
+    removed: (tag: string) => string
+    /** Shown once `maxTags` is reached. */
+    limit: (max: number) => string
   }
   themeToggle: {
     toDark: string
@@ -170,6 +247,8 @@ export interface PrMessages {
   }
   toast: {
     label: string
+    /** Name of the region holding the toasts; `{hotkey}` is the key that reaches it (F8). */
+    region: string
   }
   /** Default messages of `usePrForm`'s rules (`required()`, `minLength(2)`...). */
   validation: {
@@ -214,6 +293,9 @@ export const prMessagesFr: PrMessages = {
     confirm: 'Confirmer',
     cancel: 'Annuler',
   },
+  appShell: {
+    skipLink: 'Aller au contenu',
+  },
   calendar: {
     previousMonth: 'Mois précédent',
     nextMonth: 'Mois suivant',
@@ -223,6 +305,8 @@ export const prMessagesFr: PrMessages = {
     previous: 'Élément précédent',
     next: 'Élément suivant',
     position: (current, total) => `Élément ${current} sur ${total}`,
+    roleDescription: 'carrousel',
+    slideRoleDescription: 'élément',
   },
   combobox: {
     typeToSearch: 'Tapez pour rechercher',
@@ -231,6 +315,9 @@ export const prMessagesFr: PrMessages = {
     searchFailed: 'La recherche a échoué, réessayez.',
     remove: (label) => `Retirer ${label}`,
     clear: 'Effacer la sélection',
+    selected: (label) => `${label} sélectionné`,
+    removed: (label) => `${label} retiré`,
+    results: (count) => (count === 0 ? 'Aucun résultat' : `${count} résultat${count > 1 ? 's' : ''}`),
   },
   command: {
     placeholder: 'Rechercher',
@@ -241,6 +328,8 @@ export const prMessagesFr: PrMessages = {
     selectPage: 'Sélectionner la page',
     selectRow: (label) => `Sélectionner ${label}`,
     actions: 'Actions',
+    rowActions: (label) => `Actions pour ${label}`,
+    results: (count) => (count === 0 ? 'Aucun résultat' : `${count} résultat${count > 1 ? 's' : ''}`),
     columns: 'Colonnes',
     selectedRows: (selected, total) => `${selected} sur ${total} ligne(s) sélectionnée(s).`,
     rowsPerPage: 'Lignes par page',
@@ -271,12 +360,18 @@ export const prMessagesFr: PrMessages = {
     uploading: (fileName) => `Envoi de ${fileName}`,
     retry: (fileName) => `Réessayer l'envoi de ${fileName}`,
     remove: (fileName) => `Supprimer ${fileName}`,
+    maxSize: (size) => `${size} maximum`,
+    uploaded: 'Envoyé',
+    uploadedFile: (fileName) => `${fileName} envoyé`,
+    removed: (fileName) => `${fileName} supprimé`,
+    rejected: (fileName, reason) => `${fileName} refusé : ${reason}`,
     bytes: 'o',
     kilobytes: 'Ko',
     megabytes: 'Mo',
   },
   navbar: {
     unknownRole: 'Rôle inconnu',
+    home: 'accueil',
   },
   navigationMenu: {
     label: 'Navigation',
@@ -289,6 +384,7 @@ export const prMessagesFr: PrMessages = {
     label: 'Pagination',
     previous: 'Page précédente',
     next: 'Page suivante',
+    page: (page) => `Page ${page}`,
   },
   richTextEditor: {
     placeholder: 'Rédigez votre contenu…',
@@ -328,6 +424,59 @@ export const prMessagesFr: PrMessages = {
     counts: (characters, words) => `${characters} caractères · ${words} mots`,
     noUploadHandler: 'Aucun gestionnaire d\'envoi d\'image n\'est configuré pour cet éditeur.',
     uploadFailed: 'L\'envoi de l\'image a échoué. Réessayez avec un fichier JPG, PNG ou WebP de moins de 8 Mo.',
+    imageUploading: 'Envoi de l\'image en cours…',
+    imageUploaded: 'Image envoyée.',
+    imageProperties: 'Texte alternatif et taille de l\'image',
+    imagePanelTitle: 'Description de l\'image',
+    imageAlt: 'Texte alternatif',
+    imageAltHint: 'Ce que l\'image apporte au contenu, en une phrase courte. Il est lu par les lecteurs d\'écran.',
+    imageDecorative: 'Image décorative (elle n\'apporte aucune information)',
+    imageAltRequired: 'Saisissez un texte alternatif, ou cochez « Image décorative ».',
+    imageWidth: 'Largeur',
+    imageWidthSmall: 'Petite',
+    imageWidthMedium: 'Moyenne',
+    imageWidthFull: 'Pleine largeur',
+    imageInsert: 'Insérer l\'image',
+    imageSave: 'Enregistrer',
+    cancel: 'Annuler',
+    imagesMissingAlt: (count) => (count > 1
+      ? `${count} images sans texte alternatif : sélectionnez-les une à une puis utilisez le bouton « Texte alternatif et taille de l'image ».`
+      : '1 image sans texte alternatif : sélectionnez-la puis utilisez le bouton « Texte alternatif et taille de l\'image ».'),
+    youtubeTitlePrompt: 'Titre de la vidéo (lu par les lecteurs d\'écran) :',
+    youtubeDefaultTitle: 'Vidéo YouTube',
+    taskCheckbox: (text) => text || 'Tâche sans texte',
+    detailsExpand: 'Déplier la section',
+    detailsCollapse: 'Replier la section',
+    calloutPrefixInfo: 'Information :',
+    calloutPrefixSuccess: 'Succès :',
+    calloutPrefixWarning: 'Attention :',
+    calloutPrefixDanger: 'Danger :',
+    emojiName: (name) => ({
+      bulb: 'Ampoule',
+      white_check_mark: 'Coche',
+      warning: 'Avertissement',
+      pushpin: 'Punaise',
+      dart: 'Dans le mille',
+      thumbsup: 'Pouce levé',
+      fire: 'Feu',
+      memo: 'Mémo',
+      clock3: 'Horloge',
+      date: 'Calendrier',
+      sparkles: 'Étincelles',
+      rocket: 'Fusée',
+      mortar_board: 'Toque de diplômé',
+      books: 'Livres',
+      bell: 'Cloche',
+      exclamation: 'Point d\'exclamation',
+      question: 'Point d\'interrogation',
+      clap: 'Applaudissements',
+      raised_hands: 'Mains levées',
+      speech_balloon: 'Bulle de dialogue',
+      paperclip: 'Trombone',
+      framed_picture: 'Cadre photo',
+      tada: 'Fête',
+      blush: 'Visage souriant',
+    } as Record<string, string>)[name] ?? name.replaceAll('_', ' '),
   },
   sidebar: {
     label: 'Navigation principale',
@@ -346,10 +495,19 @@ export const prMessagesFr: PrMessages = {
     dropped: (label, position, total) => `Déplacement terminé : ${label}, position ${position} sur ${total}.`,
     cancelled: (label) => `Déplacement annulé : ${label} reprend sa place.`,
     empty: 'Aucun élément.',
+    moveUp: (label) => `Monter ${label}`,
+    moveDown: (label) => `Descendre ${label}`,
+  },
+  stepper: {
+    label: 'Étapes',
+    status: (current, total) => `Étape ${current} sur ${total}`,
   },
   tagInput: {
     placeholder: 'Ajouter...',
     remove: (tag) => `Supprimer ${tag}`,
+    added: (tag) => `${tag} ajouté`,
+    removed: (tag) => `${tag} supprimé`,
+    limit: (max) => `${max} maximum atteint`,
   },
   themeToggle: {
     toDark: 'Passer en thème sombre',
@@ -357,6 +515,7 @@ export const prMessagesFr: PrMessages = {
   },
   toast: {
     label: 'Notification',
+    region: 'Notifications, touche {hotkey}',
   },
   validation: {
     required: 'Ce champ est requis',

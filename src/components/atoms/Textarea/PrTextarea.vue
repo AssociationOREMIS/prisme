@@ -3,6 +3,7 @@ import { computed, useAttrs, useId } from 'vue'
 import { PrLabel } from '../Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { useFieldValue } from '../../fieldValue'
+import { warnWithoutName } from '../../accessibleName'
 
 export interface PrTextareaProps {
   modelValue?: string
@@ -35,6 +36,8 @@ const props = withDefaults(defineProps<PrTextareaProps>(), {
   resize: 'vertical',
 })
 
+warnWithoutName('PrTextarea', props.label)
+
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
 
@@ -50,11 +53,12 @@ const generatedId = useId()
 const textareaId = computed(() => props.id ?? `pr-textarea-${generatedId}`)
 const hintId = computed(() => `${textareaId.value}-hint`)
 const errorId = computed(() => `${textareaId.value}-error`)
-// Only the message actually shown: the error replaces the hint.
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+// The error, then the hint: the hint stays shown with the error, the format it gives is what
+// fixing the error needs (RGAA 11.10).
+const describedBy = computed(() => [
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+].filter(Boolean).join(' ') || undefined)
 
 const textareaClass = computed(() => [
   'pr-textarea pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]',
@@ -68,17 +72,14 @@ const textareaResizeClass: Record<NonNullable<PrTextareaProps['resize']>, string
 }
 
 const textareaControlClass = computed(() => [
-  'pr-textarea__control pr:min-h-24 pr:w-full pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-3)] pr:font-[inherit] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text)] pr:transition-[background-color,border-color,box-shadow] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:hover:not-disabled:border-[var(--pr-neutral-400)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:bg-[var(--pr-color-surface-subtle)] pr:disabled:text-[color:var(--pr-color-text-muted)]',
+  'pr-textarea__control pr:min-h-24 pr:w-full pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-3)] pr:font-[inherit] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text)] pr:transition-[background-color,border-color,box-shadow] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:hover:not-disabled:border-[var(--pr-color-border-hover)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:bg-[var(--pr-color-surface-subtle)] pr:disabled:text-[color:var(--pr-color-text-muted)]',
   errorText.value ? 'pr:border-[var(--pr-color-danger)]' : '',
   textareaResizeClass[props.resize],
 ])
 
-const fieldMessageClass = computed(() => [
-  'pr-textarea__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)]',
-  errorText.value
-    ? 'pr-textarea__message--error pr-field-message--error pr:text-[color:var(--pr-color-danger)]'
-    : 'pr:text-[color:var(--pr-color-text-muted)]',
-])
+const fieldMessageClassBase = 'pr-textarea__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)]'
+const hintMessageClass = `${fieldMessageClassBase} pr:text-[color:var(--pr-color-text-muted)]`
+const errorMessageClass = `${fieldMessageClassBase} pr-textarea__message--error pr-field-message--error pr:text-[color:var(--pr-color-danger)]`
 
 function updateValue(event: Event) {
   const value = (event.target as HTMLTextAreaElement).value
@@ -115,11 +116,11 @@ defineOptions({ inheritAttrs: false })
       :aria-describedby="describedBy"
       @input="updateValue"
     />
-    <p v-if="errorText" :id="errorId" :class="fieldMessageClass">
-      {{ errorText }}
-    </p>
-    <p v-else-if="hint" :id="hintId" :class="fieldMessageClass">
+    <p v-if="hint" :id="hintId" :class="hintMessageClass">
       {{ hint }}
+    </p>
+    <p v-if="errorText" :id="errorId" :class="errorMessageClass">
+      {{ errorText }}
     </p>
   </div>
 </template>

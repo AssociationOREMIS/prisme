@@ -59,11 +59,12 @@ const generatedId = useId()
 const labelId = computed(() => `pr-toggle-group-${generatedId}-label`)
 const hintId = computed(() => `pr-toggle-group-${generatedId}-hint`)
 const errorId = computed(() => `pr-toggle-group-${generatedId}-error`)
-// Only the message actually shown: the error replaces the hint.
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+// The error, then the hint: the hint stays shown with the error, the format it gives is what
+// fixing the error needs (RGAA 11.10).
+const describedBy = computed(() => [
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+].filter(Boolean).join(' ') || undefined)
 
 // Without a v-model the sliding indicator still has to follow the selection (it read
 // `modelValue` only, leaving the selected item white on transparent): keep the value locally,
@@ -138,6 +139,6 @@ const toggleGroupItemClass = [
       {{ item.label }}
     </ToggleGroupItem>
   </ToggleGroupRoot>
+  <p v-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:mt-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:mt-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-  <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:mt-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>

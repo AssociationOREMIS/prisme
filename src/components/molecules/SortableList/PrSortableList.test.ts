@@ -49,7 +49,7 @@ function mountModules() {
 
 const titles = (items: Lesson[]) => items.map((item) => item.title)
 const grip = (wrapper: VueWrapper, name: string) => wrapper.find(`button[aria-label="Déplacer ${name}"]`)
-const live = (wrapper: VueWrapper) => wrapper.findAll('[aria-live="assertive"]').map((region) => region.text()).join(' ')
+const live = (wrapper: VueWrapper) => wrapper.findAll('[role="status"]').map((region) => region.text()).join(' ')
 
 async function press(wrapper: VueWrapper, name: string, key: string) {
   await grip(wrapper, name).trigger('keydown', { key })

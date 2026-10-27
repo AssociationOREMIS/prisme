@@ -12,8 +12,14 @@ import PrDataTableViewOptions from './PrDataTableViewOptions.vue'
 import type { PrDataTableColumn, PrDataTableProps, PrDataTableRowAction, PrDataTableSort } from './types'
 import { compareDataTableValues } from './utils'
 import { usePrMessages } from '../../../i18n/context'
+import { useLiveAnnouncer } from '../../liveAnnouncer'
 
 const props = withDefaults(defineProps<PrDataTableProps>(), {
+  caption: undefined,
+  captionHidden: false,
+  ariaLabel: undefined,
+  rowHeaderKey: undefined,
+  actionsLabel: undefined,
   columns: () => [],
   rows: () => [],
   rowKey: 'id',
@@ -37,6 +43,14 @@ const props = withDefaults(defineProps<PrDataTableProps>(), {
 })
 
 const messages = usePrMessages()
+
+if (!props.caption && !props.ariaLabel) {
+  console.warn('[prisme] PrDataTable: give the table a `caption` (or an `ariaLabel`), its name for screen readers.')
+}
+
+// Screen readers hear what changed in the table: loading, the number of rows a filter leaves,
+// the page reached (WCAG 4.1.3). Only after an action of the user, never on the first display.
+const { message: liveMessage, announce } = useLiveAnnouncer()
 
 const emit = defineEmits<{
   'update:selectedRows': [rows: Record<string, unknown>[]]
@@ -247,6 +261,33 @@ function setPageSize(value: number) {
   if (props.serverSide) emit('update:pageSize', value)
 }
 
+function actionsLabelFor(row: Record<string, unknown>): string {
+  return props.actionsLabel?.(row) ?? messages.dataTable.rowActions(rowLabel(row))
+}
+
+function isRowHeader(column: PrDataTableColumn): boolean {
+  return column.key === props.rowHeaderKey
+}
+
+watch(isLoading, (loading) => {
+  if (loading) announce(messages.common.loading)
+  else announce(`${messages.dataTable.results(filteredRowsCount.value)}. ${messages.dataTable.pageOf(page.value, pageCount.value)}`)
+})
+
+// A filter also brings back the first page: one message for both. Server side, the count comes
+// with the new rows (the loading watcher above).
+watch([filterValue, page], ([filter, currentPage], [previousFilter, previousPage]) => {
+  if (isLoading.value) return
+  if (filter !== previousFilter) {
+    if (!props.serverSide) {
+      announce(`${messages.dataTable.results(filteredRowsCount.value)}. ${messages.dataTable.pageOf(currentPage, pageCount.value)}`, 600)
+    }
+  }
+  else if (currentPage !== previousPage) {
+    announce(messages.dataTable.pageOf(currentPage, pageCount.value))
+  }
+})
+
 function goToPage(nextPage: number) {
   const clamped = Math.min(Math.max(nextPage, 1), pageCount.value)
   page.value = clamped
@@ -283,10 +324,21 @@ onBeforeUnmount(() => {
 
     <div class="pr-data-table__shell pr:overflow-hidden pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)]">
       <div class="pr-data-table__scroll pr:w-full pr:overflow-auto">
-        <table class="pr-data-table__table pr:w-full pr:caption-bottom pr:border-collapse pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)]">
+        <table
+          class="pr-data-table__table pr:w-full pr:caption-bottom pr:border-collapse pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)]"
+          :aria-label="caption ? undefined : ariaLabel"
+          :aria-busy="isLoading ? 'true' : undefined"
+        >
+          <caption
+            v-if="caption"
+            class="pr-data-table__caption pr:caption-top pr:px-[var(--pr-space-4)] pr:py-[var(--pr-space-3)] pr:text-left pr:text-[length:var(--pr-font-size-md)] pr:font-bold pr:text-[color:var(--pr-color-text)]"
+            :class="{ 'pr:sr-only': captionHidden }"
+          >
+            {{ caption }}
+          </caption>
           <thead class="pr-data-table__head pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface-subtle)]">
             <tr class="pr-data-table__row pr:border-b pr:border-[var(--pr-color-border)] pr:transition-colors pr:last:border-b-0">
-              <th v-if="selectable" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
+              <th v-if="selectable" scope="col" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
                 <PrCheckbox
                   :model-value="selectAllState"
                   :aria-label="messages.dataTable.selectPage"
@@ -296,6 +348,7 @@ onBeforeUnmount(() => {
               <th
                 v-for="column in visibleColumns"
                 :key="column.key"
+                scope="col"
                 class="pr-data-table__header pr:h-12 pr:whitespace-nowrap pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold pr:text-[color:var(--pr-color-text)]"
                 :class="column.headerClass"
                 :style="columnStyle(column)"
@@ -309,7 +362,7 @@ onBeforeUnmount(() => {
                   @hide="hideColumn"
                 />
               </th>
-              <th v-if="hasRowActions" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
+              <th v-if="hasRowActions" scope="col" class="pr-data-table__header pr:h-12 pr:w-[1%] pr:px-[var(--pr-space-4)] pr:text-left pr:align-middle pr:font-bold">
                 <span class="pr:sr-only">{{ messages.dataTable.actions }}</span>
               </th>
             </tr>
@@ -353,22 +406,24 @@ onBeforeUnmount(() => {
                     @update:model-value="toggleRow(row, Boolean($event))"
                   />
                 </td>
-                <td
+                <component
+                  :is="isRowHeader(column) ? 'th' : 'td'"
                   v-for="column in visibleColumns"
                   :key="column.key"
-                  class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle"
-                  :class="column.class"
+                  :scope="isRowHeader(column) ? 'row' : undefined"
+                  class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:text-left pr:align-middle"
+                  :class="[column.class, { 'pr:font-semibold': isRowHeader(column) }]"
                   :style="columnStyle(column)"
                 >
                   <slot :name="`cell-${column.key}`" :value="row[column.key]" :row="row" :column="column">
                     {{ cellValue(row, column) }}
                   </slot>
-                </td>
+                </component>
                 <td v-if="hasRowActions" class="pr-data-table__cell pr:p-[var(--pr-space-4)] pr:align-middle">
                   <slot name="row-actions" :row="row">
                     <PrDropdownMenu align="end" :label="messages.dataTable.actions">
                       <template #trigger>
-                        <PrButton class="pr:ml-auto pr:size-8 pr:p-0" variant="ghost" size="sm" :aria-label="messages.dataTable.actions">
+                        <PrButton class="pr:ml-auto pr:size-8 pr:p-0" variant="ghost" size="sm" :aria-label="actionsLabelFor(row)">
                           <MoreHorizontal :size="16" aria-hidden="true" />
                         </PrButton>
                       </template>
@@ -393,6 +448,8 @@ onBeforeUnmount(() => {
         </table>
       </div>
     </div>
+
+    <p class="pr:sr-only" role="status">{{ liveMessage }}</p>
 
     <PrDataTablePagination
       v-if="displayPagination"

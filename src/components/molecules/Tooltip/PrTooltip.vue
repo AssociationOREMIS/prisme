@@ -41,7 +41,7 @@ withDefaults(defineProps<PrTooltipProps>(), {
           <slot name="content">
             {{ content }}
           </slot>
-          <TooltipArrow class="pr-tooltip__arrow pr:fill-current" :width="10" :height="5" />
+          <TooltipArrow class="pr-tooltip__arrow pr:fill-current" :width="10" :height="5" aria-hidden="true" />
         </TooltipContent>
       </TooltipPortal>
     </TooltipRoot>
