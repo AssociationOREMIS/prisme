@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDown } from '@lucide/vue'
-import { computed, ref, type Component } from 'vue'
+import { computed, ref, useId, type Component } from 'vue'
 import PrAvatar from '../../atoms/Avatar/PrAvatar.vue'
 import PrDropdownMenu from '../../molecules/DropdownMenu/PrDropdownMenu.vue'
 import { usePrMessages } from '../../../i18n/context'
@@ -47,6 +47,7 @@ defineSlots<{
 }>()
 
 const open = ref(false)
+const headerId = `pr-navbar-user-menu-${useId()}-header`
 
 const displayName = computed(() => (
   props.identifier ? `${props.name} (${props.identifier})` : props.name
@@ -57,14 +58,16 @@ const rolesLabel = computed(() => (
 </script>
 
 <template>
-  <PrDropdownMenu v-model:open="open" side="bottom" align="end">
+  <!-- The header (name, email, roles) is not a menu item, which screen readers skip: it describes the menu. -->
+  <PrDropdownMenu v-model:open="open" side="bottom" align="end" :description-id="headerId">
     <template #trigger>
       <button
         type="button"
         class="pr-navbar-user-menu__trigger pr:inline-flex pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-lg)] pr:border-0 pr:bg-transparent pr:px-[var(--pr-space-3)] pr:py-[var(--pr-space-2)] pr:text-[color:var(--pr-color-navbar-text)] pr:transition-[background-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:hover:bg-[var(--pr-color-navbar-muted)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
       >
         <PrAvatar :src="avatarUrl" :size="28" />
-        <span class="pr:hidden pr:max-w-[12rem] pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-sm)] pr:font-medium pr:md:inline">{{ displayName }}</span>
+        <!-- Below 768px only the picture shows: the name stays for screen readers, the button's name. -->
+        <span class="pr-navbar-user-menu__name pr:max-w-[12rem] pr:line-clamp-2 pr:break-words pr:text-left pr:text-[length:var(--pr-font-size-sm)] pr:font-medium pr:max-md:sr-only">{{ displayName }}</span>
         <ChevronDown
           class="pr:shrink-0 pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)]"
           :class="{ 'pr:rotate-180': open }"
@@ -75,10 +78,10 @@ const rolesLabel = computed(() => (
     </template>
 
     <template #default="{ item, separator, itemClass, dangerItemClass, separatorClass }">
-      <div class="pr-navbar-user-menu__header pr:mb-[var(--pr-space-1)] pr:border-b pr:border-[var(--pr-color-border)] pr:px-[var(--pr-space-3)] pr:pb-[var(--pr-space-2)]">
-        <div class="pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text)]">{{ displayName }}</div>
-        <div v-if="email" class="pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">{{ email }}</div>
-        <div class="pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">{{ rolesLabel }}</div>
+      <div :id="headerId" class="pr-navbar-user-menu__header pr:mb-[var(--pr-space-1)] pr:border-b pr:border-[var(--pr-color-border)] pr:px-[var(--pr-space-3)] pr:pb-[var(--pr-space-2)]">
+        <div class="pr:break-words pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text)]">{{ displayName }}</div>
+        <div v-if="email" class="pr:break-all pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">{{ email }}</div>
+        <div class="pr:break-words pr:text-[length:var(--pr-font-size-xs)] pr:text-[color:var(--pr-color-text-muted)]">{{ rolesLabel }}</div>
         <!-- Extra lines of the header (e.g. the role in the current app), below the roles. -->
         <slot name="header" />
       </div>

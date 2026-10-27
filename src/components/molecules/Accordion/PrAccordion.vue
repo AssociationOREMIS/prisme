@@ -21,6 +21,8 @@ export interface PrAccordionProps {
   items?: PrAccordionItem[]
   type?: 'single' | 'multiple'
   collapsible?: boolean
+  /** Level of the heading around each title, to fit the page outline (h3 by default). */
+  headingLevel?: 2 | 3 | 4 | 5 | 6
 }
 
 withDefaults(defineProps<PrAccordionProps>(), {
@@ -29,6 +31,7 @@ withDefaults(defineProps<PrAccordionProps>(), {
   items: () => [],
   type: 'single',
   collapsible: true,
+  headingLevel: 3,
 })
 
 const emit = defineEmits<{
@@ -52,7 +55,7 @@ const emit = defineEmits<{
       :value="item.value"
       :disabled="item.disabled"
     >
-      <AccordionHeader class="pr-accordion__header pr:m-0">
+      <AccordionHeader class="pr-accordion__header pr:m-0" :as="`h${headingLevel}`">
         <AccordionTrigger class="pr-accordion__trigger pr:group pr:flex pr:w-full pr:cursor-pointer pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)] pr:border-0 pr:bg-transparent pr:p-[var(--pr-space-4)] pr:text-left pr:text-[length:var(--pr-font-size-sm)] pr:font-[750] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]">
           {{ item.title }}
           <ChevronDown class="pr-accordion__icon pr:shrink-0 pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:group-data-[state=open]:rotate-180" :size="16" aria-hidden="true" />

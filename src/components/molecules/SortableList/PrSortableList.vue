@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useId, watch } from 'vue'
-import { GripVertical } from '@lucide/vue'
+import { ChevronDown, ChevronUp, GripVertical } from '@lucide/vue'
 import { usePrMessages } from '../../../i18n/context'
 import {
   cancelDrag,
@@ -36,6 +36,12 @@ export interface PrSortableListProps<T> {
   /** Name of the list, read out when an item arrives in it from the keyboard. */
   ariaLabel?: string
   emptyText?: string
+  /**
+   * « Monter » / « Descendre » buttons on each item: a single click or tap moves it, for people who
+   * cannot drag (WCAG 2.5.7). On by default; turn them off only if the page offers another way
+   * (a position field, a « Déplacer vers » menu).
+   */
+  moveButtons?: boolean
 }
 
 const props = withDefaults(defineProps<PrSortableListProps<T>>(), {
@@ -49,6 +55,7 @@ const props = withDefaults(defineProps<PrSortableListProps<T>>(), {
   disabled: false,
   ariaLabel: undefined,
   emptyText: undefined,
+  moveButtons: true,
 })
 
 const emit = defineEmits<{
@@ -128,6 +135,8 @@ onBeforeUnmount(() => {
   leaveGroup(handle)
 })
 
+const moveButtonClass = 'pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:not-aria-disabled:bg-[var(--pr-color-surface-subtle)] pr:hover:not-aria-disabled:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:aria-disabled:cursor-not-allowed pr:aria-disabled:opacity-40'
+
 const draggedKey = computed(() => (dragState.value?.current === handle ? dragState.value.key : null))
 const dragMode = computed(() => dragState.value?.mode)
 /** A move is under way in this list's group: an empty list shows where to drop. */
@@ -179,6 +188,36 @@ function onKeydown(event: KeyboardEvent, item: T): void {
       announceIn(finishDrag(), messages.sortableList.dropped)
       break
   }
+}
+
+/** An item can go up (or down) within its list, or into the previous (or next) list of its group. */
+function canMove(index: number, direction: -1 | 1): boolean {
+  const target = index + direction
+  if (target >= 0 && target < items.value.length) {
+    return true
+  }
+  const lists = listsInGroup(handle)
+  return Boolean(lists[lists.indexOf(handle) + direction])
+}
+
+// The move buttons: the keyboard move in one go (pick up, one step, drop), so the item can also
+// change lists and `change` is emitted the same way. The pressed button keeps the focus.
+function moveByButton(item: T, index: number, direction: -1 | 1): void {
+  if (props.disabled || dragState.value || !canMove(index, direction)) {
+    return
+  }
+  const key = keyOf(item)
+  startDrag(handle, item, 'keyboard')
+  step(direction, messages.sortableList)
+  const state = finishDrag()
+  announceIn(state, messages.sortableList.dropped)
+  const list = state?.current.element()
+  const button = direction < 0 ? 'up' : 'down'
+  void nextTick(() => {
+    const row = list?.querySelector<HTMLElement>(itemSelector(key))
+    ;(row?.querySelector<HTMLElement>(`.pr-sortable-list__move-${button}[aria-disabled="false"]`)
+      ?? row?.querySelector<HTMLElement>('.pr-sortable-list__move-up, .pr-sortable-list__move-down'))?.focus()
+  })
 }
 
 // Leaving the grip (a click elsewhere) drops the item where it is. Moving an item re-renders its
@@ -400,6 +439,21 @@ function findScrollParent(element: HTMLElement | null): HTMLElement | null {
         <div class="pr-sortable-list__content pr:min-w-0 pr:flex-auto">
           <slot :item="item" :index="index" :dragging="draggedKey === keyOf(item)" />
         </div>
+        <!-- aria-disabled, not disabled: the button stays focusable once its item reaches the end. -->
+        <template v-if="moveButtons && !disabled">
+          <button
+            v-for="direction in ([-1, 1] as const)"
+            :key="direction"
+            type="button"
+            :class="[direction < 0 ? 'pr-sortable-list__move-up' : 'pr-sortable-list__move-down', moveButtonClass]"
+            :aria-label="direction < 0 ? messages.sortableList.moveUp(labelOf(item)) : messages.sortableList.moveDown(labelOf(item))"
+            :aria-disabled="canMove(index, direction) ? 'false' : 'true'"
+            @click="moveByButton(item, index, direction)"
+          >
+            <ChevronUp v-if="direction < 0" :size="16" aria-hidden="true" />
+            <ChevronDown v-else :size="16" aria-hidden="true" />
+          </button>
+        </template>
       </li>
     </ul>
 
@@ -412,7 +466,7 @@ function findScrollParent(element: HTMLElement | null): HTMLElement | null {
     </div>
 
     <span :id="instructionsId" class="pr:sr-only">{{ messages.sortableList.instructions }}</span>
-    <p class="pr:sr-only" aria-live="assertive">{{ announcement }}</p>
+    <p class="pr:sr-only" role="status">{{ announcement }}</p>
 
     <template v-if="name">
       <input v-for="item in items" :key="keyOf(item)" type="hidden" :name="`${name}[]`" :value="keyOf(item)">

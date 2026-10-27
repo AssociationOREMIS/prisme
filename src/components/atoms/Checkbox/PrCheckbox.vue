@@ -58,11 +58,15 @@ defineOptions({ inheritAttrs: false })
 const generatedId = useId()
 const hintId = computed(() => `pr-checkbox-${generatedId}-hint`)
 const errorId = computed(() => `pr-checkbox-${generatedId}-error`)
-// Only the message actually shown: the error replaces the hint.
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+const labelTextId = computed(() => `pr-checkbox-${generatedId}-label`)
+const descriptionId = computed(() => `pr-checkbox-${generatedId}-description`)
+// The error, then the hint: the hint stays shown with the error, the format it gives is what
+// fixing the error needs (RGAA 11.10).
+const describedBy = computed(() => [
+  props.description ? descriptionId.value : undefined,
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+].filter(Boolean).join(' ') || undefined)
 
 const checkboxClass = computed(() => [
   'pr-checkbox pr:inline-flex pr:items-start pr:gap-[var(--pr-space-3)] pr:text-[color:var(--pr-color-text)] pr:leading-[var(--pr-line-height-tight)]',
@@ -84,6 +88,7 @@ const checkboxClass = computed(() => [
       :name="name"
       :value="value"
       :aria-invalid="errorText ? 'true' : undefined"
+      :aria-labelledby="description ? labelTextId : undefined"
       :aria-describedby="describedBy"
       @update:model-value="emit('update:modelValue', $event)"
     >
@@ -98,13 +103,15 @@ const checkboxClass = computed(() => [
       </template>
     </CheckboxRoot>
     <span v-if="label || description || $slots.default" class="pr-checkbox__text pr:grid pr:min-w-0 pr:gap-[var(--pr-space-1)]">
-      <span class="pr-checkbox__label pr:inline-flex pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:leading-[var(--pr-line-height-tight)]">
+      <!-- The label names the box and the description describes it: wrapped in the <label>, both
+           made up its name. -->
+      <span :id="labelTextId" class="pr-checkbox__label pr:inline-flex pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:leading-[var(--pr-line-height-tight)]">
         <slot>{{ label }}</slot>
         <span v-if="required" class="pr-label__required pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
       </span>
-      <span v-if="description" class="pr-checkbox__description pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
+      <span v-if="description" :id="descriptionId" class="pr-checkbox__description pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
     </span>
   </label>
+  <p v-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-  <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>

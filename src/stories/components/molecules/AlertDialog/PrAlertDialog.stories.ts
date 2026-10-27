@@ -89,8 +89,14 @@ export const KeyboardAndAsyncConfirm: Story = {
     await waitFor(() => expect(trigger).toHaveFocus())
 
     await userEvent.click(trigger)
-    await userEvent.click(await body.findByRole('button', { name: 'Archiver' }))
+    const confirm = await body.findByRole('button', { name: 'Archiver' })
+    confirm.focus()
+    await userEvent.keyboard('{Enter}')
     await expect(body.getByRole('alertdialog')).toBeTruthy()
+    // Loading, the button is aria-disabled and keeps the focus (disabled dropped it on <body>).
+    await waitFor(() => expect(confirm).toHaveAttribute('aria-busy', 'true'))
+    await expect(confirm).toHaveAttribute('aria-disabled', 'true')
+    await expect(confirm).toHaveFocus()
     await waitFor(() => expect(body.queryByRole('alertdialog')).toBeNull())
   },
 }

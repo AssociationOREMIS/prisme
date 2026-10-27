@@ -18,6 +18,8 @@ export interface PrDropdownMenuProps {
   side?: 'top' | 'right' | 'bottom' | 'left'
   align?: 'start' | 'center' | 'end'
   label?: string
+  /** Id of an element inside the menu that describes it, not a menu item (the user menu's name, email and roles). */
+  descriptionId?: string
 }
 
 withDefaults(defineProps<PrDropdownMenuProps>(), {
@@ -26,14 +28,15 @@ withDefaults(defineProps<PrDropdownMenuProps>(), {
   side: 'bottom',
   align: 'end',
   label: undefined,
+  descriptionId: undefined,
 })
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
-const itemClass = 'pr-dropdown-menu__item pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-md)] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:text-[color:var(--pr-color-text-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]'
-const checkboxItemClass = 'pr-dropdown-menu__checkbox-item pr:relative pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-md)] pr:py-0 pr:pr-[var(--pr-space-3)] pr:pl-[var(--pr-space-8)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:text-[color:var(--pr-color-text-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]'
+const itemClass = 'pr-dropdown-menu__item pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-md)] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:text-[color:var(--pr-color-text-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]'
+const checkboxItemClass = 'pr-dropdown-menu__checkbox-item pr:relative pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-md)] pr:py-0 pr:pr-[var(--pr-space-3)] pr:pl-[var(--pr-space-8)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:text-[color:var(--pr-color-text-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]'
 const dangerItemClass = `${itemClass} pr-dropdown-menu__item--danger pr:text-[color:var(--pr-color-danger)]! pr:data-[highlighted]:bg-[var(--pr-color-danger-soft)]`
 const separatorClass = 'pr-dropdown-menu__separator pr:my-[var(--pr-space-1)] pr:h-px pr:bg-[var(--pr-color-border)]'
 </script>
@@ -53,6 +56,7 @@ const separatorClass = 'pr-dropdown-menu__separator pr:my-[var(--pr-space-1)] pr
         :side="side"
         :align="align"
         :side-offset="8"
+        :aria-describedby="descriptionId"
       >
         <DropdownMenuLabel v-if="label" class="pr-dropdown-menu__label pr:px-[var(--pr-space-3)] pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-xs)] pr:font-[750] pr:uppercase pr:tracking-[0.04em] pr:text-[color:var(--pr-color-text-muted)]">
           {{ label }}
@@ -67,7 +71,7 @@ const separatorClass = 'pr-dropdown-menu__separator pr:my-[var(--pr-space-1)] pr
           :danger-item-class="dangerItemClass"
           :separator-class="separatorClass"
         />
-        <DropdownMenuArrow class="pr-dropdown-menu__arrow pr:fill-[var(--pr-color-surface)]" :width="12" :height="6" />
+        <DropdownMenuArrow class="pr-dropdown-menu__arrow pr:fill-[var(--pr-color-surface)]" :width="12" :height="6" aria-hidden="true" />
       </DropdownMenuContent>
     </DropdownMenuPortal>
   </DropdownMenuRoot>

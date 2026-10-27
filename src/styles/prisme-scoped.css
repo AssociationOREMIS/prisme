@@ -18,6 +18,7 @@
 @import "./animations.css";
 @import "./layout.css";
 @import "./rtl.css";
+@import "./forced-colors.css";
 @import "./editor-content.css";
 @import "../components/molecules/RichTextEditor/rich-text-editor.css";
 
@@ -41,6 +42,7 @@
 
 :where([class*='pr-'], [class*='pr-'] *):where(button) {
   border: 0;
+  background-color: transparent;
 }
 
 @layer prisme-scoped-utilities {

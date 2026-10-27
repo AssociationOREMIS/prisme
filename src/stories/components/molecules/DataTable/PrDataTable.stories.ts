@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { reactive } from 'vue'
 import {
   ArrowDown,
@@ -63,6 +63,7 @@ const meta = {
   component: PrDataTable,
   tags: ['autodocs'],
   args: {
+    caption: 'Demandes d\'accompagnement',
     columns,
     rows: data,
     selectable: true,
@@ -206,5 +207,30 @@ export const PageSizeOutsideOptions: Story = {
     const select = within(canvasElement).getByRole('combobox', { name: 'Lignes par page' })
     await expect(select).toHaveTextContent('25')
     await expect(select).not.toHaveTextContent('Sélectionner')
+  },
+}
+
+// « Page suivante » pressed on the second to last page keeps the focus on the last one (it is
+// aria-disabled, not disabled), and the new page is announced. The table has a caption and scopes.
+export const KeyboardPagination: Story = {
+  render: (args) => ({
+    components: { PrDataTable },
+    setup() {
+      return { args }
+    },
+    template: '<PrDataTable v-bind="args" />',
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole('table', { name: 'Demandes d\'accompagnement' })).toBeTruthy()
+    await expect(canvasElement.querySelectorAll('thead th:not([scope="col"])')).toHaveLength(0)
+
+    const next = canvas.getByRole('button', { name: 'Page suivante' })
+    next.focus()
+    await userEvent.keyboard('{Enter}')
+
+    await waitFor(() => expect(next).toHaveAttribute('aria-disabled', 'true'))
+    await expect(next).toHaveFocus()
+    await waitFor(() => expect(canvasElement.querySelector('[role="status"]')).toHaveTextContent('Page 2 sur 2'))
   },
 }

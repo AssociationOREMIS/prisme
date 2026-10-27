@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { X } from '@lucide/vue'
-import { computed, ref, useId } from 'vue'
+import { computed, nextTick, ref, useId } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { usePrMessages } from '../../../i18n/context'
 import { useFieldValue } from '../../fieldValue'
+import { useLiveAnnouncer } from '../../liveAnnouncer'
+import { warnWithoutName } from '../../accessibleName'
 
 export interface PrTagInputProps {
   modelValue?: string[]
@@ -33,6 +35,8 @@ const props = withDefaults(defineProps<PrTagInputProps>(), {
   name: undefined,
 })
 
+warnWithoutName('PrTagInput', props.label)
+
 const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
@@ -46,11 +50,15 @@ const generatedId = useId()
 const inputId = computed(() => props.id ?? `pr-tag-input-${generatedId}`)
 const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
-// Only the message actually shown: the error replaces the hint.
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+const limitId = computed(() => `${inputId.value}-limit`)
+// The error, then the hint, which stays shown with the error (RGAA 11.10), then the limit once reached.
+const describedBy = computed(() => [
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+  canAddMore.value ? undefined : limitId.value,
+].filter(Boolean).join(' ') || undefined)
+const rootRef = ref<HTMLElement | null>(null)
+const { message: liveMessage, announce } = useLiveAnnouncer()
 const inputRef = ref<HTMLInputElement | null>(null)
 const inputValue = ref('')
 
@@ -77,6 +85,7 @@ function addTag(raw: string) {
   if (!tag || !canAddMore.value) return
   if (tags.value.some(t => t.toLowerCase() === tag.toLowerCase())) return
   setTags([...tags.value, tag])
+  announce(messages.tagInput.added(tag))
 }
 
 function addTags(rawList: string[]) {
@@ -88,13 +97,27 @@ function addTags(rawList: string[]) {
     if (next.some(t => t.toLowerCase() === tag.toLowerCase())) continue
     next = [...next, tag]
   }
+  const added = next.slice(tags.value.length)
   setTags(next)
+  if (added.length) announce(added.map(tag => messages.tagInput.added(tag)).join(', '))
 }
 
 function removeTag(index: number) {
   const updated = [...tags.value]
-  updated.splice(index, 1)
+  const [removed] = updated.splice(index, 1)
   setTags(updated)
+  if (removed !== undefined) announce(messages.tagInput.removed(removed))
+}
+
+// Removed with its button, the tag took the focus with it: the next tag's button gets it, or the
+// previous one, or the field (the focus fell on <body> otherwise).
+function removeTagAndFocus(index: number) {
+  removeTag(index)
+  void nextTick(() => {
+    const buttons = Array.from(rootRef.value?.querySelectorAll<HTMLElement>('.pr-tag-input__remove') ?? [])
+    const target = buttons[index] ?? buttons[index - 1] ?? inputRef.value
+    target?.focus()
+  })
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -130,7 +153,7 @@ defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
-  <div class="pr-tag-input pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div ref="rootRef" class="pr-tag-input pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <label
       v-if="label"
       class="pr-tag-input__label pr:inline-flex pr:w-fit pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)]"
@@ -159,9 +182,9 @@ defineOptions({ inheritAttrs: false })
         <button
           v-if="!disabled"
           type="button"
-          class="pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+          class="pr-tag-input__remove pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="messages.tagInput.remove(tag)"
-          @click.stop="removeTag(index)"
+          @click.stop="removeTagAndFocus(index)"
         >
           <X :size="10" aria-hidden="true" />
         </button>
@@ -171,10 +194,11 @@ defineOptions({ inheritAttrs: false })
         ref="inputRef"
         v-bind="$attrs"
         v-model="inputValue"
-        class="pr-tag-input__input pr:min-w-[6rem] pr:grow pr:bg-transparent pr:py-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
+        class="pr-tag-input__input pr:min-w-[6rem] pr:grow pr:border-0 pr:bg-transparent pr:py-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
         type="text"
         :placeholder="tags.length === 0 ? (placeholder ?? messages.tagInput.placeholder) : undefined"
-        :disabled="disabled || !canAddMore"
+        :disabled="disabled"
+        :readonly="!canAddMore || undefined"
         :required="required && tags.length === 0"
         :aria-invalid="errorText ? 'true' : undefined"
         :aria-describedby="describedBy"
@@ -188,7 +212,10 @@ defineOptions({ inheritAttrs: false })
     <template v-if="name">
       <input v-for="(tag, index) in tags" :key="`${inputId}-${index}`" type="hidden" :name="name" :value="tag">
     </template>
+    <!-- Once the limit is reached the field stays focusable (read only), and says why it no longer takes tags. -->
+    <p v-if="!canAddMore" :id="limitId" class="pr-tag-input__message pr-tag-input__limit pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ messages.tagInput.limit(maxTags ?? 0) }}</p>
+    <p class="pr:sr-only" role="status">{{ liveMessage }}</p>
+    <p v-if="hint" :id="hintId" class="pr-tag-input__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
     <p v-if="errorText" :id="errorId" class="pr-tag-input__message pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-tag-input__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

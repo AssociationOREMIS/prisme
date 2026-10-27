@@ -58,6 +58,37 @@
   margin-top: 0;
 }
 
+/*
+ * Links: underlined, so they do not rest on their color alone (WCAG 1.4.1, RGAA 10.6), and in the
+ * theme's primary color rather than the browser's blue, which is unreadable on a dark background.
+ */
+.pr-editor-content a {
+  color: var(--pr-color-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.pr-editor-content a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/*
+ * Text in the HTML for screen readers and pages without CSS, hidden visually: the prefix of a
+ * callout ("Attention :"). Not scoped to `.pr-editor-content`, so it also hides in a page that
+ * renders the HTML without that wrapper.
+ */
+.pr-editor-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Bullet and numbered lists: the reset removes their markers and indent. Task lists are styled below. */
 .pr-editor-content ul:not([data-type="taskList"]),
 .pr-editor-content ol {
@@ -86,11 +117,11 @@
  * A host page's own typography reset (e.g. Storybook's docs-mode "sbdocs"
  * stylesheet, or a consumer app's own `p`/`li`/`td` rules) can target these
  * tags directly and win over the `color` inherited from `.pr-editor-content`
- * above — a rule that directly matches an element always beats inheritance
+ * above, a rule that directly matches an element always beats inheritance
  * from an ancestor, regardless of the ancestor's specificity. `!important`
  * makes sure our text stays legible no matter what the host page does.
  * `inherit` (not a hardcoded token) so nested contexts with their own color
- * — Callout boxes, code blocks — still win via the more specific selectors
+ *, Callout boxes, code blocks, still win via the more specific selectors
  * below, since among `!important` rules normal specificity still decides.
  */
 .pr-editor-content p,
@@ -159,7 +190,54 @@
 }
 
 .pr-editor-content ul[data-type="taskList"] li > label {
-  margin-top: 0.2em;
+  display: inline-flex;
+}
+
+/* The task's text on the box's line, whatever top margin the page gives paragraphs. */
+.pr-editor-content ul[data-type="taskList"] li > div > :first-child {
+  margin-top: 0;
+}
+
+/*
+ * Checklist boxes: a 24px target (WCAG 2.5.8; the browser's box is 13px, and in the editor the
+ * text field around it leaves no spacing) drawing an 18px box like PrCheckbox, line-high with the text.
+ */
+.pr-editor-content ul[data-type="taskList"] li > label > input[type="checkbox"] {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  border-radius: var(--pr-radius-sm);
+  cursor: pointer;
+}
+
+.pr-editor-content ul[data-type="taskList"] li > label > input[type="checkbox"]::before {
+  content: "";
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 1px solid var(--pr-color-border-strong);
+  border-radius: var(--pr-radius-sm);
+  background: var(--pr-color-surface);
+  color: var(--pr-color-primary-contrast);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pr-editor-content ul[data-type="taskList"] li > label > input[type="checkbox"]:checked::before {
+  content: "\2713";
+  border-color: var(--pr-color-primary);
+  background: var(--pr-color-primary);
+}
+
+.pr-editor-content ul[data-type="taskList"] li > label > input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--pr-color-focus);
+  outline-offset: 0;
 }
 
 .pr-editor-content pre {
@@ -246,7 +324,9 @@
   font-weight: 700;
 }
 
-.pr-editor-content div[data-callout] > *:last-child {
+/* The prefix and the content wrapper (`data-callout-content`) are new; older HTML has the blocks directly inside. */
+.pr-editor-content div[data-callout] > *:last-child,
+.pr-editor-content div[data-callout-content] > *:last-child {
   margin-bottom: 0;
 }
 

@@ -11,11 +11,14 @@ import {
   ComboboxRoot,
   ComboboxViewport,
 } from 'reka-ui'
-import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { usePrMessages } from '../../../i18n/context'
 import { useFieldValue } from '../../fieldValue'
+import { useLiveAnnouncer } from '../../liveAnnouncer'
+import { useControlAttrs } from '../../controlAttrs'
+import { warnWithoutName } from '../../accessibleName'
 
 export interface PrComboboxOption {
   label: string
@@ -77,7 +80,13 @@ const props = withDefaults(defineProps<PrComboboxProps>(), {
   debounce: 250,
 })
 
+warnWithoutName('PrCombobox', props.label)
+
 const messages = usePrMessages()
+
+// `autocomplete`, `aria-*`... reach the search field, class and style stay on the wrapper.
+defineOptions({ inheritAttrs: false })
+const { rootAttrs, controlAttrs } = useControlAttrs()
 
 // One message, or the first of Laravel's array of messages.
 const errorText = useErrorText(() => props.error)
@@ -90,11 +99,12 @@ const generatedId = useId()
 const inputId = computed(() => props.id ?? `pr-combobox-${generatedId}`)
 const hintId = computed(() => `${inputId.value}-hint`)
 const errorId = computed(() => `${inputId.value}-error`)
-// Only the message actually shown: the error replaces the hint.
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+// The error, then the hint: the hint stays shown with the error, the format it gives is what
+// fixing the error needs (RGAA 11.10).
+const describedBy = computed(() => [
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+].filter(Boolean).join(' ') || undefined)
 
 // Without a v-model (a plain Blade form), keep the selection locally so it shows and gets
 // submitted through the hidden inputs; a real v-model still takes priority.
@@ -160,6 +170,9 @@ onBeforeUnmount(() => {
   searchController?.abort()
 })
 
+// For screen readers, the number of results once a search is done.
+const remoteStatus = computed(() => (searchState.value === 'done' ? messages.combobox.results(remoteOptions.value.length) : remoteMessage.value))
+
 const remoteMessage = computed(() => {
   switch (searchState.value) {
     case 'short': return props.minChars > 1 ? messages.combobox.typeAtLeast(props.minChars) : messages.combobox.typeToSearch
@@ -169,9 +182,58 @@ const remoteMessage = computed(() => {
   }
 })
 
+const { message: liveMessage, announce } = useLiveAnnouncer()
+
 function setValue(value: string | string[]) {
+  // A value picked in a multiple combobox only shows as a new chip: say it.
+  const before = Array.isArray(currentValue.value) ? currentValue.value : []
+  if (Array.isArray(value)) {
+    const added = value.filter(v => !before.includes(v))
+    if (added.length) announce(added.map(v => messages.combobox.selected(labelFor(v))).join(', '))
+  }
   setCurrentValue(value)
   emit('update:modelValue', value)
+}
+
+/** What PrCombobox reads of reka's ComboboxRoot: its highlighted option and its filtered count. */
+interface ComboboxRootExposed {
+  highlightedElement?: HTMLElement | null
+  filtered?: { count?: number }
+}
+const rootRef = ref<ComboboxRootExposed | null>(null)
+const anchorRef = ref<{ $el: HTMLElement } | null>(null)
+
+// reka points aria-activedescendant at the highlighted option, and keeps doing so once a new
+// search has removed it from the list: an id that no longer exists (axe aria-valid-attr-value).
+// Checked after each change of the list, the attribute is dropped until an option is highlighted.
+const activeDescendant = ref<string>()
+const isOpen = ref(false)
+async function syncActiveDescendant() {
+  await nextTick()
+  const element = rootRef.value?.highlightedElement
+  activeDescendant.value = isOpen.value && element && element.isConnected && element.id ? element.id : undefined
+}
+watch(
+  [() => rootRef.value?.highlightedElement, visibleOptions, searchState],
+  syncActiveDescendant,
+  { flush: 'post', immediate: true },
+)
+
+// Closed, the list is gone (once its animation ends): no active option to point at.
+function onOpenChange(open: boolean) {
+  isOpen.value = open
+  if (open) void syncActiveDescendant()
+  else activeDescendant.value = undefined
+}
+
+// The number of options left as the person types, read once they pause.
+function onSearchInput(term: string) {
+  onSearchTerm(term)
+  if (isRemote.value) return
+  void nextTick(() => {
+    const count = rootRef.value?.filtered?.count
+    if (count !== undefined && term.trim() !== '') announce(messages.combobox.results(count), 600)
+  })
 }
 
 const displayValue = computed(() => (val: string | string[]) => {
@@ -191,13 +253,25 @@ const hasValue = computed(() => {
   return Boolean(currentValue.value)
 })
 
-function clearValue() {
+function clearValueAndFocus() {
   setValue(props.multiple ? [] : '')
+  // The clear button disappears with the value: the focus goes back to the field.
+  void nextTick(() => document.getElementById(inputId.value)?.focus())
 }
 
 function removeValue(value: string) {
   if (!Array.isArray(currentValue.value)) return
+  const index = currentValue.value.indexOf(value)
   setValue(currentValue.value.filter(v => v !== value))
+  announce(messages.combobox.removed(labelFor(value)))
+  // The chip's button had the focus and is gone: the next chip's button takes it, or the previous
+  // one, or the field (the focus fell on <body> otherwise).
+  void nextTick(() => {
+    const anchor = anchorRef.value?.$el as HTMLElement | undefined
+    const buttons = anchor ? Array.from(anchor.querySelectorAll<HTMLElement>('.pr-combobox__tag-remove')) : []
+    const target = buttons[index] ?? buttons[index - 1] ?? document.getElementById(inputId.value)
+    target?.focus()
+  })
 }
 
 function labelFor(value: string) {
@@ -206,17 +280,20 @@ function labelFor(value: string) {
 </script>
 
 <template>
-  <div class="pr-combobox pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div v-bind="rootAttrs()" class="pr-combobox pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :for="inputId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <ComboboxRoot
+      ref="rootRef"
       class="pr:relative"
       :model-value="currentValue"
       :multiple="multiple"
       :disabled="disabled"
       :ignore-filter="isRemote"
+      @update:open="onOpenChange"
       @update:model-value="setValue($event as string | string[])"
     >
       <ComboboxAnchor
+        ref="anchorRef"
         class="pr-combobox__anchor pr:inline-flex pr:min-h-[2.375rem] pr:w-full pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-2)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:py-[var(--pr-space-1)] pr:focus-within:outline-2 pr:focus-within:outline-offset-2 pr:focus-within:outline-[var(--pr-color-focus)]"
         :class="{ 'pr:border-[var(--pr-color-danger)]': Boolean(errorText) }"
       >
@@ -229,7 +306,7 @@ function labelFor(value: string) {
           <button
             v-if="!disabled"
             type="button"
-            class="pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+            class="pr-combobox__tag-remove pr:-my-1 pr:-mr-1.5 pr:inline-grid pr:size-6 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
             :aria-label="messages.combobox.remove(labelFor(value))"
             @click.stop="removeValue(value)"
           >
@@ -237,24 +314,26 @@ function labelFor(value: string) {
           </button>
         </span>
         <ComboboxInput
+          v-bind="controlAttrs()"
           :id="inputId"
-          class="pr-combobox__input pr:min-w-0 pr:grow pr:bg-transparent pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
+          class="pr-combobox__input pr:min-w-0 pr:grow pr:border-0 pr:bg-transparent pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:outline-none pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:disabled:cursor-not-allowed"
           :display-value="multiple ? undefined : displayValue"
           :placeholder="fieldPlaceholder"
           :required="required && !hasValue"
           :aria-required="required || undefined"
           :aria-invalid="errorText ? 'true' : undefined"
           :aria-describedby="describedBy"
-          @update:model-value="onSearchTerm"
+          :aria-activedescendant="activeDescendant"
+          @update:model-value="onSearchInput"
           @focus="isFocused = true"
           @blur="isFocused = false"
         />
         <button
           v-if="hasValue && !disabled"
           type="button"
-          class="pr-combobox__clear pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)]"
+          class="pr-combobox__clear pr:inline-grid pr:size-6 pr:shrink-0 pr:place-items-center pr:rounded-[0.25rem] pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
           :aria-label="messages.combobox.clear"
-          @click.stop="clearValue"
+          @click.stop="clearValueAndFocus"
         >
           <X :size="14" aria-hidden="true" />
         </button>
@@ -282,7 +361,7 @@ function labelFor(value: string) {
             <ComboboxItem
               v-for="option in visibleOptions"
               :key="option.value"
-              class="pr-combobox__item pr:relative pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-md)] pr:py-0 pr:pr-[var(--pr-space-8)] pr:pl-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-50"
+              class="pr-combobox__item pr:relative pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-md)] pr:py-0 pr:pr-[var(--pr-space-8)] pr:pl-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[highlighted]:outline-solid pr:data-[highlighted]:outline-2 pr:data-[highlighted]:-outline-offset-2 pr:data-[highlighted]:outline-[var(--pr-color-focus)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-50"
               :value="option.value"
               :disabled="option.disabled"
             >
@@ -295,14 +374,15 @@ function labelFor(value: string) {
         </ComboboxContent>
       </ComboboxPortal>
     </ComboboxRoot>
-    <p v-if="isRemote" class="pr:sr-only" role="status">{{ remoteMessage }}</p>
+    <p v-if="isRemote" class="pr:sr-only" role="status">{{ remoteStatus }}</p>
+    <p class="pr:sr-only" role="status">{{ liveMessage }}</p>
     <!-- ComboboxInput only ever carries the search text, not the selected
          value(s), so native form submission goes through these hidden inputs. -->
     <template v-if="name">
       <input v-if="!multiple" type="hidden" :name="name" :value="typeof currentValue === 'string' ? currentValue : ''">
       <input v-for="value in Array.isArray(currentValue) ? currentValue : []" v-else :key="value" type="hidden" :name="name" :value="value">
     </template>
+    <p v-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
     <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

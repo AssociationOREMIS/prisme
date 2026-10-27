@@ -51,9 +51,9 @@ export const WithoutVModel: Story = {
     await waitFor(() => expect(data().get('start')).toBe('2026-10-07'))
 
     // The current page moves without v-model:page.
-    await expect(canvas.getByRole('button', { name: 'Page précédente' })).toBeDisabled()
+    await expect(canvas.getByRole('button', { name: 'Page précédente' })).toHaveAttribute('aria-disabled', 'true')
     await userEvent.click(canvas.getByRole('button', { name: 'Page suivante' }))
-    await waitFor(() => expect(canvas.getByRole('button', { name: 'Page précédente' })).toBeEnabled())
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Page précédente' })).not.toHaveAttribute('aria-disabled', 'true'))
     await expect(canvasElement.querySelector('[aria-current="page"]')).toHaveTextContent('2')
   },
 }

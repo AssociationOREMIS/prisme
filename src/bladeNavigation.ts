@@ -44,6 +44,8 @@ interface FetchedPage {
   template: string
   assets: string[]
   csrfToken: string | null
+  /** The new page's `<html lang>`: screen readers pronounce its text in that language (RGAA 8.3). */
+  lang: string | null
 }
 
 type HistoryState = { prisme: true, scrollY?: number }
@@ -266,6 +268,7 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
       template: appElement.innerHTML,
       assets: assetsOf(doc, appElement),
       csrfToken: doc.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? null,
+      lang: doc.documentElement.getAttribute('lang'),
     }
   }
 
@@ -399,6 +402,7 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
     const swap = async (): Promise<void> => {
       current.value = compileTemplate(page.template)
       document.title = page.title
+      if (page.lang && page.lang !== document.documentElement.lang) document.documentElement.lang = page.lang
       if (page.csrfToken) document.querySelector('meta[name="csrf-token"]')?.setAttribute('content', page.csrfToken)
       await nextTick()
       afterRender()

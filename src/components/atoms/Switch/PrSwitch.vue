@@ -53,11 +53,15 @@ defineOptions({ inheritAttrs: false })
 const generatedId = useId()
 const hintId = computed(() => `pr-switch-${generatedId}-hint`)
 const errorId = computed(() => `pr-switch-${generatedId}-error`)
-// Only the message actually shown: the error replaces the hint.
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+const labelTextId = computed(() => `pr-switch-${generatedId}-label`)
+const descriptionId = computed(() => `pr-switch-${generatedId}-description`)
+// The error, then the hint: the hint stays shown with the error, the format it gives is what
+// fixing the error needs (RGAA 11.10).
+const describedBy = computed(() => [
+  props.description ? descriptionId.value : undefined,
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+].filter(Boolean).join(' ') || undefined)
 
 const switchClass = computed(() => [
   'pr-switch pr:inline-flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-3)] pr:text-[color:var(--pr-color-text)]',
@@ -68,11 +72,12 @@ const switchClass = computed(() => [
 <template>
   <label :class="switchClass">
     <span v-if="label || description || $slots.default" class="pr-switch__text pr:grid pr:min-w-0 pr:gap-[var(--pr-space-1)]">
-      <span class="pr-switch__label pr:inline-flex pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:leading-[var(--pr-line-height-tight)]">
+      <!-- The label names the switch, the description describes it (both made up its name). -->
+      <span :id="labelTextId" class="pr-switch__label pr:inline-flex pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-[650] pr:leading-[var(--pr-line-height-tight)]">
         <slot>{{ label }}</slot>
         <span v-if="required" class="pr-label__required pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
       </span>
-      <span v-if="description" class="pr-switch__description pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
+      <span v-if="description" :id="descriptionId" class="pr-switch__description pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
     </span>
     <input v-if="name && uncheckedValue !== undefined" type="hidden" :name="name" :value="uncheckedValue" :disabled="disabled">
     <SwitchRoot
@@ -86,12 +91,14 @@ const switchClass = computed(() => [
       :name="name"
       :value="value"
       :aria-invalid="errorText ? 'true' : undefined"
+      :aria-labelledby="description ? labelTextId : undefined"
       :aria-describedby="describedBy"
       @update:model-value="emit('update:modelValue', $event)"
     >
-      <SwitchThumb class="pr-switch__thumb pr:block pr:size-4 pr:translate-x-0 pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-xs)] pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:data-[state=checked]:translate-x-4" />
+      <!-- The thumb tells the state: it must stand out from the track (3:1, WCAG 1.4.11). -->
+      <SwitchThumb class="pr-switch__thumb pr:block pr:size-4 pr:translate-x-0 pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-text-muted)] pr:data-[state=checked]:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-xs)] pr:transition-transform pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:data-[state=checked]:translate-x-4" />
     </SwitchRoot>
   </label>
+  <p v-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-  <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:mt-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
 </template>

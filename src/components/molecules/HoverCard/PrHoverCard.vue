@@ -35,7 +35,7 @@ withDefaults(defineProps<PrHoverCardProps>(), {
         :side-offset="8"
       >
         <slot />
-        <HoverCardArrow class="pr-hover-card__arrow pr:fill-[var(--pr-color-surface)]" :width="12" :height="6" />
+        <HoverCardArrow class="pr-hover-card__arrow pr:fill-[var(--pr-color-surface)]" :width="12" :height="6" aria-hidden="true" />
       </HoverCardContent>
     </HoverCardPortal>
   </HoverCardRoot>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrNavbarProps {
   title?: string
@@ -16,6 +17,10 @@ export interface PrNavbarProps {
   hideActionsOnMobile?: boolean
   /** Hides the app title and its divider below 780px, keeping only the logo. */
   hideTitleOnMobile?: boolean
+  /** Makes the logo and the title a link to this address, the app's home page. Ignored if the `#brand` slot is used. */
+  homeHref?: string
+  /** Text alternative of the logo (defaults to `brandLabel`). Left empty when the title shown next to it already says it. */
+  logoAlt?: string
 }
 
 const props = withDefaults(defineProps<PrNavbarProps>(), {
@@ -28,7 +33,11 @@ const props = withDefaults(defineProps<PrNavbarProps>(), {
   diagonalDivider: false,
   hideActionsOnMobile: false,
   hideTitleOnMobile: false,
+  homeHref: undefined,
+  logoAlt: undefined,
 })
+
+const messages = usePrMessages()
 
 const navbarTitle = computed(() => props.title ?? props.brandLabel)
 const resolvedLogoSrc = computed(() => {
@@ -38,6 +47,12 @@ const resolvedLogoSrc = computed(() => {
   return props.logoSrc ?? 'https://static.oremis.fr/img/logos/oremis-logo-white.svg'
 })
 const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
+// The logo's alternative, unless the title next to it, always shown, already says the same:
+// « OREMIS OREMIS » was read otherwise.
+const resolvedLogoAlt = computed(() => {
+  const alt = props.logoAlt ?? props.brandLabel
+  return !props.hideTitleOnMobile && navbarTitle.value === alt ? '' : alt
+})
 </script>
 
 <template>
@@ -47,30 +62,38 @@ const hasMobileLogo = computed(() => !!props.mobileLogoSrc)
   <header class="pr-navbar pr:[--pr-color-focus:var(--pr-blue-200)] pr:sticky pr:top-0 pr:col-[1/-1] pr:row-[1] pr:z-[50] pr:flex pr:h-[var(--pr-navbar-height)] pr:w-full pr:items-center pr:justify-between pr:bg-[var(--pr-color-navbar)] pr:px-[var(--pr-space-4)] pr:py-[var(--pr-space-3)] pr:text-[color:var(--pr-color-navbar-text)] pr:max-[780px]:px-[var(--pr-space-3)]">
     <div class="pr-navbar__brand pr:inline-flex pr:min-w-0 pr:items-center pr:gap-[var(--pr-space-3)]">
       <slot name="brand">
-        <img
-          class="pr-navbar__logo pr:block pr:h-9 pr:w-auto pr:shrink-0 pr:object-contain pr:object-center"
-          :class="[
-            { 'pr-navbar__logo--icon pr:w-9': logoVariant === 'icon-only' },
-            { 'pr:max-[780px]:hidden': hasMobileLogo },
-          ]"
-          :src="resolvedLogoSrc"
-          alt="OREMIS"
+        <component
+          :is="homeHref ? 'a' : 'div'"
+          class="pr-navbar__home pr:inline-flex pr:min-w-0 pr:items-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-md)] pr:text-inherit pr:no-underline pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+          :href="homeHref"
         >
-        <img
-          v-if="hasMobileLogo"
-          class="pr-navbar__logo pr-navbar__logo--mobile pr:hidden pr:h-9 pr:w-9 pr:shrink-0 pr:object-contain pr:object-center pr:max-[780px]:block"
-          :src="mobileLogoSrc"
-          alt="OREMIS"
-        >
-        <span
-          class="pr-navbar__divider"
-          :class="[
-            'pr:h-8 pr:w-0.5 pr:shrink-0 pr:bg-[var(--pr-color-navbar-muted)]',
-            { 'pr-navbar__divider--diagonal pr:rotate-12': diagonalDivider, 'pr:max-[780px]:hidden': hideTitleOnMobile },
-          ]"
-          aria-hidden="true"
-        />
-        <p :class="{ 'pr:max-[780px]:hidden': hideTitleOnMobile }" class="pr-navbar__title pr:font-[family-name:var(--pr-font-heading)] pr:m-0 pr:min-w-0 pr:overflow-hidden pr:text-ellipsis pr:whitespace-nowrap pr:text-[length:var(--pr-font-size-lg)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
+          <img
+            class="pr-navbar__logo pr:block pr:h-9 pr:w-auto pr:shrink-0 pr:object-contain pr:object-center"
+            :class="[
+              { 'pr-navbar__logo--icon pr:w-9': logoVariant === 'icon-only' },
+              { 'pr:max-[780px]:hidden': hasMobileLogo },
+            ]"
+            :src="resolvedLogoSrc"
+            :alt="resolvedLogoAlt"
+          >
+          <img
+            v-if="hasMobileLogo"
+            class="pr-navbar__logo pr-navbar__logo--mobile pr:hidden pr:h-9 pr:w-9 pr:shrink-0 pr:object-contain pr:object-center pr:max-[780px]:block"
+            :src="mobileLogoSrc"
+            :alt="resolvedLogoAlt"
+          >
+          <span
+            class="pr-navbar__divider"
+            :class="[
+              'pr:h-8 pr:w-0.5 pr:shrink-0 pr:bg-[var(--pr-color-navbar-muted)]',
+              { 'pr-navbar__divider--diagonal pr:rotate-12': diagonalDivider, 'pr:max-[780px]:hidden': hideTitleOnMobile },
+            ]"
+            aria-hidden="true"
+          />
+          <!-- Two lines at most, rather than cut: a long title stays readable with larger text spacing (WCAG 1.4.12). -->
+          <p :class="{ 'pr:max-[780px]:hidden': hideTitleOnMobile }" class="pr-navbar__title pr:font-[family-name:var(--pr-font-heading)] pr:m-0 pr:min-w-0 pr:line-clamp-2 pr:break-words pr:text-[length:var(--pr-font-size-lg)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-navbar-text)]">{{ navbarTitle }}</p>
+          <span v-if="homeHref" class="pr:sr-only">({{ messages.navbar.home }})</span>
+        </component>
       </slot>
     </div>
 

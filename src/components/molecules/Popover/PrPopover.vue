@@ -8,6 +8,7 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from 'reka-ui'
+import { useId } from 'vue'
 import { usePrMessages } from '../../../i18n/context'
 
 export interface PrPopoverProps {
@@ -17,6 +18,8 @@ export interface PrPopoverProps {
   align?: 'start' | 'center' | 'end'
   title?: string
   closeLabel?: string
+  /** Level of the `title` heading, to fit the page outline (h2 by default). */
+  headingLevel?: 2 | 3 | 4 | 5 | 6
 }
 
 withDefaults(defineProps<PrPopoverProps>(), {
@@ -26,9 +29,11 @@ withDefaults(defineProps<PrPopoverProps>(), {
   align: 'start',
   title: undefined,
   closeLabel: undefined,
+  headingLevel: 2,
 })
 
 const messages = usePrMessages()
+const titleId = `pr-popover-${useId()}-title`
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -50,10 +55,11 @@ const emit = defineEmits<{
         :side="side"
         :align="align"
         :side-offset="8"
+        :aria-labelledby="title ? titleId : undefined"
       >
         <div v-if="title || $slots.header" class="pr-popover__header pr:mb-[var(--pr-space-3)] pr:flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-3)]">
           <slot name="header">
-            <h2 class="pr-popover__title pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:font-[750] pr:leading-[var(--pr-line-height-tight)]">{{ title }}</h2>
+            <component :is="`h${headingLevel}`" :id="titleId" class="pr-popover__title pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:font-[750] pr:leading-[var(--pr-line-height-tight)]">{{ title }}</component>
           </slot>
           <PopoverClose class="pr-popover__close pr:-m-1 pr:inline-grid pr:size-8 pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]" :aria-label="closeLabel ?? messages.common.close">
             <X :size="16" aria-hidden="true" />
@@ -62,7 +68,7 @@ const emit = defineEmits<{
         <div class="pr-popover__body pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)]">
           <slot />
         </div>
-        <PopoverArrow class="pr-popover__arrow pr:fill-[var(--pr-color-surface)]" :width="12" :height="6" />
+        <PopoverArrow class="pr-popover__arrow pr:fill-[var(--pr-color-surface)]" :width="12" :height="6" aria-hidden="true" />
       </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>

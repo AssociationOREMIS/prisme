@@ -2,6 +2,81 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## Unreleased
+
+Accessibilite : corrige les non-conformites de l'audit RGAA 4.1.2 / WCAG 2.2 AA de la rc.7. Aucun changement cassant ; quelques changements visibles, listes plus bas.
+
+### Mise en page
+
+- **Lien d'evitement** : `PrAppShell` commence par « Aller au contenu », visible a la premiere tabulation, qui envoie le focus sur le contenu (`<main id="main-content">`). Props `main-id`, `skip-link-label`, `hide-skip-link`. Sans `PrAppShell`, la classe `pr-skip-link` donne le meme style.
+- **Pied de page** : nouveau slot `footer` de `PrAppShell`, rendu en `<footer>` (repere `contentinfo`), pour la mention « Accessibilite : partiellement conforme » et les liens obligatoires.
+- **Lien vers l'accueil** : `home-href` sur `PrNavbar` fait du logo et du titre un lien. `logo-alt` donne l'alternative du logo ; elle reste vide quand le titre dit deja la meme chose (« OREMIS OREMIS » etait lu).
+- **La navbar collante ne cache plus l'element qui a le focus** (WCAG 2.4.11) : `scroll-padding-top` sous la navbar.
+- **Menu utilisateur nomme sur telephone** : sous 768 px, le bouton de `PrNavbarUserMenu` n'avait aucun nom (le nom etait masque). Il est garde pour les lecteurs d'ecran. Le nom, l'email et les roles en tete du menu le decrivent.
+- **Sidebar** : la navigation est nommee (et n'est plus une `nav` sans nom dans un `aside`). Une pastille est lue apres le libelle (« Membres, 3 notifications »), et le libelle reste dans le nom du lien quand la sidebar est etroite. Le bouton du menu mobile dit s'il est ouvert. Les libelles et descriptions longs passent sur deux lignes au lieu d'etre coupes.
+- La navigation sans rechargement met aussi a jour la langue de la page (`<html lang>`).
+
+### Focus
+
+- **Le focus ne tombe plus sur la page** quand le bouton presse devient indisponible ou disparait :
+  - `PrButton` en chargement (`loading`, dont la confirmation asynchrone de `PrAlertDialog`) reste focalisable : `aria-disabled` et clics ignores, au lieu de `disabled`. Meme chose pour un `aria-disabled="true"` donne par l'app.
+  - « Page suivante » sur la derniere page (et « Page precedente » sur la premiere) de `PrPagination` et de `PrDataTable`.
+  - Retrait d'une puce de `PrCombobox` ou de `PrTagInput`, d'un fichier de `PrFileUpload` : le focus va a la puce ou au fichier suivant, sinon au champ.
+  - `PrTagInput` a sa limite reste focalisable (lecture seule) et affiche « 5 maximum atteint ».
+- **Focus visible** : les elements de `PrDropdownMenu` (le contour etait annule), l'option surlignee de `PrSelect`, `PrCombobox` et `PrCommand` (un contour en plus du fond gris clair, 1,10:1 seul), les boutons de `PrCarousel`, le bouton d'effacement de `PrCombobox`, la zone de depot de `PrFileUpload`.
+
+### Couleurs et contrastes
+
+- **Onglet actif souligne** : l'indicateur de `PrTabs` avait une largeur nulle, l'onglet actif n'etait reconnu qu'a sa couleur.
+- **Plus de fond gris du navigateur sur les boutons** (`reset.css` et `styles-scoped.css`) : les onglets en theme sombre (1,93:1), les boutons +/- de `PrNumberInput`, les croix des puces. Les champs internes de `PrNumberInput`, `PrCombobox` et `PrTagInput` perdent leur bordure native.
+- **Contrastes des composants (3:1)** : pouce de `PrSwitch` gris quand il est eteint (au lieu de blanc sur gris clair) ; pistes de `PrSlider` et `PrProgress` bordees ; le survol d'un champ assombrit sa bordure au lieu de l'eclaircir (nouveau token `--pr-color-border-hover`) ; entree active de la sidebar en vert plus fonce en theme clair (`--pr-color-sidebar-active` passe a `--pr-green-600`), icone sombre sur le vert en theme sombre (nouveau token `--pr-color-sidebar-active-contrast`).
+- **Mode contraste eleve Windows** (`forced-colors`) : interrupteur, groupe de boutons, onglet actif, page courante, jour choisi, etapes, barre de progression et curseur, case cochee, entree active de la sidebar et option surlignee restent visibles, en couleurs systeme.
+
+### Messages et noms
+
+- **`PrDataTable`** : nouvelles props `caption` (et `caption-hidden`), `aria-label`, `row-header-key` (en-tetes de ligne), `actions-label`. Les en-tetes ont `scope="col"`, le tableau est `aria-busy` pendant le chargement, et une region polie annonce le chargement, le nombre de resultats d'un filtre et la page atteinte. Le bouton d'actions de chaque ligne est nomme « Actions pour » et la premiere colonne. Un tableau sans `caption` ni `aria-label` le signale dans la console, comme `PrTable` (nouvelles props `caption-hidden`, `aria-label`).
+- **Annonces** : puces ajoutees et retirees (`PrTagInput`, `PrCombobox`), nombre de resultats de `PrCombobox`, fichiers envoyes, retires ou refuses (`PrFileUpload`).
+- **`PrFileUpload`** affiche les fichiers refuses et leur raison (prop `hide-rejected` pour les masquer), dit « Envoye » aux lecteurs d'ecran, et « 8 Mo maximum » au lieu de « Max 8 Mo ». Son champ fichier masque n'apparait plus comme un second bouton.
+- **L'aide d'un champ reste affichee avec son erreur** (tous les champs) : le format qu'elle donne sert justement a corriger l'erreur. Le champ est decrit par l'erreur puis par l'aide.
+- **Champs sans nom signales dans la console** : `PrInput`, `PrTextarea`, `PrSelect`, `PrNumberInput`, `PrTagInput`, `PrCombobox`, `PrFileUpload`, `PrProgress`, `PrToggle`.
+- **Textes en francais** : statut « Etape 2 sur 4 » et nom du groupe de `PrStepper` (reka les ecrivait en anglais), `aria-roledescription` de `PrCarousel`, region des toasts (« Notifications, touche F8 »). Nouvelles cles dans `messages` : `appShell`, `stepper`, et des cles ajoutees a `carousel`, `combobox`, `dataTable`, `fileUpload`, `navbar`, `pagination`, `sortableList`, `tagInput`, `toast`.
+- **`PrPagination`** nomme ses pages « Page 2 ».
+- **Cases, radios et interrupteurs avec description** : le libelle les nomme, la description les decrit (elle faisait partie du nom).
+- **`PrSpinner`** porte son texte dans la region de statut (un `aria-label` seul n'etait souvent pas lu). Le `<output>` de `PrSlider` n'est plus lu en double.
+- **Toasts** : info, succes et neutre sont annonces poliment, seuls l'avertissement et l'erreur interrompent.
+- **`PrCombobox`** : `aria-activedescendant` ne pointe plus vers une option disparue apres une recherche serveur.
+- **Attributs transmis au vrai champ** : `autocomplete="bday"` sur `PrDatePicker` atterrissait sur le `div` ; `PrCombobox` et `PrSelect` transmettent aussi leurs attributs (`class` et `style` restent sur l'enveloppe).
+- **Titres** : `PrStepper` n'ecrit plus un `h4` par etape ; `heading-level` sur `PrAccordion` et `PrPopover` (dont le titre nomme maintenant la fenetre), `as` sur `PrTypography`.
+- Fleches decoratives des menus, popovers et infobulles masquees aux lecteurs d'ecran ; `aria-label` sur `PrTabs`, `PrStepper` et `PrScrollArea` ; zones defilantes de `PrScrollArea` et blocs de code de `PrTypography` atteignables au clavier.
+
+### Glisser-deposer
+
+- **`PrSortableList` : boutons « Monter » / « Descendre »** sur chaque element, pour deplacer d'un seul clic sans glisser (WCAG 2.5.7). Actifs par defaut, ce qui ajoute deux boutons a chaque ligne ; `:move-buttons="false"` les retire si la page offre un autre moyen. Les annonces passent en poli.
+
+### Editeur de texte riche (outil auteur, EN 301 549 11.8)
+
+- **`PrRichTextEditor` demande le texte alternatif des images** : apres l'envoi, un panneau demande une description, ou la case « Image decorative » (`alt=""`). Aucune image n'est plus inseree sans `alt`. Le bouton « Texte alternatif et taille de l'image » modifie l'`alt` et la largeur (petite, moyenne, pleine largeur) d'une image selectionnee, au clavier. Une image sans `alt` (contenu plus ancien) est signalee sous l'editeur. `insertImageFromFile(file)` ouvre ce panneau ; `insertImageFromFile(file, alt)` insere directement.
+- **Le bouton image garde le focus pendant l'envoi** (`aria-disabled` au lieu de `disabled`), et l'envoi est annonce aux lecteurs d'ecran (« Envoi de l'image en cours... », « Image envoyee. »).
+- **Videos YouTube nommees** : le titre de l'iframe est demande a l'insertion (« Video YouTube » par defaut, aussi pour les videos deja enregistrees).
+- **Tableaux de l'editeur** : les cellules d'en-tete ont `scope="col"` (ou `scope="row"` pour une colonne d'en-tete).
+- **Listes a cocher** : chaque case porte le texte de sa tache (`aria-label`) dans le HTML enregistre, et devient une cible de 24 px. Le bouton des sections repliables est en francais (« Deplier la section ») et fait 24 px.
+- **Encadres** : le HTML contient leur sens en texte (« Attention : », « Information : »...), masque a l'ecran mais lu par les lecteurs d'ecran et visible sans CSS. Les encadres enregistres avant se relisent sans perte.
+- **Liens soulignes** dans `.pr-editor-content`.
+- **Barre d'outils au clavier** (motif « toolbar » de l'APG) : un seul arret de tabulation, fleches gauche/droite, Debut et Fin entre les boutons. Les boutons bascule disent s'ils sont actifs (`aria-pressed`). Le bouton Italique ne montrait jamais son etat actif, c'est corrige.
+- **Selecteur de couleur** : il a maintenant un contour de focus visible.
+- **Menu emoji** : fleches, Debut/Fin, Echap rend le focus au bouton, noms d'emoji en francais (« Coche » et non `white_check_mark`), contour de focus visible.
+- **Noeuds tiptap accessibles** exportes par `@oremis/prisme/editor` et `@oremis/prisme/tiptap/<nom>` : `AccessibleImage`, `AccessibleYoutube`, `AccessibleTaskItem`, `ScopedTableHeader`. Nouvelle option `prefixes` sur `Callout`. Un nettoyeur HTML cote serveur doit garder `alt`, `title`, `scope`, `aria-label`, `class` et `data-callout-*`.
+
+### Tests
+
+- axe tourne sur chaque story avec les regles WCAG 2.0, 2.1 et 2.2 A/AA (dont `target-size`) et les bonnes pratiques, en theme clair **et** en theme sombre (nouveau projet de test `storybook-dark`). Les regles qui concernent une page entiere (repere `main`, `h1`) sont ecartees.
+- `contrast.test.ts` couvre les paires qui manquaient (avertissement, primaire, erreur, boutons survoles, navbar, survol des champs, pouce du switch, sidebar active, anneaux de focus) et verifie que les deux blocs du theme sombre restent identiques.
+- Nouveaux tests de non-regression : `src/components/accessibility.test.ts`, et des `play` (lien d'evitement, focus du bouton en chargement, pagination au clavier, puces, contour du menu, indicateur d'onglet).
+
+### Changements visibles
+
+- Un trait sous l'onglet actif ; le pouce de l'interrupteur eteint en gris ; une bordure autour des pistes de curseur et de progression ; un contour sur l'option surlignee des listes ; le vert actif de la sidebar plus fonce en theme clair et son icone sombre en theme sombre ; l'aide affichee avec l'erreur ; les fichiers refuses listes sous `PrFileUpload` ; le message de limite de `PrTagInput` ; les boutons « Monter » / « Descendre » de `PrSortableList` ; les libelles longs de la sidebar et le titre de la navbar sur deux lignes au lieu d'etre coupes.
+
 ## 1.0.0-rc.7 (2026-10-18)
 
 Septieme version candidate, sous le tag npm `next`. Des titres de groupes dans la sidebar, et des tableaux sans cadre pour les tableaux de bord.

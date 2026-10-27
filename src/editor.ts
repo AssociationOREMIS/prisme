@@ -17,7 +17,15 @@ export { PrRichTextEditor }
 export type { PrRichTextEditorProps } from './components/molecules/RichTextEditor'
 
 export { Callout } from './tiptap/callout'
-export type { PrCalloutAttributes, PrCalloutVariant } from './tiptap/callout'
+export type { PrCalloutAttributes, PrCalloutOptions, PrCalloutVariant } from './tiptap/callout'
+
+// The accessible variants of tiptap nodes the editor uses, for an app mounting its own tiptap editor.
+export { AccessibleImage, imageWidthAttributes, PR_IMAGE_WIDTHS } from './tiptap/accessible-image'
+export type { PrImageWidth } from './tiptap/accessible-image'
+export { AccessibleTaskItem } from './tiptap/accessible-task-item'
+export { AccessibleYoutube } from './tiptap/accessible-youtube'
+export type { PrYoutubeOptions } from './tiptap/accessible-youtube'
+export { ScopedTableHeader } from './tiptap/scoped-table-header'
 
 /**
  * Registers `PrRichTextEditor` globally, the editor counterpart of

@@ -28,9 +28,8 @@ const spinnerClass = computed(() => [
 </script>
 
 <template>
-  <span
-    :class="spinnerClass"
-    role="status"
-    :aria-label="ariaLabel ?? messages.common.loading"
-  />
+  <!-- The text sits inside the status region: an aria-label alone is often not read when it appears. -->
+  <span :class="spinnerClass" role="status">
+    <span class="pr:sr-only">{{ ariaLabel ?? messages.common.loading }}</span>
+  </span>
 </template>

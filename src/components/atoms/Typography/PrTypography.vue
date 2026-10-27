@@ -19,10 +19,16 @@ export interface PrTypographyProps {
     | 'large'
     | 'small'
     | 'subtle'
+  /**
+   * The element to render, when the look and the level differ: `variant="h2" as="h3"` keeps the
+   * page outline right (no skipped level) with the size of an h2.
+   */
+  as?: string
 }
 
 const props = withDefaults(defineProps<PrTypographyProps>(), {
   variant: 'p',
+  as: undefined,
 })
 
 const normalizedVariant = computed(() => (props.variant === 'code' ? 'inline-code' : props.variant))
@@ -44,6 +50,7 @@ const typographyVariantClass = computed(() => ({
   subtle: 'pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-[color:var(--pr-color-text-muted)]',
 })[normalizedVariant.value])
 const tag = computed(() => {
+  if (props.as) return props.as
   switch (normalizedVariant.value) {
     case 'lead':
     case 'subtle':
@@ -63,7 +70,13 @@ const tag = computed(() => {
 </script>
 
 <template>
-  <component :is="tag" class="pr-typography pr:m-0 pr:text-[color:var(--pr-color-text)]" :class="typographyVariantClass">
+  <!-- A code block scrolls sideways: focusable, so the keyboard can scroll it too. -->
+  <component
+    :is="tag"
+    class="pr-typography pr:m-0 pr:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+    :class="typographyVariantClass"
+    :tabindex="normalizedVariant === 'code-block' ? 0 : undefined"
+  >
     <code v-if="normalizedVariant === 'code-block'" class="pr-typography__code-block-content pr:whitespace-pre pr:font-[var(--pr-font-mono)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-inherit">
       <slot />
     </code>

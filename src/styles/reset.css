@@ -34,6 +34,9 @@ select {
   font: inherit;
 }
 
+/* No browser button face: a button without its own background showed the browser's grey
+   (ButtonFace, #6b6b6b in the dark theme), under text Prisme colors for its own surface. */
 button {
   border: 0;
+  background-color: transparent;
 }

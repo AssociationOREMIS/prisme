@@ -67,13 +67,13 @@ export const AsLinks: Story = {
     await expect(next.searchParams.get('absent_page')).toBe('2')
     await expect(next.hash).toBe('#absent-staff')
 
-    const current = middle.getByRole('link', { name: '3' })
+    const current = middle.getByRole('link', { name: 'Page 3' })
     await expect(current).toHaveAttribute('aria-current', 'page')
-    await expect(new URL(middle.getByRole('link', { name: '4' }).getAttribute('href') ?? '').searchParams.get('absent_page')).toBe('4')
+    await expect(new URL(middle.getByRole('link', { name: 'Page 4' }).getAttribute('href') ?? '').searchParams.get('absent_page')).toBe('4')
 
     // Same look as the buttons.
-    const link = first.getByRole('link', { name: '2' })
-    const button = within(canvas.getByTestId('buttons')).getByRole('button', { name: '2' })
+    const link = first.getByRole('link', { name: 'Page 2' })
+    const button = within(canvas.getByTestId('buttons')).getByRole('button', { name: 'Page 2' })
     await expect(getComputedStyle(link).backgroundColor).toBe(getComputedStyle(button).backgroundColor)
     await expect(getComputedStyle(link).textDecorationLine).toBe('none')
     await expect(link.getBoundingClientRect().height).toBe(button.getBoundingClientRect().height)

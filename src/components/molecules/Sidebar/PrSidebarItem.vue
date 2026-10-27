@@ -11,6 +11,7 @@ import {
   sidebarItemLinkDisabledClass,
 } from './sidebarItemStyles'
 import type { PrSidebarItemProps } from './types'
+import { usePrMessages } from '../../../i18n/context'
 
 const props = withDefaults(defineProps<PrSidebarItemProps>(), {
   as: undefined,
@@ -29,6 +30,7 @@ const emit = defineEmits<{
   'update:expanded': [value: boolean]
 }>()
 
+const messages = usePrMessages()
 const slots = useSlots()
 const sidebar = inject(prSidebarContextKey, null)
 const hasSubItems = computed(() => Boolean(slots.default))
@@ -63,6 +65,19 @@ const componentAttrs = computed(() => {
   }
 })
 const itemLabel = computed(() => props.label)
+const isNarrow = computed(() => Boolean(sidebar?.isNarrow.value))
+// The badge is drawn on the icon, before the label: screen readers hear it after the label
+// instead (« Membres, 3 notifications »). In a narrow sidebar the label is hidden, so it is
+// said here too: the link's name never comes down to its badge alone.
+const badgeText = computed(() => {
+  if ((props.badgeCount ?? 0) > 0) return messages.sidebar.notifications(props.badgeCount)
+  return props.badgeDot ? messages.sidebar.notifications(undefined) : ''
+})
+const screenReaderText = computed(() => {
+  const parts = [isNarrow.value ? itemLabel.value : '', badgeText.value].filter(Boolean)
+  if (!parts.length) return ''
+  return isNarrow.value ? parts.join(', ') : `, ${parts.join(', ')}`
+})
 const itemClass = computed(() => [
   sidebarItemClass,
   {
@@ -114,8 +129,8 @@ function handleClick(event: MouseEvent) {
       :class="linkClass"
       v-bind="componentAttrs"
       :aria-current="resolvedActive ? 'page' : undefined"
-      :aria-expanded="hasSubItems ? isExpanded : undefined"
-      :title="sidebar?.isNarrow.value && itemLabel ? itemLabel : undefined"
+      :aria-expanded="hasSubItems && !isNarrow ? isExpanded : undefined"
+      :title="isNarrow && itemLabel ? itemLabel : undefined"
       @click="handleClick"
     >
       <PrSidebarIcon
@@ -126,6 +141,7 @@ function handleClick(event: MouseEvent) {
         :badge-dot="badgeDot"
       />
       <PrSidebarItemBody :label="label" :description="description" :active="resolvedActive" />
+      <span v-if="screenReaderText" class="pr:sr-only">{{ screenReaderText }}</span>
       <ChevronRight
         v-if="hasSubItems"
         class="pr-sidebar-item__chevron pr:shrink-0 pr:text-[color:var(--pr-color-text-subtle)] pr:transition-[color,transform] pr:duration-[200ms] pr:ease-[var(--pr-ease-standard)]"

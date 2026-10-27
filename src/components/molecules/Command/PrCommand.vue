@@ -136,7 +136,7 @@ function onKeydown(event: KeyboardEvent) {
         :id="itemId(item)"
         :key="item.value"
         class="pr-command__item pr:grid pr:cursor-pointer pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-md)] pr:border-0 pr:bg-transparent pr:p-[var(--pr-space-3)] pr:text-left pr:text-[color:var(--pr-color-text)] pr:hover:not-disabled:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:opacity-[0.58]"
-        :class="{ 'pr:bg-[var(--pr-color-surface-subtle)]': index === highlightedIndex }"
+        :class="{ 'pr-command__item--highlighted pr:bg-[var(--pr-color-surface-subtle)] pr:outline-solid pr:outline-2 pr:-outline-offset-2 pr:outline-[var(--pr-color-focus)]': index === highlightedIndex }"
         type="button"
         role="option"
         :aria-selected="index === highlightedIndex ? 'true' : undefined"

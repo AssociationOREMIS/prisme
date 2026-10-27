@@ -22,6 +22,8 @@ export const sidebarIconInactiveClass = [
 ].join(' ')
 
 export const sidebarIconActiveClass =
-  // White icon on the data/formation green, kept by design choice although it reaches only
-  // 2.23:1 (WCAG asks 3:1 for icons): the active entry is also marked by aria-current.
-  'pr:bg-[var(--pr-color-sidebar-active)] pr:text-[color:var(--pr-neutral-0)]'
+  // The data/formation green, dark enough in the light theme for its white icon (4.56:1) and to
+  // stand out from the sidebar and the inactive boxes (4.16:1). In the dark theme the green stays
+  // light and the icon turns dark. The entry is also marked by aria-current and, when the label
+  // shows, by its bolder weight.
+  'pr-sidebar-item__icon-box--active pr:bg-[var(--pr-color-sidebar-active)] pr:text-[color:var(--pr-color-sidebar-active-contrast)]'

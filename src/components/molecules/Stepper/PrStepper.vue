@@ -9,6 +9,7 @@ import {
   StepperTitle,
   StepperTrigger,
 } from 'reka-ui'
+import { usePrMessages } from '../../../i18n/context'
 
 export interface PrStep {
   label: string
@@ -22,6 +23,8 @@ export interface PrStepperProps {
   steps?: PrStep[]
   orientation?: 'horizontal' | 'vertical'
   linear?: boolean
+  /** Name of the group of steps for screen readers (defaults to `messages.stepper.label`). */
+  ariaLabel?: string
 }
 
 withDefaults(defineProps<PrStepperProps>(), {
@@ -30,7 +33,10 @@ withDefaults(defineProps<PrStepperProps>(), {
   steps: () => [],
   orientation: 'horizontal',
   linear: false,
+  ariaLabel: undefined,
 })
+
+const messages = usePrMessages()
 
 const emit = defineEmits<{
   'update:modelValue': [value: number]
@@ -40,8 +46,12 @@ const emit = defineEmits<{
 <template>
   <!-- Horizontal steps keep one row and scroll sideways on a narrow screen instead of overflowing
        (p-1 keeps the focus rings inside the scroll area). -->
+  <!-- reka names the group « progress » and reads « Step 2 of 4 », in English: the name is replaced
+       and its status hidden, a French one (messages.stepper.status) takes its place. -->
   <StepperRoot
-    class="pr-stepper pr:flex pr:max-w-full"
+    v-slot="{ modelValue: currentStep }"
+    class="pr-stepper pr:flex pr:max-w-full pr:[&>[role=status]:not(.pr-stepper__status)]:hidden"
+    :aria-label="ariaLabel ?? messages.stepper.label"
     :class="orientation === 'vertical' ? 'pr:flex-col pr:gap-0' : 'pr:flex-row pr:items-start pr:overflow-x-auto pr:p-1'"
     :model-value="modelValue"
     :default-value="defaultValue"
@@ -84,8 +94,10 @@ const emit = defineEmits<{
         class="pr-stepper__content"
         :class="orientation === 'vertical' ? 'pr:py-[var(--pr-space-2)]' : 'pr:mt-[var(--pr-space-2)] pr:text-center'"
       >
+        <!-- A span, not reka's <h4>: steps are not sections of the page. Block, with the h4's margins, so the layout stays the same. -->
         <StepperTitle
-          class="pr-stepper__title pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
+          as="span"
+          class="pr-stepper__title pr:block pr:my-[1.33em] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:group-data-[state=incomplete]/item:text-[color:var(--pr-color-text-muted)]"
         >
           {{ step.label }}
         </StepperTitle>
@@ -97,5 +109,6 @@ const emit = defineEmits<{
         </StepperDescription>
       </div>
     </StepperItem>
+    <p class="pr-stepper__status pr:sr-only" role="status">{{ currentStep ? messages.stepper.status(currentStep, steps.length) : '' }}</p>
   </StepperRoot>
 </template>

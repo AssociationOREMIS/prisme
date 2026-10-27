@@ -6,6 +6,7 @@
 @import "./animations.css";
 @import "./layout.css";
 @import "./rtl.css";
+@import "./forced-colors.css";
 /* PrRichTextEditor lives in the separate `@oremis/prisme/editor` JS entry (so the
    main entry doesn't require tiptap), but its CSS still ships here: consumers keep
    importing a single `styles.css`, whichever entry their components come from. */

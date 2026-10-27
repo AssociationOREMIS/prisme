@@ -10,6 +10,7 @@ import {
   SlidersHorizontal,
   Users,
 } from '@lucide/vue'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 import {
   PrAppShell,
@@ -151,3 +152,43 @@ export const Default: Story = {
     `,
   }),
 }
+
+// The building blocks of the RGAA's mandatory items: the skip link (first Tab), the brand linked to
+// the home page, and the footer with the accessibility statement's compliance status.
+export const SkipLinkAndFooter: Story = {
+  render: () => ({
+    components: { House, PrAppShell, PrCard, PrNavbar, PrSidebar, PrSidebarItem, Users },
+    setup() {
+      return { House, Users }
+    },
+    template: `
+      <PrAppShell>
+        <template #navbar><PrNavbar title="Formation" home-href="#accueil" /></template>
+        <template #sidebar>
+          <PrSidebar>
+            <PrSidebarItem :icon="House" label="Accueil" href="#accueil" active />
+            <PrSidebarItem :icon="Users" label="Bénévoles" href="#benevoles" />
+          </PrSidebar>
+        </template>
+        <PrCard title="Bienvenue Camille MARTIN">Le contenu de la page.</PrCard>
+        <template #footer>
+          <a href="#accessibilite">Accessibilité : partiellement conforme</a>
+        </template>
+      </PrAppShell>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.tab()
+    const skip = canvas.getByRole('link', { name: 'Aller au contenu' })
+    await expect(skip).toHaveFocus()
+    // Shown above everything once it has the focus.
+    await waitFor(() => expect(skip.getBoundingClientRect().top).toBeGreaterThanOrEqual(0))
+
+    await userEvent.keyboard('{Enter}')
+    await waitFor(() => expect(canvas.getByRole('main')).toHaveFocus())
+    await expect(canvas.getByRole('link', { name: /Formation.*accueil/ })).toHaveAttribute('href', '#accueil')
+    await expect(canvas.getByRole('contentinfo')).toHaveTextContent('Accessibilité : partiellement conforme')
+  },
+}
+

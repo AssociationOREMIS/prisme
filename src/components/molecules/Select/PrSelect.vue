@@ -19,6 +19,8 @@ import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { usePrMessages } from '../../../i18n/context'
 import { useFieldValue } from '../../fieldValue'
+import { useControlAttrs } from '../../controlAttrs'
+import { warnWithoutName } from '../../accessibleName'
 
 export interface PrSelectOption {
   label: string
@@ -57,6 +59,8 @@ const props = withDefaults(defineProps<PrSelectProps>(), {
   id: undefined,
 })
 
+warnWithoutName('PrSelect', props.label)
+
 const messages = usePrMessages()
 
 // One message, or the first of Laravel's array of messages.
@@ -88,15 +92,24 @@ function update(value: unknown) {
   emit('update:modelValue', toExternal(value))
 }
 
-// Only the message actually shown: the error replaces the hint.
-const describedBy = computed(() => {
-  if (errorText.value) return errorId.value
-  return props.hint ? hintId.value : undefined
-})
+// The error, then the hint: the hint stays shown with the error, the format it gives is what
+// fixing the error needs (RGAA 11.10).
+const describedBy = computed(() => [
+  errorText.value ? errorId.value : undefined,
+  props.hint ? hintId.value : undefined,
+].filter(Boolean).join(' ') || undefined)
+
+// `aria-*`, `data-*`... reach the trigger (and `autocomplete` the select reka posts), class and
+// style stay on the wrapper.
+defineOptions({ inheritAttrs: false })
+const { rootAttrs, controlAttrs } = useControlAttrs()
+function triggerAttrs() {
+  return Object.fromEntries(Object.entries(controlAttrs()).filter(([key]) => key !== 'autocomplete'))
+}
 </script>
 
 <template>
-  <div class="pr-select pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div v-bind="rootAttrs()" class="pr-select pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :for="triggerId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <SelectRoot
       :model-value="toInternal(modelValue)"
@@ -104,9 +117,11 @@ const describedBy = computed(() => {
       :disabled="disabled"
       :required="required"
       :name="hasEmptyOption ? undefined : name"
+      :autocomplete="typeof $attrs.autocomplete === 'string' ? $attrs.autocomplete : undefined"
       @update:model-value="update"
     >
       <SelectTrigger
+        v-bind="triggerAttrs()"
         :id="triggerId"
         :aria-label="label ? undefined : ariaLabel"
         class="pr-select__trigger pr:inline-flex pr:min-h-[2.375rem] pr:w-full pr:cursor-pointer pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[placeholder]:text-[color:var(--pr-color-text-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
@@ -132,7 +147,7 @@ const describedBy = computed(() => {
             <SelectItem
               v-for="option in options"
               :key="option.value"
-              class="pr-select__item pr:relative pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-md)] pr:py-0 pr:pr-[var(--pr-space-8)] pr:pl-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:text-[color:var(--pr-color-text-subtle)]"
+              class="pr-select__item pr:relative pr:flex pr:min-h-9 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-md)] pr:py-0 pr:pr-[var(--pr-space-8)] pr:pl-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:data-[highlighted]:bg-[var(--pr-color-surface-subtle)] pr:outline-none pr:data-[highlighted]:outline-solid pr:data-[highlighted]:outline-2 pr:data-[highlighted]:-outline-offset-2 pr:data-[highlighted]:outline-[var(--pr-color-focus)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:text-[color:var(--pr-color-text-subtle)]"
               :value="itemValue(option.value)"
               :disabled="option.disabled"
             >
@@ -149,7 +164,7 @@ const describedBy = computed(() => {
       </SelectPortal>
     </SelectRoot>
     <input v-if="name && hasEmptyOption" type="hidden" :name="name" :value="currentValue ?? ''">
+    <p v-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
     <p v-if="errorText" :id="errorId" class="pr-field-message pr-field-message--error pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-danger)]">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ hint }}</p>
   </div>
 </template>

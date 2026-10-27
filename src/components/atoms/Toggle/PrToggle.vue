@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 import { Toggle } from 'reka-ui'
+import { warnWithoutName } from '../../accessibleName'
 
 export interface PrToggleProps {
   modelValue?: boolean
@@ -19,6 +20,8 @@ const props = withDefaults(defineProps<PrToggleProps>(), {
   variant: 'default',
   ariaLabel: undefined,
 })
+
+warnWithoutName('PrToggle', useSlots().default, 'text in its slot')
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
