@@ -215,6 +215,7 @@ export const prMessagesEn: PrMessages = {
   stepper: {
     label: 'Steps',
     status: (current, total) => `Step ${current} of ${total}`,
+    step: 'Step',
   },
   tagInput: {
     placeholder: 'Add...',

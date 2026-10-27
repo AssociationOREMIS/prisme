@@ -231,6 +231,8 @@ export interface PrMessages {
     label: string
     /** Read to screen readers when the current step changes. */
     status: (current: number, total: number) => string
+    /** Read before the step number on its button, e.g. "Étape 1 Identité". */
+    step: string
   }
   tagInput: {
     placeholder: string
@@ -501,6 +503,7 @@ export const prMessagesFr: PrMessages = {
   stepper: {
     label: 'Étapes',
     status: (current, total) => `Étape ${current} sur ${total}`,
+    step: 'Étape',
   },
   tagInput: {
     placeholder: 'Ajouter...',
