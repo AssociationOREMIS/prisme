@@ -2,7 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.9 (2026-10-27)
+
+Neuvieme version candidate, sous le tag npm `next`. Le nom accessible de `PrStepper` et de `PrFileUpload` contient tout le texte qu'ils affichent (WCAG 2.5.3). Aucun changement cassant, rien ne change a l'ecran.
 
 ### Corrections
 
