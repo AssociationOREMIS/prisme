@@ -3,6 +3,7 @@ import { inject } from 'vue'
 import { usePrMessages } from '../../../i18n/context'
 import { ToastProvider, ToastViewport } from 'reka-ui'
 import { prToastProviderKey } from './context'
+import PrToastTimerVisibility from './PrToastTimerVisibility.vue'
 import PrToastContent from './PrToastContent.vue'
 
 export interface PrToastProps {
@@ -55,6 +56,7 @@ const messages = usePrMessages()
   </PrToastContent>
 
   <ToastProvider v-else :label="messages.toast.label">
+    <PrToastTimerVisibility />
     <PrToastContent
       :open="open"
       :default-open="defaultOpen"
