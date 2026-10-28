@@ -78,7 +78,7 @@ function updateValue(value: unknown) {
 </script>
 
 <template>
-  <div class="pr-radio-group pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div class="pr-radio-group pr:grid pr:content-start pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <!-- A group has no single input for the label to point at: it names the radiogroup through aria-labelledby. -->
     <PrLabel v-if="label" :id="labelId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <RadioGroupRoot

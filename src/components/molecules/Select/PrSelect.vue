@@ -109,7 +109,7 @@ function triggerAttrs() {
 </script>
 
 <template>
-  <div v-bind="rootAttrs()" class="pr-select pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div v-bind="rootAttrs()" class="pr-select pr:grid pr:content-start pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :for="triggerId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <SelectRoot
       :model-value="toInternal(modelValue)"

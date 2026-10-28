@@ -288,7 +288,7 @@ const hasFiles = computed(() => currentFiles.value.length > 0)
 </script>
 
 <template>
-  <div ref="rootRef" class="pr-file-upload pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div ref="rootRef" class="pr-file-upload pr:grid pr:content-start pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :id="labelId" :for="fieldId" :disabled="disabled">{{ label }}</PrLabel>
     <!-- Outside the dropzone (a role="button" cannot hold another control) and out of the tab
          order: the dropzone is the keyboard target, this input only opens the picker and posts.

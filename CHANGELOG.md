@@ -2,6 +2,14 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.10 (2026-10-28)
+
+Dixieme version candidate, sous le tag npm `next`. Les champs gardent leur hauteur cote a cote dans une grille de formulaire. Aucun changement cassant.
+
+### Corrections
+
+- **Les champs ne s'etirent plus dans une grille de formulaire** : cote a cote dans une grille, quand le champ voisin a une aide ou une erreur, la ligne prend sa hauteur, et le champ sans aide etirait son controle pour la remplir (50 px au lieu de 38). `PrInput`, `PrTextarea`, `PrSelect`, `PrCombobox`, `PrTagInput`, `PrNumberInput`, `PrFileUpload`, `PrRadioGroup` et `PrSlider` gardent leurs lignes en haut (`align-content: start`). Plus besoin de `items-start` sur la grille de l'app. Nouvelle story « Forms/Input / In A Form Grid », qui le verifie.
+
 ## 1.0.0-rc.9 (2026-10-27)
 
 Neuvieme version candidate, sous le tag npm `next`. Le nom accessible de `PrStepper` et de `PrFileUpload` contient tout le texte qu'ils affichent (WCAG 2.5.3). Aucun changement cassant, rien ne change a l'ecran.

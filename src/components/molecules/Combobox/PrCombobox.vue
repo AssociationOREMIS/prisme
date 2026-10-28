@@ -280,7 +280,7 @@ function labelFor(value: string) {
 </script>
 
 <template>
-  <div v-bind="rootAttrs()" class="pr-combobox pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div v-bind="rootAttrs()" class="pr-combobox pr:grid pr:content-start pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <PrLabel v-if="label" :for="inputId" :required="required" :disabled="disabled">{{ label }}</PrLabel>
     <ComboboxRoot
       ref="rootRef"

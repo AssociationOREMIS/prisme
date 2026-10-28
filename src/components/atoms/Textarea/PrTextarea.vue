@@ -61,7 +61,7 @@ const describedBy = computed(() => [
 ].filter(Boolean).join(' ') || undefined)
 
 const textareaClass = computed(() => [
-  'pr-textarea pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]',
+  'pr-textarea pr:grid pr:content-start pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]',
 ])
 
 const textareaResizeClass: Record<NonNullable<PrTextareaProps['resize']>, string> = {
