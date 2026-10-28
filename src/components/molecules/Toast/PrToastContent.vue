@@ -82,8 +82,7 @@ const showProgress = computed(() => Number.isFinite(effectiveDuration.value) && 
 
 // Reka pauses the close timer while the toast is hovered or focused, or the page is hidden
 // (PrToastTimerVisibility), then resumes it with the time left: the bar must stop and restart
-// with it, or it
-// runs out while the toast stays open.
+// with it, or it runs out while the toast stays open.
 const paused = ref(false)
 </script>
 
