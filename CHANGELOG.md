@@ -2,7 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.10 (2026-10-28)
+
+Dixieme version candidate, sous le tag npm `next`. Les champs gardent leur hauteur cote a cote dans une grille de formulaire. Aucun changement cassant.
 
 ### Corrections
 
