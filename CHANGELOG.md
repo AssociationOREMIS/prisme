@@ -2,7 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.11 (2026-10-28)
+
+Onzieme version candidate, sous le tag npm `next`. Le minuteur des notifications suit ce qui se voit : il continue quand on clique sur un autre ecran, s'arrete quand la page est cachee. Aucun changement cassant.
 
 ### Corrections
 
