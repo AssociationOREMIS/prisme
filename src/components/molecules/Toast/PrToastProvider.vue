@@ -2,6 +2,7 @@
 import { onBeforeUnmount, provide } from 'vue'
 import { ToastProvider, ToastViewport } from 'reka-ui'
 import { prToastProviderKey } from './context'
+import PrToastTimerVisibility from './PrToastTimerVisibility.vue'
 import PrToastContent from './PrToastContent.vue'
 import { claimToastQueue, dismissToast, releaseToastQueue, toastQueue } from './queue'
 import { usePrMessages } from '../../../i18n/context'
@@ -38,6 +39,7 @@ onBeforeUnmount(() => releaseToastQueue(owner))
     :swipe-direction="swipeDirection"
     :swipe-threshold="swipeThreshold"
   >
+    <PrToastTimerVisibility />
     <slot />
     <template v-if="showsQueue">
       <PrToastContent

@@ -2,6 +2,12 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## Non publie
+
+### Corrections
+
+- **Les notifications continuent de s'ecouler quand on clique ailleurs** : Reka mettait leur minuteur en pause des que la fenetre perdait le focus, par exemple un clic sur un deuxieme ecran ou une autre application, alors que la page restait visible. Le minuteur continue maintenant tant que la page se voit. Il s'arrete toujours au survol ou au focus clavier de la notification, et quand la page est cachee (autre onglet, fenetre reduite, ecran verrouille), pour reprendre avec le temps restant : une notification arrivee dans un onglet en arriere-plan attend qu'on revienne (WCAG 2.2.1). Nouveau composant interne `PrToastTimerVisibility`, dans `PrToast` et `PrToastProvider`.
+
 ## 1.0.0-rc.10 (2026-10-28)
 
 Dixieme version candidate, sous le tag npm `next`. Les champs gardent leur hauteur cote a cote dans une grille de formulaire. Aucun changement cassant.
