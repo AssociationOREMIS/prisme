@@ -1,11 +1,10 @@
 name: CI
 
-# Lint, type check, tests and build on every pull request and on develop, so a broken change is
-# caught before the merge into main (which publishes, see npm-publish.yml).
+# Lint, type check, tests and build on every pull request, so a broken change is caught before
+# the merge into develop, then into main (which publishes, see npm-publish.yml). No run on the push
+# to develop: it would test again what its pull request just tested.
 on:
   pull_request:
-  push:
-    branches: [develop]
 
 permissions:
   contents: read
@@ -17,6 +16,8 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    # A hung step (apt mirrors, a lost browser) stops here instead of burning the 6-hour default.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -26,7 +27,18 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # Chromium is cached per Playwright version. On a hit nothing is installed: the runner image
+      # ships Google Chrome, so the system libraries are already there, and the apt step of
+      # --with-deps (which sometimes hangs for minutes on the mirrors) only runs on a miss.
+      - id: playwright-version
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+      - if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
       - run: npm run lint
       - run: npm run type-check
       # The browser tests sometimes lose the page (Chrome drops an import or closes, or a run
