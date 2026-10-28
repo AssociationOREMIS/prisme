@@ -61,7 +61,7 @@ const describedBy = computed(() => [
 ].filter(Boolean).join(' ') || undefined)
 
 const inputClass = computed(() => [
-  'pr-input pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]',
+  'pr-input pr:grid pr:content-start pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]',
 ])
 
 const inputControlClass = computed(() => [

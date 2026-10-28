@@ -63,7 +63,7 @@ function focusThumb() {
 </script>
 
 <template>
-  <div class="pr-slider pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div class="pr-slider pr:grid pr:content-start pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <div v-if="label || showValue" class="pr-slider__header pr:flex pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)]">
       <PrLabel v-if="label" :for="sliderId" :disabled="disabled" @click="focusThumb">{{ label }}</PrLabel>
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -- a visual echo of the value, which the slider thumb already announces -->
