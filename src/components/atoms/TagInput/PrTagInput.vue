@@ -153,7 +153,7 @@ defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
-  <div ref="rootRef" class="pr-tag-input pr:grid pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div ref="rootRef" class="pr-tag-input pr:grid pr:content-start pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
     <label
       v-if="label"
       class="pr-tag-input__label pr:inline-flex pr:w-fit pr:items-baseline pr:gap-[var(--pr-space-1)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:leading-[var(--pr-line-height-tight)]"
