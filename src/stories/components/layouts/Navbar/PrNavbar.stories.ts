@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { PrButton, PrNavbar } from '../../../../index'
+import { LogOut } from '@lucide/vue'
+import { expect, within } from 'storybook/test'
+import { PrButton, PrNavbar, PrNavigationMenu, PrThemeToggle } from '../../../../index'
 import '../../navigation.stories.css'
 
 const meta = {
@@ -118,4 +120,37 @@ export const WithChildrenAndDiagonalDivider: Story = {
       </div>
     `,
   }),
+}
+
+// The header of a public site: a light rounded bar floating above the page, the color logo
+// (white in the dark theme), the main navigation right after the brand.
+export const Floating: Story = {
+  render: () => ({
+    components: { PrButton, PrNavbar, PrNavigationMenu, PrThemeToggle },
+    setup() {
+      const nav = [
+        { label: 'Accueil', href: '#', active: true },
+        { label: 'Comprendre', href: '#comprendre', active: false },
+        { label: "Parler à quelqu'un", href: '#parler', active: false },
+      ]
+      return { nav, LogOut }
+    },
+    template: `
+      <PrNavbar variant="floating" title="SOS Harcèlement" home-href="#">
+        <template #nav>
+          <PrNavigationMenu :items="nav" variant="subtle" aria-label="Navigation principale" />
+        </template>
+        <template #user>
+          <PrButton variant="danger" size="sm" :icon="LogOut">Quitter vite</PrButton>
+          <PrThemeToggle />
+        </template>
+      </PrNavbar>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvasElement.querySelector('.pr-navbar--floating')).not.toBeNull()
+    await expect(canvas.getByRole('navigation', { name: 'Navigation principale' })).toBeTruthy()
+    await expect(canvas.getByRole('link', { name: 'Accueil' }).getAttribute('aria-current')).toBe('page')
+  },
 }

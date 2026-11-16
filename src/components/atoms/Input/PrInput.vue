@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useAttrs, useId } from 'vue'
+import { computed, useAttrs, useId, type Component } from 'vue'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { useFieldValue } from '../../fieldValue'
 import { warnWithoutName } from '../../accessibleName'
@@ -19,6 +19,8 @@ export interface PrInputProps {
   placeholder?: string
   id?: string
   name?: string
+  /** Icon (a Lucide component) inside the field, at its start: a magnifying glass for a search. Decorative. */
+  icon?: Component
 }
 
 const props = withDefaults(defineProps<PrInputProps>(), {
@@ -34,6 +36,7 @@ const props = withDefaults(defineProps<PrInputProps>(), {
   placeholder: undefined,
   id: undefined,
   name: undefined,
+  icon: undefined,
 })
 
 warnWithoutName('PrInput', props.label)
@@ -65,7 +68,9 @@ const inputClass = computed(() => [
 ])
 
 const inputControlClass = computed(() => [
-  'pr-input__control pr:min-h-[2.375rem] pr:w-full pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-md)] pr:text-[color:var(--pr-color-text)] pr:transition-[background-color,border-color,box-shadow] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:hover:not-disabled:border-[var(--pr-color-border-hover)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:bg-[var(--pr-color-surface-subtle)] pr:disabled:text-[color:var(--pr-color-text-muted)]',
+  'pr-input__control pr:min-h-[2.375rem] pr:w-full pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:text-[length:var(--pr-font-size-md)] pr:text-[color:var(--pr-color-text)] pr:transition-[background-color,border-color,box-shadow] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:placeholder:text-[color:var(--pr-color-text-subtle)] pr:hover:not-disabled:border-[var(--pr-color-border-hover)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:disabled:cursor-not-allowed pr:disabled:bg-[var(--pr-color-surface-subtle)] pr:disabled:text-[color:var(--pr-color-text-muted)]',
+  // Logical sides (start/end), so the icon and its room follow a right-to-left page.
+  props.icon ? 'pr:ps-[2.25rem] pr:pe-[var(--pr-space-3)]' : 'pr:px-[var(--pr-space-3)]',
   errorText.value ? 'pr:border-[var(--pr-color-danger)]' : '',
 ])
 
@@ -96,7 +101,30 @@ defineOptions({ inheritAttrs: false })
       <span v-if="required" class="pr-input__required pr:text-[color:var(--pr-color-danger)]" aria-hidden="true">*</span>
     </label>
 
+    <span v-if="icon" class="pr-input__field pr:relative pr:block">
+      <component
+        :is="icon"
+        class="pr-input__icon pr:pointer-events-none pr:absolute pr:start-[var(--pr-space-3)] pr:top-1/2 pr:-translate-y-1/2 pr:text-[color:var(--pr-color-text-muted)]"
+        :size="16"
+        aria-hidden="true"
+      />
+      <input
+        :id="inputId"
+        v-bind="$attrs"
+        :class="inputControlClass"
+        :name="name"
+        :value="fieldValue"
+        :type="type"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :required="required"
+        :aria-invalid="errorText ? 'true' : undefined"
+        :aria-describedby="describedBy"
+        @input="updateValue"
+      >
+    </span>
     <input
+      v-else
       :id="inputId"
       v-bind="$attrs"
       :class="inputControlClass"

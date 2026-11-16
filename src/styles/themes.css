@@ -76,6 +76,12 @@
   --pr-color-info: var(--pr-blue-700);
   --pr-color-info-soft: var(--pr-blue-50);
   --pr-color-info-border: var(--pr-blue-200);
+
+  /* Page and section titles (PrHero, PrPanel, PrFeature...): the text color, a brand theme
+     can give them their own (the OREMIS navy). */
+  --pr-color-heading: var(--pr-color-text);
+  /* Decoration only (PrHero's pattern), never text nor the only border of a control. */
+  --pr-color-accent: var(--pr-blue-300);
 }
 
 [data-pr-theme="dark"],
@@ -130,6 +136,9 @@
   --pr-color-info: #7ea2d6;
   --pr-color-info-soft: rgb(126 162 214 / 16%);
   --pr-color-info-border: rgb(126 162 214 / 30%);
+
+  --pr-color-heading: var(--pr-color-text);
+  --pr-color-accent: var(--pr-blue-400);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -185,5 +194,8 @@
     --pr-color-info: #7ea2d6;
     --pr-color-info-soft: rgb(126 162 214 / 16%);
     --pr-color-info-border: rgb(126 162 214 / 30%);
+
+    --pr-color-heading: var(--pr-color-text);
+    --pr-color-accent: var(--pr-blue-400);
   }
 }

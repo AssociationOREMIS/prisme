@@ -22,6 +22,12 @@ const themesCss = read('themes.css')
 const light = declarations(themesCss.slice(0, themesCss.indexOf('[data-pr-theme="dark"],')))
 const dark = declarations(themesCss.slice(themesCss.indexOf('[data-pr-theme="dark"],'), themesCss.indexOf('@media')))
 
+// The "Charte OREMIS" brand theme only overrides some tokens of the light and dark themes.
+const brandCss = read('brand-charte.css')
+const brandDarkStart = brandCss.indexOf('[data-pr-brand="charte"][data-pr-theme="dark"],')
+const charteLight = { ...light, ...declarations(brandCss.slice(0, brandDarkStart)) }
+const charteDark = { ...dark, ...declarations(brandCss.slice(brandDarkStart, brandCss.indexOf('@media'))) }
+
 type Rgba = [number, number, number, number]
 
 function resolve(theme: Record<string, string>, token: string): Rgba {
@@ -87,6 +93,11 @@ const TEXT: Array<[string, string]> = [
   ['--pr-color-primary-contrast', '--pr-color-primary-active'],
   // The navbar.
   ['--pr-color-navbar-text', '--pr-color-navbar'],
+  // Titles of public pages (PrHero, PrPanel, PrFeature) and of a highlighted band.
+  ['--pr-color-heading', '--pr-color-surface'],
+  ['--pr-color-heading', '--pr-color-background'],
+  ['--pr-color-heading', '--pr-color-primary-soft'],
+  ['--pr-color-heading', '--pr-color-surface-subtle'],
 ]
 
 const NON_TEXT: Array<[string, string]> = [
@@ -114,6 +125,8 @@ const NAVBAR_FOCUS = '--pr-blue-200'
 describe.each([
   ['light', light],
   ['dark', dark],
+  ['charte light', charteLight],
+  ['charte dark', charteDark],
 ])('%s theme contrast', (_name, theme) => {
   it.each(TEXT)('%s on %s reaches 4.5:1', (foreground, background) => {
     expect(contrast(theme, foreground, background)).toBeGreaterThanOrEqual(4.5)
@@ -134,5 +147,12 @@ describe('dark theme blocks', () => {
   it('declare the same tokens with the same values', () => {
     const media = themesCss.slice(themesCss.indexOf('@media'))
     expect(declarations(media)).toEqual(dark)
+  })
+})
+
+describe('charte dark blocks', () => {
+  it('declare the same tokens with the same values', () => {
+    const media = brandCss.slice(brandCss.indexOf('@media'))
+    expect(declarations(media)).toEqual(declarations(brandCss.slice(brandDarkStart, brandCss.indexOf('@media'))))
   })
 })

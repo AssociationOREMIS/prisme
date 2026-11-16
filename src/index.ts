@@ -58,6 +58,36 @@ export { PrTypography } from './components/atoms/Typography'
 export { PrPageHeader } from './components/layouts/PageHeader'
 export { PrDescriptionItem, PrDescriptionList } from './components/molecules/DescriptionList'
 
+export { PrVisuallyHidden } from './components/atoms/VisuallyHidden'
+export { PrStatusDot } from './components/atoms/StatusDot'
+export { PrFab } from './components/molecules/Fab'
+export { PrQuickExit } from './components/molecules/QuickExit'
+export { PrEmergencyContacts } from './components/molecules/EmergencyContacts'
+export { PrChatThread } from './components/molecules/ChatThread'
+export { PrChatMessage } from './components/molecules/ChatMessage'
+export { PrTypingIndicator } from './components/molecules/TypingIndicator'
+export { PrChatComposer } from './components/molecules/ChatComposer'
+export { PrStack } from './components/atoms/Stack'
+export { PrGrid } from './components/atoms/Grid'
+export { PrFeature } from './components/molecules/Feature'
+export { PrLinkList } from './components/molecules/LinkList'
+export { PrContainer } from './components/layouts/Container'
+export { PrHero } from './components/layouts/Hero'
+export { PrBand } from './components/layouts/Band'
+export { PrPanel } from './components/layouts/Panel'
+export { PrFooter } from './components/layouts/Footer'
+// Brand icons for social links (Lucide has none), usable as the `icon` of PrButton or PrFooter's socials.
+export {
+  PrIconDiscord,
+  PrIconFacebook,
+  PrIconInstagram,
+  PrIconLinkedin,
+  PrIconTiktok,
+  PrIconX,
+  PrIconYoutube,
+} from './icons/brand'
+export type { PrBrandIconProps } from './icons/brand'
+export { PrChatWindow } from './components/molecules/ChatWindow'
 export type {
   PrAccordionItem,
   PrAccordionProps,
@@ -137,6 +167,32 @@ export type {
   PrDescriptionItemProps,
   PrDescriptionListItem,
   PrDescriptionListProps,
+  PrVisuallyHiddenProps,
+  PrStatusDotProps,
+  PrFabProps,
+  PrQuickExitProps,
+  PrEmergencyContact,
+  PrEmergencyContactsProps,
+  PrChatThreadProps,
+  PrChatMessageProps,
+  PrTypingIndicatorProps,
+  PrChatComposerProps,
+  PrStackProps,
+  PrSpaceStep,
+  PrGridProps,
+  PrFeatureProps,
+  PrLinkListProps,
+  PrLinkListItem,
+  PrLinkListTag,
+  PrContainerProps,
+  PrHeroProps,
+  PrBandProps,
+  PrPanelProps,
+  PrFooterProps,
+  PrFooterColumn,
+  PrFooterLink,
+  PrFooterSocial,
+  PrChatWindowProps,
 } from './components/registry'
 
 export { fromLaravelPaginator } from './components/registry'

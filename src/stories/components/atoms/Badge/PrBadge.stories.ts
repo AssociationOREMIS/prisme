@@ -11,6 +11,10 @@ const meta = {
       control: 'select',
       options: ['neutral', 'primary', 'success', 'warning', 'danger', 'info'],
     },
+    shape: {
+      control: 'select',
+      options: ['pill', 'tag'],
+    },
   },
   args: {
     variant: 'neutral',
@@ -53,5 +57,22 @@ export const Playground: Story = {
       return { args }
     },
     template: '<PrBadge v-bind="args">Badge</PrBadge>',
+  }),
+}
+
+// Compact labels with small corners and no border: the tags of an article or of a feed entry.
+export const Tags: Story = {
+  render: () => ({
+    components: { PrBadge },
+    template: `
+      <div class="story-stack">
+        <PrBadge shape="tag">Infra</PrBadge>
+        <PrBadge shape="tag" variant="primary">Article</PrBadge>
+        <PrBadge shape="tag" variant="success">Web</PrBadge>
+        <PrBadge shape="tag" variant="warning">API</PrBadge>
+        <PrBadge shape="tag" variant="danger">Changement important</PrBadge>
+        <PrBadge shape="tag" variant="info">Accessibilité</PrBadge>
+      </div>
+    `,
   }),
 }

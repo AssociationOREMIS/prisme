@@ -363,6 +363,61 @@ Pour empiler plusieurs composants Prisme verticalement (DataTable, formulaire, e
 </div>
 ```
 
+## Sites publics
+
+Prisme sert aussi aux sites publics d'OREMIS (pages d'accueil, sites de service comme SOS Harcelement, blog technique), pas seulement aux applications. Ces pages occupent toute la largeur, avec des marges laterales, et se construisent avec les blocs ci-dessous.
+
+### Charte OREMIS (`data-pr-brand="charte"`)
+
+Le theme de marque reprend la charte graphique 2026 de l'association (celle de PIO) : fond creme clair, Bleu `#2658A8` en couleur principale, titres en Marine `#093272`, surfaces douces en Ciel `#E4ECF8`. Les bordures restent gris-bleu : aucun contour beige ou jaune. En sombre : base neutre, Bleu clair `#8FB0E6`, titres creme doux. Il s'ajoute au theme clair ou sombre, choisi comme d'habitude par `data-pr-theme` :
+
+```html
+<html lang="fr" data-pr-brand="charte">
+```
+
+Avec `mountPrismeIsolated()`, posez l'attribut sur l'element hote. Les contrastes du theme sont verifies par les tests, comme ceux des themes de base.
+
+Nouveaux tokens, dans tous les themes : `--pr-radius-xl` (1rem, grands blocs), `--pr-color-heading` (titres des pages publiques) et `--pr-color-accent` (decoration seulement, jamais du texte ni le seul contour d'un controle).
+
+### En-tete et pied de page
+
+```vue
+<PrNavbar variant="floating" title="SOS Harcelement" home-href="/">
+  <template #nav>
+    <PrNavigationMenu :items="nav" variant="subtle" aria-label="Navigation principale" />
+  </template>
+  <template #user>
+    <PrQuickExit />
+    <PrThemeToggle />
+  </template>
+</PrNavbar>
+```
+
+- `PrNavbar variant="floating"` : barre claire et arrondie, avec une ombre, qui flotte au-dessus de la page. Le logo couleur s'affiche en clair, le blanc en sombre (`logo-src`, `logo-src-dark`). Le slot `nav` place la navigation juste apres la marque ; sous 780 px, elle passe sur sa propre ligne.
+- `PrNavigationMenu variant="subtle"` : liens texte ; le lien actif est en couleur principale et souligne, pas seulement colore.
+- `PrFooter` : marque, texte, reseaux sociaux, une a quatre colonnes de liens (chacune une `nav` nommee par son titre), puis une ligne avec le copyright de l'association et les liens legaux (`legal-links`). Les icones des reseaux (`PrIconDiscord`, `PrIconInstagram`, `PrIconFacebook`, `PrIconLinkedin`, `PrIconYoutube`, `PrIconX`, `PrIconTiktok`) s'utilisent comme les icones Lucide.
+
+### Mise en page
+
+- `PrContainer` : pleine largeur avec des marges laterales (`width="full"` par defaut, `wide` ou `narrow` pour centrer).
+- `PrStack` et `PrGrid` : piles et grilles sans CSS d'application. `PrGrid` cree autant de colonnes que la largeur le permet (`min="18rem"`), une seule sur telephone.
+- `PrHero` : titre de page (`h1`), sous-titre et actions, avec un motif decoratif a droite (`:pattern="false"` pour l'enlever).
+- `PrBand` : bandeau mis en avant, arrondi (`tone="primary"`, `subtle` ou `surface`), avec une colonne `aside` facultative.
+- `PrPanel` : panneau blanc arrondi, avec une colonne laterale facultative (slot `aside`) sur fond gris.
+- `PrFeature` : icone dans un rond, titre et texte (« Anonyme », « Gratuit »...).
+- `PrLinkList` : liste d'articles ou de mises a jour, avec etiquettes, titre lien, resume et date.
+
+Variantes ajoutees aux composants existants : `PrTabs variant="pills"` (groupe de boutons, l'onglet actif rempli), `PrBadge shape="tag"` (etiquette compacte sans bordure), `PrButton variant="link"` et `icon-position="end"` (« Lire l'article → »), `PrInput :icon="Search"` (icone dans le champ).
+
+### Securite des personnes aidees
+
+- `PrQuickExit` : bouton « Quitter vite ». Il remplace la page par une page neutre (`href`, une recherche meteo par defaut) sans possibilite de revenir avec Precedent ; deux appuis sur Echap en moins d'une seconde font la meme chose (`:shortcut="false"` pour le desactiver). A mettre sur toute page lue par une victime.
+- `PrEmergencyContacts` : numeros d'urgence cliquables (15, 112, 3114, 119, 3018, 114 par SMS). La liste vient des messages (`emergencyContacts.contacts`) : une seule a tenir a jour.
+
+### Chat
+
+Les briques du widget OREMIS Chat : `PrChatThread` (fil des messages, annonce poliment les nouveaux et descend tout seul sauf si on est remonte lire), `PrChatMessage` (`author="self"`, `other` ou `system`), `PrTypingIndicator`, `PrChatComposer` (`@send`, `multiline` : Entree envoie, Maj+Entree va a la ligne), `PrChatWindow` (le cadre : avatar, nom, disponibilite, actions, puis le fil et la saisie) et `PrFab` (bouton rond flottant qui ouvre la fenetre). `PrStatusDot` affiche une disponibilite (« Des benevoles vous repondent ») et `PrVisuallyHidden` un texte reserve aux lecteurs d'ecran.
+
 ## Laravel Blade
 
 Dans une application Laravel avec Vite, Prisme peut etre monte dans une vue Blade via une petite application Vue.

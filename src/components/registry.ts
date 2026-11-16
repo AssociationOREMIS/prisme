@@ -188,6 +188,63 @@ export type { PrTagInputProps } from './atoms/TagInput'
  * never render an editor. It lives in its own `@oremis/prisme/editor` entry
  * (`src/editor.ts`) instead.
  */
+import { PrVisuallyHidden } from './atoms/VisuallyHidden'
+export type { PrVisuallyHiddenProps } from './atoms/VisuallyHidden'
+
+import { PrStatusDot } from './atoms/StatusDot'
+export type { PrStatusDotProps } from './atoms/StatusDot'
+
+import { PrFab } from './molecules/Fab'
+export type { PrFabProps } from './molecules/Fab'
+
+import { PrQuickExit } from './molecules/QuickExit'
+export type { PrQuickExitProps } from './molecules/QuickExit'
+
+import { PrEmergencyContacts } from './molecules/EmergencyContacts'
+export type { PrEmergencyContact, PrEmergencyContactsProps } from './molecules/EmergencyContacts'
+
+import { PrChatThread } from './molecules/ChatThread'
+export type { PrChatThreadProps } from './molecules/ChatThread'
+
+import { PrChatMessage } from './molecules/ChatMessage'
+export type { PrChatMessageProps } from './molecules/ChatMessage'
+
+import { PrTypingIndicator } from './molecules/TypingIndicator'
+export type { PrTypingIndicatorProps } from './molecules/TypingIndicator'
+
+import { PrChatComposer } from './molecules/ChatComposer'
+export type { PrChatComposerProps } from './molecules/ChatComposer'
+
+import { PrStack } from './atoms/Stack'
+export type { PrStackProps, PrSpaceStep } from './atoms/Stack'
+
+import { PrGrid } from './atoms/Grid'
+export type { PrGridProps } from './atoms/Grid'
+
+import { PrFeature } from './molecules/Feature'
+export type { PrFeatureProps } from './molecules/Feature'
+
+import { PrLinkList } from './molecules/LinkList'
+export type { PrLinkListProps, PrLinkListItem, PrLinkListTag } from './molecules/LinkList'
+
+import { PrContainer } from './layouts/Container'
+export type { PrContainerProps } from './layouts/Container'
+
+import { PrHero } from './layouts/Hero'
+export type { PrHeroProps } from './layouts/Hero'
+
+import { PrBand } from './layouts/Band'
+export type { PrBandProps } from './layouts/Band'
+
+import { PrPanel } from './layouts/Panel'
+export type { PrPanelProps } from './layouts/Panel'
+
+import { PrFooter } from './layouts/Footer'
+export type { PrFooterProps, PrFooterColumn, PrFooterLink, PrFooterSocial } from './layouts/Footer'
+
+import { PrChatWindow } from './molecules/ChatWindow'
+export type { PrChatWindowProps } from './molecules/ChatWindow'
+
 export const componentRegistry = {
   PrAccordion,
   PrAlert,
@@ -249,4 +306,23 @@ export const componentRegistry = {
   PrPageHeader,
   PrDescriptionList,
   PrDescriptionItem,
+  PrVisuallyHidden,
+  PrStatusDot,
+  PrFab,
+  PrQuickExit,
+  PrEmergencyContacts,
+  PrChatThread,
+  PrChatMessage,
+  PrTypingIndicator,
+  PrChatComposer,
+  PrStack,
+  PrGrid,
+  PrFeature,
+  PrLinkList,
+  PrContainer,
+  PrHero,
+  PrBand,
+  PrPanel,
+  PrFooter,
+  PrChatWindow,
 } satisfies Record<string, Component>

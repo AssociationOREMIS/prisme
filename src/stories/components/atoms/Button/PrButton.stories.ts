@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
-import { Eye, Pencil, Save, Trash2 } from '@lucide/vue'
+import { ArrowRight, Eye, Pencil, Save, Trash2 } from '@lucide/vue'
 import { PrButton, prButtonActions } from '../../../../components/atoms/Button'
 import '../../../stories.css'
 
@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'ghost', 'danger'],
+      options: ['primary', 'secondary', 'ghost', 'danger', 'link'],
     },
     size: {
       control: 'select',
@@ -267,5 +267,30 @@ export const Actions: Story = {
     const add = canvas.getByRole('button', { name: 'Ajouter un bénévole' })
     await expect(add.querySelector('svg.pr-button__icon')).not.toBeNull()
     await expect(canvas.getByRole('link', { name: 'Voir' })).toHaveAttribute('href', '#fiche')
+  },
+}
+
+// Text in the primary color, the arrow after the label: « Lire l'article → ».
+export const LinkWithIconAtEnd: Story = {
+  render: () => ({
+    components: { PrButton },
+    setup() {
+      return { ArrowRight }
+    },
+    template: `
+      <div class="story-stack">
+        <PrButton variant="link" href="#" :icon="ArrowRight" icon-position="end">Lire l'article</PrButton>
+        <PrButton variant="link" :icon="ArrowRight" icon-position="end">Voir tous les signalements</PrButton>
+        <PrButton variant="link" tone="danger">Retirer</PrButton>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const link = canvas.getByRole('link', { name: "Lire l'article" })
+    const content = link.querySelector('.pr-button__content')!
+    // The icon comes after the label.
+    await expect(content.lastElementChild?.classList.contains('pr-button__icon--end')).toBe(true)
+    await expect(getComputedStyle(link).backgroundColor).toBe('rgba(0, 0, 0, 0)')
   },
 }

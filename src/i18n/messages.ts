@@ -40,6 +40,19 @@ export interface PrMessages {
     roleDescription: string
     slideRoleDescription: string
   }
+  chat: {
+    /** Name of the list of messages (`PrChatThread`), a polite live region. */
+    thread: string
+    /** Sender label of the visitor's own messages, for screen readers. */
+    you: string
+    /** Sender label of automatic messages, for screen readers. */
+    system: string
+    /** `PrTypingIndicator`: "{name} writes". */
+    typing: (name: string) => string
+    composerLabel: string
+    placeholder: string
+    send: string
+  }
   combobox: {
     typeToSearch: string
     typeAtLeast: (count: number) => string
@@ -83,6 +96,12 @@ export interface PrMessages {
   descriptionList: {
     empty: string
   }
+  emergencyContacts: {
+    title: string
+    /** Read after an SMS number: the link opens a text message, not a call. */
+    sms: string
+    contacts: ReadonlyArray<{ number: string; label: string; channel: 'tel' | 'sms' }>
+  }
   errorSummary: {
     title: (count: number) => string
     item: (label: string, message: string) => string
@@ -109,6 +128,16 @@ export interface PrMessages {
     kilobytes: string
     megabytes: string
   }
+  footer: {
+    /** Name of the navigation holding the legal links. */
+    legalNav: string
+    /** Name of the group of social network links. */
+    socials: string
+    copyright: (year: number) => string
+  }
+  linkList: {
+    empty: string
+  }
   navbar: {
     unknownRole: string
     /** Added for screen readers to the brand link of `homeHref`. */
@@ -127,6 +156,13 @@ export interface PrMessages {
     next: string
     /** Name of a page's link or button (« Page 2 »), its visible text being the number alone. */
     page: (page: number) => string
+  }
+  quickExit: {
+    label: string
+    /** Read after the label: what the button does. */
+    description: string
+    /** Read after the description when the Escape shortcut is on. */
+    shortcut: string
   }
   richTextEditor: {
     placeholder: string
@@ -310,6 +346,15 @@ export const prMessagesFr: PrMessages = {
     roleDescription: 'carrousel',
     slideRoleDescription: 'élément',
   },
+  chat: {
+    thread: 'Conversation',
+    you: 'Vous',
+    system: 'Message automatique',
+    typing: name => `${name} écrit`,
+    composerLabel: 'Votre message',
+    placeholder: 'Écrivez votre message...',
+    send: 'Envoyer',
+  },
   combobox: {
     typeToSearch: 'Tapez pour rechercher',
     typeAtLeast: (count) => `Tapez au moins ${count} caractères`,
@@ -348,6 +393,18 @@ export const prMessagesFr: PrMessages = {
   descriptionList: {
     empty: 'Non renseigné',
   },
+  emergencyContacts: {
+    title: "En cas d'urgence, n'attendez pas",
+    sms: 'par SMS',
+    contacts: [
+      { number: '15', label: 'SAMU, urgence médicale', channel: 'tel' },
+      { number: '112', label: "Numéro d'urgence européen", channel: 'tel' },
+      { number: '3114', label: 'Prévention du suicide, 24h/24', channel: 'tel' },
+      { number: '119', label: 'Enfance en danger, 24h/24', channel: 'tel' },
+      { number: '3018', label: 'Harcèlement et cyberharcèlement, gratuit et anonyme', channel: 'tel' },
+      { number: '114', label: 'Urgences par SMS, pour les personnes sourdes ou malentendantes', channel: 'sms' },
+    ],
+  },
   errorSummary: {
     title: (count) => (count > 1 ? `Le formulaire contient ${count} erreurs` : 'Le formulaire contient une erreur'),
     item: (label, message) => `${label} : ${message}`,
@@ -371,6 +428,14 @@ export const prMessagesFr: PrMessages = {
     kilobytes: 'Ko',
     megabytes: 'Mo',
   },
+  footer: {
+    legalNav: 'Informations légales',
+    socials: 'Réseaux sociaux',
+    copyright: year => `© ${year} Association OREMIS`,
+  },
+  linkList: {
+    empty: 'Aucun élément.',
+  },
   navbar: {
     unknownRole: 'Rôle inconnu',
     home: 'accueil',
@@ -387,6 +452,11 @@ export const prMessagesFr: PrMessages = {
     previous: 'Page précédente',
     next: 'Page suivante',
     page: (page) => `Page ${page}`,
+  },
+  quickExit: {
+    label: 'Quitter vite',
+    description: 'Quitte ce site tout de suite et ouvre une page neutre.',
+    shortcut: 'Raccourci : appuyez deux fois sur Échap.',
   },
   richTextEditor: {
     placeholder: 'Rédigez votre contenu…',

@@ -33,10 +33,12 @@ const props = withDefaults(defineProps<PrTypographyProps>(), {
 
 const normalizedVariant = computed(() => (props.variant === 'code' ? 'inline-code' : props.variant))
 const typographyVariantClass = computed(() => ({
-  h1: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-4xl pr:lg:text-5xl pr:font-bold pr:leading-none',
-  h2: 'pr:font-[family-name:var(--pr-font-heading)] pr:mt-[var(--pr-space-10)] pr:first:mt-0 pr:pb-[var(--pr-space-3)] pr:text-3xl pr:font-bold pr:leading-[1.2]',
-  h3: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-2xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)]',
-  h4: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)]',
+  // Titles in the heading color (the text color, or the brand's), a link in a title (an article,
+  // an entry of a list) reads as the title until hovered.
+  h1: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-4xl pr:lg:text-5xl pr:font-bold pr:leading-none pr:text-[color:var(--pr-color-heading)] pr:[&_a]:text-inherit pr:[&_a]:no-underline pr:[&_a:hover]:text-[color:var(--pr-color-primary)] pr:[&_a:hover]:underline pr:[&_a]:underline-offset-4',
+  h2: 'pr:font-[family-name:var(--pr-font-heading)] pr:mt-[var(--pr-space-10)] pr:first:mt-0 pr:pb-[var(--pr-space-3)] pr:text-3xl pr:font-bold pr:leading-[1.2] pr:text-[color:var(--pr-color-heading)] pr:[&_a]:text-inherit pr:[&_a]:no-underline pr:[&_a:hover]:text-[color:var(--pr-color-primary)] pr:[&_a:hover]:underline pr:[&_a]:underline-offset-4',
+  h3: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-2xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-heading)] pr:[&_a]:text-inherit pr:[&_a]:no-underline pr:[&_a:hover]:text-[color:var(--pr-color-primary)] pr:[&_a:hover]:underline pr:[&_a]:underline-offset-4',
+  h4: 'pr:font-[family-name:var(--pr-font-heading)] pr:text-xl pr:font-semibold pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-heading)] pr:[&_a]:text-inherit pr:[&_a]:no-underline pr:[&_a:hover]:text-[color:var(--pr-color-primary)] pr:[&_a:hover]:underline pr:[&_a]:underline-offset-4',
   p: 'pr:not-first:mt-[var(--pr-space-6)] pr:leading-[var(--pr-line-height-normal)]',
   blockquote: 'pr:mt-[var(--pr-space-6)] pr:border-l-2 pr:border-[var(--pr-color-border)] pr:pl-[var(--pr-space-6)] pr:italic pr:text-[color:var(--pr-color-text-muted)]',
   ul: 'pr:my-[var(--pr-space-6)] pr:list-disc pr:pl-[var(--pr-space-6)] pr:text-[color:var(--pr-color-text)] pr:[&>li]:mt-[var(--pr-space-2)] pr:[&>li]:text-inherit',
@@ -73,8 +75,8 @@ const tag = computed(() => {
   <!-- A code block scrolls sideways: focusable, so the keyboard can scroll it too. -->
   <component
     :is="tag"
-    class="pr-typography pr:m-0 pr:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
-    :class="typographyVariantClass"
+    class="pr-typography pr:m-0 pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+    :class="[typographyVariantClass, !typographyVariantClass.includes('pr:text-[color:') && 'pr:text-[color:var(--pr-color-text)]']"
     :tabindex="normalizedVariant === 'code-block' ? 0 : undefined"
   >
     <code v-if="normalizedVariant === 'code-block'" class="pr-typography__code-block-content pr:whitespace-pre pr:font-[var(--pr-font-mono)] pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-normal)] pr:text-inherit">

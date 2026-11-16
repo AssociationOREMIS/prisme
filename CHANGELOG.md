@@ -2,6 +2,35 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## Non publie
+
+Les composants des sites publics d'OREMIS : theme de la charte, en-tete flottant, pied de page, blocs de mise en page, securite des personnes aidees et chat. Aucun changement cassant.
+
+### Charte OREMIS
+
+- **Theme de marque `data-pr-brand="charte"`** : la charte graphique 2026 de l'association (celle de PIO) en clair et en sombre, par-dessus `data-pr-theme`. Bordures gris-bleu, ni beige ni jaune autour des controles. Contrastes verifies par les tests (texte 4,5:1, bordures de champ et focus 3:1).
+- **Nouveaux tokens** : `--pr-radius-xl`, `--pr-color-heading`, `--pr-color-accent`.
+
+### Nouveaux composants
+
+- Mise en page : `PrContainer`, `PrStack`, `PrGrid`, `PrHero`, `PrBand`, `PrPanel`, `PrFeature`, `PrLinkList`, `PrFooter`.
+- Icones des reseaux sociaux : `PrIconDiscord`, `PrIconInstagram`, `PrIconFacebook`, `PrIconLinkedin`, `PrIconYoutube`, `PrIconX`, `PrIconTiktok`.
+- Securite : `PrQuickExit` (« Quitter vite », aussi par deux appuis sur Echap ; la page quittee ne revient pas avec Precedent), `PrEmergencyContacts` (le 114 est lu « 114 par SMS »).
+- Chat : `PrChatWindow`, `PrChatThread`, `PrChatMessage`, `PrTypingIndicator`, `PrChatComposer`, `PrFab`.
+- Petits outils : `PrStatusDot`, `PrVisuallyHidden`.
+- Nouveaux messages : `chat`, `emergencyContacts`, `footer`, `linkList`, `quickExit`.
+
+### Composants existants
+
+- **`PrNavbar`** : `variant="floating"` (barre claire, arrondie et flottante des sites publics), slot `nav` juste apres la marque, `logo-src-dark` (logo du theme sombre). La barre par defaut ne change pas.
+- **`PrNavigationMenu`** : `variant="subtle"`, le lien actif souligne en plus de sa couleur (WCAG 1.4.1).
+- **`PrTabs`** : `variant="pills"`, groupe de boutons dont l'onglet actif est rempli ; les onglets passent a la ligne sur un ecran etroit.
+- **`PrBadge`** : `shape="tag"`, etiquette compacte sans bordure.
+- **`PrButton`** : `variant="link"` et `icon-position="end"`.
+- **`PrInput`** : prop `icon`, une icone decorative au debut du champ (cotes logiques, suit une page de droite a gauche).
+- **`PrTypography`** : les titres (`h1` a `h4`) prennent `--pr-color-heading`, et un lien dans un titre garde la couleur du titre, souligne au survol.
+- **`PrSelect`** : la valeur choisie est alignee a gauche comme dans un champ, et tient sur deux lignes au plus dans un select etroit (elle etait centree).
+
 ## 1.0.0-rc.11 (2026-10-28)
 
 Onzieme version candidate, sous le tag npm `next`. Le minuteur des notifications suit ce qui se voit : il continue quand on clique sur un autre ecran, s'arrete quand la page est cachee. Aucun changement cassant.

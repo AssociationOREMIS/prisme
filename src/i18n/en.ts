@@ -47,6 +47,15 @@ export const prMessagesEn: PrMessages = {
     roleDescription: 'carousel',
     slideRoleDescription: 'item',
   },
+  chat: {
+    thread: 'Conversation',
+    you: 'You',
+    system: 'Automatic message',
+    typing: name => `${name} is typing`,
+    composerLabel: 'Your message',
+    placeholder: 'Write your message...',
+    send: 'Send',
+  },
   combobox: {
     typeToSearch: 'Type to search',
     typeAtLeast: (count) => `Type at least ${count} characters`,
@@ -85,6 +94,13 @@ export const prMessagesEn: PrMessages = {
   descriptionList: {
     empty: 'Not provided',
   },
+  emergencyContacts: {
+    title: "In an emergency, don't wait",
+    sms: 'by text message',
+    contacts: [
+      { number: '112', label: 'European emergency number', channel: 'tel' },
+    ],
+  },
   errorSummary: {
     title: (count) => (count > 1 ? `The form has ${count} errors` : 'The form has an error'),
     item: (label, message) => `${label}: ${message}`,
@@ -108,6 +124,14 @@ export const prMessagesEn: PrMessages = {
     kilobytes: 'KB',
     megabytes: 'MB',
   },
+  footer: {
+    legalNav: 'Legal information',
+    socials: 'Social networks',
+    copyright: year => `© ${year} OREMIS association`,
+  },
+  linkList: {
+    empty: 'No items.',
+  },
   navbar: {
     unknownRole: 'Unknown role',
     home: 'home',
@@ -124,6 +148,11 @@ export const prMessagesEn: PrMessages = {
     previous: 'Previous page',
     next: 'Next page',
     page: (page) => `Page ${page}`,
+  },
+  quickExit: {
+    label: 'Quick exit',
+    description: 'Leaves this site right away and opens a neutral page.',
+    shortcut: 'Shortcut: press Escape twice.',
   },
   richTextEditor: {
     placeholder: 'Write your content…',
