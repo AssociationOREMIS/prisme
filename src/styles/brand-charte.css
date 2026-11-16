@@ -1,0 +1,127 @@
+/* "Charte OREMIS 2026": the association's brand guide, as a brand theme on top of the light
+   and dark themes. Opt-in with `data-pr-brand="charte"` on <html> (or on the host of
+   mountPrismeIsolated()); `data-pr-theme` still picks light or dark.
+
+   Palette: Marine #093272, Bleu #2658A8, Ciel #E4ECF8, Creme #FDF8EB (and Mais #EDC660,
+   Saumon #F68240, Abricot #F8B993, decoration only). 60/30/10: a neutral base, white
+   surfaces, the brand colors as accents. Borders stay cool (blue grey): no beige or yellow
+   outline. Mais and Saumon never carry text nor outline a control.
+
+   Selectors: the light values exclude the dark theme (`:not([data-pr-theme="dark"])`), so the
+   brand never overrides the dark theme whatever the order of the stylesheets; every rule is
+   (0,2,0), above the plain theme selectors (0,1,0). The prefers-color-scheme block comes last
+   and wins over the light one when no theme is forced. */
+
+[data-pr-brand="charte"]:not([data-pr-theme="dark"]),
+:host([data-pr-brand="charte"]:not([data-pr-theme="dark"])) {
+  /* Creme leger: lighter than Creme so the page stays calm. */
+  --pr-color-background: #fdfaf3;
+  --pr-color-surface: #ffffff;
+  --pr-color-surface-raised: #ffffff;
+  --pr-color-surface-subtle: #f4f7fc;
+  --pr-color-border: #e1e8f4;
+  /* Field borders: 3.5:1 on white (WCAG 1.4.11). */
+  --pr-color-border-strong: #7d8aa3;
+  --pr-color-border-hover: #4a5670;
+  --pr-color-skeleton: #eef2f9;
+  --pr-color-skeleton-shine: #e1e8f4;
+  /* 13.7:1 on the page. */
+  --pr-color-text: #1f2a44;
+  /* 7.1:1 on the page, 6.2:1 on Ciel. */
+  --pr-color-text-muted: #4a5670;
+  --pr-color-text-subtle: #4a5670;
+  --pr-color-focus: #2658a8;
+  --pr-color-navbar: #093272;
+
+  /* Bleu: white text on it 6.9:1. */
+  --pr-color-primary: #2658a8;
+  --pr-color-primary-contrast: #ffffff;
+  --pr-color-primary-contrast-accent: #e4ecf8;
+  /* Marine. */
+  --pr-color-primary-hover: #093272;
+  --pr-color-primary-active: #093272;
+  /* Ciel. */
+  --pr-color-primary-soft: #e4ecf8;
+  --pr-color-primary-border: #b9cbea;
+
+  --pr-color-info: #093272;
+  --pr-color-info-soft: #e4ecf8;
+  --pr-color-info-border: #b9cbea;
+
+  /* Marine: 11.8:1 on the page. */
+  --pr-color-heading: #093272;
+  /* Abricot, decoration only. */
+  --pr-color-accent: #f8b993;
+}
+
+/* Dark: a calm neutral base, the brand only in accents (a light tint of Bleu, Creme doux titles). */
+[data-pr-brand="charte"][data-pr-theme="dark"],
+:host([data-pr-brand="charte"][data-pr-theme="dark"]) {
+  --pr-color-background: #11161f;
+  --pr-color-surface: #171d28;
+  --pr-color-surface-raised: #1c2330;
+  --pr-color-surface-subtle: #1c2330;
+  --pr-color-border: #2c3546;
+  /* 4.6:1 on the surface. */
+  --pr-color-border-strong: #7a869a;
+  --pr-color-border-hover: #aab3c2;
+  --pr-color-skeleton: #1c2330;
+  --pr-color-skeleton-shine: #283246;
+  --pr-color-text: #e6e8ec;
+  --pr-color-text-muted: #aab3c2;
+  --pr-color-text-subtle: #aab3c2;
+  --pr-color-focus: #8fb0e6;
+  --pr-color-navbar: #171d28;
+
+  /* Bleu clair: 8.2:1 on the page; dark text on it. */
+  --pr-color-primary: #8fb0e6;
+  --pr-color-primary-contrast: #11161f;
+  --pr-color-primary-contrast-accent: #093272;
+  --pr-color-primary-hover: #b9cdef;
+  --pr-color-primary-active: #b9cdef;
+  --pr-color-primary-soft: #222a38;
+  --pr-color-primary-border: #3a4558;
+
+  --pr-color-info: #8fb0e6;
+  --pr-color-info-soft: #222a38;
+  --pr-color-info-border: #3a4558;
+
+  /* Creme doux: 12:1 on #222a38. */
+  --pr-color-heading: #f1ead8;
+  --pr-color-accent: #8a6a55;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-pr-brand="charte"]:not([data-pr-theme]),
+  :host([data-pr-brand="charte"]:not([data-pr-theme])) {
+    --pr-color-background: #11161f;
+    --pr-color-surface: #171d28;
+    --pr-color-surface-raised: #1c2330;
+    --pr-color-surface-subtle: #1c2330;
+    --pr-color-border: #2c3546;
+    --pr-color-border-strong: #7a869a;
+    --pr-color-border-hover: #aab3c2;
+    --pr-color-skeleton: #1c2330;
+    --pr-color-skeleton-shine: #283246;
+    --pr-color-text: #e6e8ec;
+    --pr-color-text-muted: #aab3c2;
+    --pr-color-text-subtle: #aab3c2;
+    --pr-color-focus: #8fb0e6;
+    --pr-color-navbar: #171d28;
+
+    --pr-color-primary: #8fb0e6;
+    --pr-color-primary-contrast: #11161f;
+    --pr-color-primary-contrast-accent: #093272;
+    --pr-color-primary-hover: #b9cdef;
+    --pr-color-primary-active: #b9cdef;
+    --pr-color-primary-soft: #222a38;
+    --pr-color-primary-border: #3a4558;
+
+    --pr-color-info: #8fb0e6;
+    --pr-color-info-soft: #222a38;
+    --pr-color-info-border: #3a4558;
+
+    --pr-color-heading: #f1ead8;
+    --pr-color-accent: #8a6a55;
+  }
+}

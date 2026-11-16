@@ -28,3 +28,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+// Plain text links for a site header; the active one in the primary color and underlined.
+export const Subtle: Story = {
+  args: { variant: 'subtle' },
+}

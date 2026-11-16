@@ -78,6 +78,11 @@ html:has(.pr-navbar) {
   scroll-padding-top: calc(var(--pr-navbar-height) + var(--pr-space-2));
 }
 
+/* The floating navbar of a public site is taller, with its margin around it. */
+html:has(.pr-navbar--floating) {
+  scroll-padding-top: 7.5rem;
+}
+
 /* Skip link (PrAppShell): out of sight until it has the keyboard focus, then above the navbar. */
 .pr-skip-link {
   position: fixed;

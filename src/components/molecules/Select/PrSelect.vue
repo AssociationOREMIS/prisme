@@ -124,12 +124,14 @@ function triggerAttrs() {
         v-bind="triggerAttrs()"
         :id="triggerId"
         :aria-label="label ? undefined : ariaLabel"
-        class="pr-select__trigger pr:inline-flex pr:min-h-[2.375rem] pr:w-full pr:cursor-pointer pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[placeholder]:text-[color:var(--pr-color-text-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
+        class="pr-select__trigger pr:inline-flex pr:min-h-[2.375rem] pr:w-full pr:cursor-pointer pr:items-center pr:justify-between pr:text-start pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-md)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[placeholder]:text-[color:var(--pr-color-text-subtle)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
         :class="{ 'pr:border-[var(--pr-color-danger)]': Boolean(errorText) }"
         :aria-invalid="errorText ? 'true' : undefined"
         :aria-describedby="describedBy"
       >
-        <SelectValue :placeholder="placeholder ?? messages.common.select" />
+        <!-- Aligned to the start like a text field (a <button> centers its text), on two lines at
+             most in a narrow select rather than cut: still readable with larger text spacing (WCAG 1.4.12). -->
+        <SelectValue class="pr-select__value pr:min-w-0 pr:line-clamp-2 pr:break-words" :placeholder="placeholder ?? messages.common.select" />
         <SelectIcon class="pr-select__icon pr:inline-flex pr:shrink-0 pr:text-[color:var(--pr-color-text-muted)]">
           <ChevronDown :size="16" aria-hidden="true" />
         </SelectIcon>

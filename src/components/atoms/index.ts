@@ -57,3 +57,15 @@ export type { PrNumberInputProps } from './NumberInput'
 
 export { PrTagInput } from './TagInput'
 export type { PrTagInputProps } from './TagInput'
+
+export { PrVisuallyHidden } from './VisuallyHidden'
+export type { PrVisuallyHiddenProps } from './VisuallyHidden'
+
+export { PrStatusDot } from './StatusDot'
+export type { PrStatusDotProps } from './StatusDot'
+
+export { PrStack } from './Stack'
+export type { PrStackProps, PrSpaceStep } from './Stack'
+
+export { PrGrid } from './Grid'
+export type { PrGridProps } from './Grid'

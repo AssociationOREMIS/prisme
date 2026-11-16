@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { Search } from '@lucide/vue'
 import { expect, within } from 'storybook/test'
 import { ref } from 'vue'
 import { PrInput } from '../../../../components/atoms/Input'
@@ -128,5 +129,24 @@ export const InAFormGrid: Story = {
     await expect(site).toBe(siret)
     await expect(height('.pr-select [role="combobox"]')).toBe(siret)
     await expect(Math.round(height('textarea'))).toBeLessThan(Math.round(height('.pr-textarea')))
+  },
+}
+
+// A search field: the magnifying glass inside the field, the label kept for screen readers.
+export const WithIcon: Story = {
+  render: () => ({
+    components: { PrInput },
+    setup() {
+      return { Search }
+    },
+    template: '<PrInput :icon="Search" type="search" label="Rechercher une mise à jour" hide-label placeholder="Rechercher une mise à jour" />',
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const field = canvas.getByRole('searchbox', { name: 'Rechercher une mise à jour' })
+    const icon = canvasElement.querySelector('.pr-input__icon')!
+    await expect(icon.getAttribute('aria-hidden')).toBe('true')
+    // The text starts after the icon.
+    await expect(parseFloat(getComputedStyle(field).paddingInlineStart)).toBeGreaterThan(30)
   },
 }

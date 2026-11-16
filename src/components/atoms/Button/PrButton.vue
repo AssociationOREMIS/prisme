@@ -6,16 +6,21 @@ import { prButtonActions, type PrButtonAction } from './actions'
 import { usePrMessages } from '../../../i18n/context'
 
 export interface PrButtonProps {
-  /** Default `primary`, `ghost` with an `action`. */
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+  /**
+   * Default `primary`, `ghost` with an `action`. `link`: text in the primary color, no
+   * background, underlined on hover, for « Lire l'article → » or « Voir tout ».
+   */
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'link'
   size?: 'sm' | 'md' | 'lg'
   type?: 'button' | 'submit' | 'reset'
   disabled?: boolean
   loading?: boolean
   /** Renders a link (`<a>`) styled as a button: for navigation, a button inside a link is not accessible. */
   href?: string
-  /** Icon (a Lucide component) shown before the label. */
+  /** Icon (a Lucide component) shown before the label, or after it with `icon-position="end"`. */
   icon?: Component
+  /** Where the icon goes next to the label: `start` (default) or `end` (an arrow after « Lire l'article »). */
+  iconPosition?: 'start' | 'end'
   /**
    * Name of an icon-only button (`icon` and no label in the slot): a square button whose name is
    * `label`, also shown as a tooltip. Row actions of a table: Voir, Modifier, Supprimer...
@@ -39,6 +44,7 @@ const props = withDefaults(defineProps<PrButtonProps>(), {
   loading: false,
   href: undefined,
   icon: undefined,
+  iconPosition: 'start',
   label: undefined,
   tone: undefined,
   action: undefined,
@@ -117,6 +123,7 @@ const dangerHover = 'pr:[&:not(:disabled):hover]:bg-[color-mix(in_srgb,var(--pr-
 const dangerToneClass: Partial<Record<NonNullable<PrButtonProps['variant']>, string>> = {
   secondary: `pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-danger)] pr:shadow-[var(--pr-shadow-xs)] ${dangerHover}`,
   ghost: `pr:bg-transparent pr:text-[color:var(--pr-color-danger)] ${dangerHover}`,
+  link: 'pr:bg-transparent pr:text-[color:var(--pr-color-danger)] pr:[&:not(:disabled):hover]:text-[color:var(--pr-color-danger-hover)]',
 }
 
 const buttonVariantClass: Record<NonNullable<PrButtonProps['variant']>, string> = {
@@ -128,12 +135,19 @@ const buttonVariantClass: Record<NonNullable<PrButtonProps['variant']>, string> 
     'pr:bg-transparent pr:text-[color:var(--pr-color-text)] pr:[&:not(:disabled):hover]:bg-[var(--pr-color-surface-subtle)]',
   danger:
     'pr:bg-[var(--pr-color-danger-solid)] pr:text-[color:var(--pr-neutral-0)] pr:shadow-[var(--pr-shadow-xs)] pr:[&:not(:disabled):hover]:bg-[var(--pr-color-danger-solid-hover)]',
+  link: 'pr:bg-transparent pr:text-[color:var(--pr-color-primary)] pr:[&:not(:disabled):hover]:text-[color:var(--pr-color-primary-hover)]',
 }
+
+// A link reads as text: no side padding (it lines up with the text around it), a lighter weight,
+// underlined on hover. It keeps the height of its size, a target of 24 px at least (WCAG 2.5.8).
+// `w-fit`: in a column (a stack, an aside) it keeps the width of its text instead of stretching.
+const linkClass = 'pr-button--link pr:w-fit pr:px-0 pr:font-semibold pr:[&:not(:disabled):hover]:underline pr:underline-offset-4'
 
 const buttonClass = computed(() => [
   buttonBaseClass,
   buttonSizeClass[props.size],
   isIconOnly.value && iconOnlySizeClass[props.size],
+  variant.value === 'link' && !isIconOnly.value && linkClass,
   (tone.value === 'danger' && dangerToneClass[variant.value]) || buttonVariantClass[variant.value],
 ])
 </script>
@@ -188,8 +202,9 @@ const buttonClass = computed(() => [
       class="pr-button__content pr:inline-flex pr:items-center pr:justify-center pr:gap-[inherit]"
       :class="{ 'pr:opacity-0': loading }"
     >
-      <component :is="icon" v-if="icon" class="pr-button__icon" :size="iconSize[size]" aria-hidden="true" />
+      <component :is="icon" v-if="icon && iconPosition === 'start'" class="pr-button__icon" :size="iconSize[size]" aria-hidden="true" />
       <slot />
+      <component :is="icon" v-if="icon && iconPosition === 'end'" class="pr-button__icon pr-button__icon--end" :size="iconSize[size]" aria-hidden="true" />
     </span>
   </component>
 </template>

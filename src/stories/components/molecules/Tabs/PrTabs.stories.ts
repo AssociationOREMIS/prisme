@@ -125,3 +125,35 @@ export const ActiveIndicator: Story = {
     await expect(getComputedStyle(active).backgroundColor).toBe('rgba(0, 0, 0, 0)')
   },
 }
+
+// A filter above a list: a group of buttons, the active one filled. Wraps on a narrow screen.
+export const Pills: Story = {
+  render: (args) => ({
+    components: { PrTabs },
+    setup() {
+      return { args }
+    },
+    template: `
+      <PrTabs v-bind="args" variant="pills" aria-label="Type de mise à jour" default-value="all">
+        <template #all>Toutes les mises à jour</template>
+        <template #articles>Articles</template>
+        <template #software>Logiciels</template>
+      </PrTabs>
+    `,
+  }),
+  args: {
+    tabs: [
+      { value: 'all', label: 'Toutes les mises à jour' },
+      { value: 'articles', label: 'Articles' },
+      { value: 'software', label: 'Logiciels' },
+    ],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvasElement.querySelector('.pr-tabs__indicator')).toBeNull()
+    const active = canvas.getByRole('tab', { name: 'Toutes les mises à jour' })
+    await expect(getComputedStyle(active).backgroundColor).not.toBe('rgba(0, 0, 0, 0)')
+    await userEvent.click(canvas.getByRole('tab', { name: 'Articles' }))
+    await expect(canvas.getByRole('tab', { name: 'Articles' }).getAttribute('data-state')).toBe('active')
+  },
+}
