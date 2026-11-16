@@ -2,9 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.12 (2026-11-16)
 
-Les composants des sites publics d'OREMIS : theme de la charte, en-tete flottant, pied de page, blocs de mise en page, securite des personnes aidees et chat. Aucun changement cassant.
+Douzieme version candidate, sous le tag npm `next`. Les composants des sites publics d'OREMIS : theme de la charte, en-tete flottant, pied de page, blocs de mise en page, securite des personnes aidees et chat. Aucun changement cassant.
 
 ### Charte OREMIS
 
