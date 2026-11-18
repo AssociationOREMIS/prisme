@@ -64,10 +64,10 @@ const sheetSizeClass = computed(() => {
 
   return vertical
     ? {
-        sm: 'pr:max-h-[min(20rem,100dvh)]',
-        md: 'pr:max-h-[min(28rem,100dvh)]',
-        lg: 'pr:max-h-[min(36rem,100dvh)]',
-        xl: 'pr:max-h-[min(48rem,100dvh)]',
+        sm: 'pr:max-h-[min(20rem,100vh)] pr:supports-[height:100dvh]:max-h-[min(20rem,100dvh)]',
+        md: 'pr:max-h-[min(28rem,100vh)] pr:supports-[height:100dvh]:max-h-[min(28rem,100dvh)]',
+        lg: 'pr:max-h-[min(36rem,100vh)] pr:supports-[height:100dvh]:max-h-[min(36rem,100dvh)]',
+        xl: 'pr:max-h-[min(48rem,100vh)] pr:supports-[height:100dvh]:max-h-[min(48rem,100dvh)]',
       }[props.size]
     : {
         sm: 'pr:w-[min(20rem,100vw)]',
@@ -87,9 +87,9 @@ const sheetSizeClass = computed(() => {
       <DialogOverlay class="pr-sheet__overlay pr:fixed pr:inset-0 pr:z-[80] pr:bg-[var(--pr-color-overlay)] pr:data-[state=open]:animate-[pr-fade-in_150ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-fade-out_150ms_var(--pr-ease-standard)]" />
       <!-- Explicit rows: without them a sheet as tall as the screen shared its height between the
            header and the body, leaving a gap under the title. The body takes the rest and scrolls.
-           100dvh, not 100vh: on a phone, 100vh runs under the address bar. -->
+           100dvh where supported (100vh otherwise): on a phone, 100vh runs under the address bar. -->
       <DialogContent
-        class="pr-sheet pr:fixed pr:z-[90] pr:grid pr:max-h-[100dvh] pr:max-w-screen pr:overflow-hidden pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)]"
+        class="pr-sheet pr:fixed pr:z-[90] pr:grid pr:max-h-screen pr:supports-[height:100dvh]:max-h-dvh pr:max-w-screen pr:overflow-hidden pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)]"
         :class="[sheetSideClass, sheetSizeClass, $slots.footer ? 'pr:grid-rows-[auto_minmax(0,1fr)_auto]' : 'pr:grid-rows-[auto_minmax(0,1fr)]']"
       >
         <div class="pr-sheet__header pr:flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-4)] pr:border-b pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-5)]">

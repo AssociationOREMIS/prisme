@@ -27,7 +27,18 @@ Les composants des sites publics, completes pour un site entier et pour le telep
 
 ### Corrections
 
-- **`PrSheet`** : sans pied, l'en-tete prenait la moitie de la hauteur (un grand vide sous le titre). Lignes de grille explicites. Hauteurs en `100dvh` : le panneau ne passe plus sous la barre d'adresse d'un telephone.
+- **`PrSheet`** : sans pied, l'en-tete prenait la moitie de la hauteur (un grand vide sous le titre). Lignes de grille explicites. Hauteurs en `100dvh` quand le navigateur le connait : le panneau ne passe plus sous la barre d'adresse d'un telephone.
+
+### Responsive : tout Prisme a 320 px (WCAG 1.4.10, 1.4.12, 2.5.8)
+
+Revue des 270 stories a 320 et 390 px, avec l'espacement de texte agrandi et le texte a 200 %, et des fenetres ouvertes a 320 px.
+
+- **Plus de defilement horizontal de la page** : `PrDataTable` (jusqu'a 745 px de trop, a cause des textes pour lecteurs d'ecran qui sortaient du conteneur), `PrTable` et `PrStepper` horizontal. `PrDataTable` et `PrTabs` ne font plus grandir une colonne de grille ou de flex.
+- **`PrTabs` vertical** : sous 780 px, la liste des onglets passe au-dessus du panneau.
+- **Fenetres** : `PrTooltip`, `PrPopover`, `PrHoverCard`, `PrDropdownMenu`, `PrSelect` et `PrCombobox` gardent 8 px du bord de l'ecran et ne depassent plus sa largeur ; hauteur maximale selon la place disponible. Le selecteur d'emoji de `PrRichTextEditor` se decale pour tenir a l'ecran. `PrDialog`, `PrAlertDialog` et les toasts en `dvh`.
+- **Cibles tactiles de 24 px** (WCAG 2.5.8) : zone de clic invisible de 24 x 24 autour de `PrCheckbox`, `PrRadioGroup`, `PrSwitch` et du curseur de `PrSlider`, sans changement visuel ; declencheur compact de `PrCollapsible` et lien retour de `PrPageHeader` a 24 px.
+- **`PrDialog` et `PrAlertDialog`** sans description : plus d'`aria-describedby` vers un element absent.
+- **Storybook** : stories qui marchent a 320 px, et une story « Foundations/Reflow » qui verifie en navigateur qu'une colonne de 320 px ne deborde jamais.
 
 ## 1.0.0-rc.12 (2026-11-16)
 
