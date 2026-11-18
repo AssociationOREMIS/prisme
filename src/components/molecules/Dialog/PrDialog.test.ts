@@ -70,7 +70,7 @@ describe('size', () => {
     mount(PrSheet, { props: { defaultOpen: true, title: 'Filtres', side: 'bottom' }, attachTo: document.body })
     await nextTick()
     const className = document.querySelector('[role="dialog"]')?.className
-    expect(className).toContain('pr:max-h-[min(28rem,100vh)]')
+    expect(className).toContain('pr:supports-[height:100dvh]:max-h-[min(28rem,100dvh)]')
     expect(className).not.toContain('pr:w-[')
   })
 })

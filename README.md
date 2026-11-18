@@ -393,21 +393,42 @@ Nouveaux tokens, dans tous les themes : `--pr-radius-xl` (1rem, grands blocs), `
 </PrNavbar>
 ```
 
-- `PrNavbar variant="floating"` : barre claire et arrondie, avec une ombre, qui flotte au-dessus de la page. Le logo couleur s'affiche en clair, le blanc en sombre (`logo-src`, `logo-src-dark`). Le slot `nav` place la navigation juste apres la marque ; sous 780 px, elle passe sur sa propre ligne.
-- `PrNavigationMenu variant="subtle"` : liens texte ; le lien actif est en couleur principale et souligne, pas seulement colore.
-- `PrFooter` : marque, texte, reseaux sociaux, une a quatre colonnes de liens (chacune une `nav` nommee par son titre), puis une ligne avec le copyright de l'association et les liens legaux (`legal-links`). Les icones des reseaux (`PrIconDiscord`, `PrIconInstagram`, `PrIconFacebook`, `PrIconLinkedin`, `PrIconYoutube`, `PrIconX`, `PrIconTiktok`) s'utilisent comme les icones Lucide.
+- `PrNavbar variant="floating"` : barre claire et arrondie, avec une ombre, qui flotte au-dessus de la page. Le logo couleur s'affiche en clair, le blanc en sombre (`logo-src`, `logo-src-dark`). Le slot `nav` place la navigation juste apres la marque.
+  - `width="wide"` ou `narrow` : la barre se centre sur la largeur d'un `PrContainer` du meme nom, le logo aligne sur le texte des sections.
+  - **Mobile** : sous 780 px, la barre reste sur une ligne. Le slot `nav` et les actions (slot par defaut ou `actions`) passent dans un menu (`PrNavbarMenu`, bouton « Menu ») ; le slot `user` (theme, « Quitter vite ») reste dans la barre. Sous 400 px, le titre n'est plus lu que par les lecteurs d'ecran. `:mobile-menu="false"` garde l'ancien comportement (navigation sur sa propre ligne).
+  - Fond a 90 % avec un flou, opaque si l'utilisateur demande moins de transparence (`prefers-reduced-transparency`). L'ombre se renforce une fois la page defilee.
+- `PrNavbarMenu` : le menu d'un telephone, utilisable seul. Un bouton ouvre un panneau lateral (`PrSheet`) ; les `PrNavigationMenu` qu'il contient passent en colonne ; suivre un lien le ferme. `v-model:open` facultatif.
+- `PrNavigationMenu variant="subtle"` : liens texte ; le lien actif est en couleur principale et souligne, pas seulement colore. `orientation="vertical"` : un lien par ligne, toute la largeur, cibles de 44 px.
+- `PrFooter` : marque, texte, reseaux sociaux, une a quatre colonnes de liens (chacune une `nav` nommee par son titre), puis une ligne avec le copyright de l'association et les liens legaux (`legal-links`). `width="wide"` ou `narrow` centre le contenu sur les sections (le fond reste pleine largeur) ; `flush` enleve la marge du haut, quand il suit une section pleine largeur. Les icones des reseaux (`PrIconDiscord`, `PrIconInstagram`, `PrIconFacebook`, `PrIconLinkedin`, `PrIconYoutube`, `PrIconX`, `PrIconTiktok`) s'utilisent comme les icones Lucide.
 
 ### Mise en page
 
 - `PrContainer` : pleine largeur avec des marges laterales (`width="full"` par defaut, `wide` ou `narrow` pour centrer).
 - `PrStack` et `PrGrid` : piles et grilles sans CSS d'application. `PrGrid` cree autant de colonnes que la largeur le permet (`min="18rem"`), une seule sur telephone.
-- `PrHero` : titre de page (`h1`), sous-titre et actions, avec un motif decoratif a droite (`:pattern="false"` pour l'enlever).
+- `PrHero` : titre de page (`h1`), sous-titre et actions, avec un motif decoratif a droite (`:pattern="false"` pour l'enlever). Avec `background` (une image), il occupe toute la largeur sous un voile sombre, en theme sombre, avec `parallax`, `under-navbar` (l'image passe derriere la barre flottante) et `align="center"`. A mettre hors de tout `PrContainer`.
+- `PrSection` : une section pleine largeur, son contenu dans un `PrContainer` (`width`, `wide` par defaut). `tone="subtle"` ou `primary` pour un fond doux ; `background` pour une image sous un voile sombre (`overlay`, 70 % par defaut) : le contenu passe en theme sombre, cartes comprises, et garde la marque de la page. `parallax` (image fixe au defilement, coupee sur ecran tactile et avec moins d'animations), `spacing` (`none`, `md`, `lg`), `under-navbar`.
+- **Telephone** : tous les composants tiennent dans 320 px sans faire defiler la page de cote (WCAG 1.4.10). Les tableaux defilent dans leur propre cadre ; `PrTabs` vertical passe la liste des onglets au-dessus du panneau sous 780 px ; les fenetres (infobulles, menus, listes) gardent 8 px du bord de l'ecran.
+- `PrSplit` : un texte et son illustration cote a cote (slot `media`), `ratio` `7/5`, `1/1` ou `5/7`. `reverse` met l'illustration a gauche sans changer l'ordre de lecture ; une seule colonne sous 900 px, le texte en premier.
+- `PrImage` : une image jamais plus large que sa colonne (`max-width` en plus), `alt` obligatoire (`""` si decorative), `width`/`height` pour garder la place pendant le chargement, `loading="lazy"` par defaut.
+- `PrReveal` : le contenu apparait quand il arrive a l'ecran (`effect` `fade-up`, `fade-left`, `fade-right` ou `fade`, `duration`, `delay` pour decaler des cartes, `repeat`). Rien ne bouge avec moins d'animations, et sans JavaScript le contenu est simplement la. Les glissements lateraux ne font jamais defiler la page de cote.
 - `PrBand` : bandeau mis en avant, arrondi (`tone="primary"`, `subtle` ou `surface`), avec une colonne `aside` facultative.
 - `PrPanel` : panneau blanc arrondi, avec une colonne laterale facultative (slot `aside`) sur fond gris.
 - `PrFeature` : icone dans un rond, titre et texte (« Anonyme », « Gratuit »...).
 - `PrLinkList` : liste d'articles ou de mises a jour, avec etiquettes, titre lien, resume et date.
 
-Variantes ajoutees aux composants existants : `PrTabs variant="pills"` (groupe de boutons, l'onglet actif rempli), `PrBadge shape="tag"` (etiquette compacte sans bordure), `PrButton variant="link"` et `icon-position="end"` (« Lire l'article → »), `PrInput :icon="Search"` (icone dans le champ).
+Variantes ajoutees aux composants existants : `PrTabs variant="pills"` (groupe de boutons, l'onglet actif rempli), `PrBadge shape="tag"` (etiquette compacte sans bordure), `PrButton variant="link"` et `icon-position="end"` (« Lire l'article → »), `PrButton variant="cta"` (l'appel a l'action d'une page : pilule en degrade, en capitales) avec `pulse` (un halo qui pulse, une fois seulement avec moins d'animations ; un seul par page), `PrInput :icon="Search"` (icone dans le champ).
+
+### Liens et Vue Router
+
+`PrLink` est le lien sur lequel reposent les autres composants : un `<a>` avec `href`, ou le `RouterLink` de l'application avec `to` (navigation sans rechargement). Aucun reglage : Prisme utilise le `RouterLink` que `app.use(router)` declare ; sans routeur, un `to` texte devient un `href`. `current-detection` marque la page courante (`aria-current="page"`, `data-current`), par le routeur ou par l'adresse (`/adherer` et `/adherer/` sont la meme page, `/` n'est jamais courant sur une autre). `to` existe aussi sur `PrButton`, les liens de `PrNavigationMenu` et de `PrFooter`, et `home-to` sur `PrNavbar` et `PrFooter`.
+
+### Services tiers
+
+`PrEmbed` affiche un service tiers (formulaire de paiement, video, carte) dans un cadre arrondi, `title` obligatoire, `height` ou `aspect-ratio="16/9"`. Avec `consent`, rien n'est charge depuis le service avant le clic sur « Afficher le contenu de HelloAsso » (`provider`) : ni cookie ni adresse IP ne lui parviennent (RGPD). `external-link` ajoute un lien vers le contenu sur le site du service.
+
+### Modele de site public
+
+Storybook, **Modeles / Site public** : des pages completes construites uniquement avec ces composants (accueil sur image avec appel a l'action, sections texte et illustration qui apparaissent, cartes sur image en parallaxe, page de formulaire tiers), en clair et en sombre, de 320 px a l'ecran large. Le point de depart d'un nouveau site public.
 
 ### Securite des personnes aidees
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { LogOut } from '@lucide/vue'
 import { expect, within } from 'storybook/test'
-import { PrButton, PrNavbar, PrNavigationMenu, PrThemeToggle } from '../../../../index'
+import { PrButton, PrNavbar, PrNavigationMenu, PrQuickExit, PrThemeToggle } from '../../../../index'
 import '../../navigation.stories.css'
 
 const meta = {
@@ -77,7 +77,7 @@ export const ActionsVisibleOnMobile: Story = {
   render: () => ({
     components: { PrButton, PrNavbar },
     template: `
-      <div class="nav-story-navbar-frame" style="width: 390px;">
+      <div class="nav-story-navbar-frame" style="width: min(390px, 100%);">
         <PrNavbar title="Navbar Title">
           <PrButton size="sm">Action</PrButton>
           <template #user>
@@ -100,7 +100,7 @@ export const HideActionsOnMobile: Story = {
       return { args }
     },
     template: `
-      <div class="nav-story-navbar-frame" style="width: 390px;">
+      <div class="nav-story-navbar-frame" style="width: min(390px, 100%);">
         <PrNavbar v-bind="args">
           <PrButton size="sm">Action</PrButton>
         </PrNavbar>
@@ -152,5 +152,39 @@ export const Floating: Story = {
     await expect(canvasElement.querySelector('.pr-navbar--floating')).not.toBeNull()
     await expect(canvas.getByRole('navigation', { name: 'Navigation principale' })).toBeTruthy()
     await expect(canvas.getByRole('link', { name: 'Accueil' }).getAttribute('aria-current')).toBe('page')
+  },
+}
+
+// A public site's bar centered on the width of its sections (`width="wide"`, as PrContainer). Below
+// 780 px it stays on one line: the navigation and the call to action go into the menu (☰), the
+// `user` slot (« Quitter vite », theme) stays in the bar. Narrow the window to see it.
+export const FloatingWithMobileMenu: Story = {
+  render: () => ({
+    components: { PrButton, PrNavbar, PrNavigationMenu, PrQuickExit, PrThemeToggle },
+    setup() {
+      const nav = [
+        { label: 'Accueil', href: '#', active: true },
+        { label: 'Adhérer', href: '#adherer', active: false },
+        { label: 'Nous contacter', href: '#contact', active: false },
+      ]
+      return { nav }
+    },
+    template: `
+      <PrNavbar variant="floating" title="Adhésion" home-href="#" width="wide">
+        <template #nav>
+          <PrNavigationMenu :items="nav" variant="subtle" aria-label="Navigation principale" />
+        </template>
+        <template #actions>
+          <PrButton variant="ghost" href="#benevole">Je deviens bénévole</PrButton>
+        </template>
+        <template #user>
+          <PrThemeToggle />
+        </template>
+      </PrNavbar>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector('.pr-navbar__inner')?.classList.contains('pr:max-w-[80rem]')).toBe(true)
+    await expect(canvasElement.querySelector('.pr-navbar__menu')).not.toBeNull()
   },
 }

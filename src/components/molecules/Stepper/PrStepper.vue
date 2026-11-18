@@ -48,12 +48,13 @@ const stepId = (index: number): string => `pr-stepper-${generatedId}-${index}`
 
 <template>
   <!-- Horizontal steps keep one row and scroll sideways on a narrow screen instead of overflowing
-       (p-1 keeps the focus rings inside the scroll area). -->
+       (p-1 keeps the focus rings inside the scroll area). relative: the visually hidden texts
+       (absolutely positioned) stay inside that scroll area instead of widening the page. -->
   <!-- reka names the group « progress » and reads « Step 2 of 4 », in English: the name is replaced
        and its status hidden, a French one (messages.stepper.status) takes its place. -->
   <StepperRoot
     v-slot="{ modelValue: currentStep }"
-    class="pr-stepper pr:flex pr:max-w-full pr:[&>[role=status]:not(.pr-stepper__status)]:hidden"
+    class="pr-stepper pr:relative pr:flex pr:max-w-full pr:[&>[role=status]:not(.pr-stepper__status)]:hidden"
     :aria-label="ariaLabel ?? messages.stepper.label"
     :class="orientation === 'vertical' ? 'pr:flex-col pr:gap-0' : 'pr:flex-row pr:items-start pr:overflow-x-auto pr:p-1'"
     :model-value="modelValue"

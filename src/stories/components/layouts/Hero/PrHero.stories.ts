@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { PrButton } from '../../../../components/atoms/Button'
 import { PrContainer } from '../../../../components/layouts/Container'
 import { PrHero } from '../../../../components/layouts/Hero'
+import fond from '../../../assets/site-public/fond-vagues.svg'
 import '../../../stories.css'
 
 const meta = {
@@ -51,5 +52,28 @@ export const WithoutPattern: Story = {
     components: { PrContainer, PrHero },
     setup: () => ({ args }),
     template: '<PrContainer><PrHero v-bind="args" /></PrContainer>',
+  }),
+}
+
+// On an image, the whole width, under a dark veil: the text switches to the dark theme. Centered,
+// with the call to action of the page. Put it outside any container.
+export const WithBackground: Story = {
+  args: {
+    title: "Ensemble, construisons l'avenir",
+    description: 'Votre adhésion soutient nos actions de prévention et d\'accompagnement, pour une école plus inclusive et plus sûre.',
+    background: fond,
+    parallax: true,
+    align: 'center',
+  },
+  render: args => ({
+    components: { PrButton, PrHero },
+    setup: () => ({ args }),
+    template: `
+      <PrHero v-bind="args">
+        <template #actions>
+          <PrButton variant="cta" size="lg" href="#adherer" pulse>Adhérer à OREMIS</PrButton>
+        </template>
+      </PrHero>
+    `,
   }),
 }

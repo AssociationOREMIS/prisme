@@ -69,3 +69,12 @@ export type { PrStackProps, PrSpaceStep } from './Stack'
 
 export { PrGrid } from './Grid'
 export type { PrGridProps } from './Grid'
+
+export { PrLink } from './Link'
+export type { PrLinkProps, PrLinkTo } from './Link'
+
+export { PrImage } from './Image'
+export type { PrImageProps } from './Image'
+
+export { PrReveal } from './Reveal'
+export type { PrRevealProps } from './Reveal'

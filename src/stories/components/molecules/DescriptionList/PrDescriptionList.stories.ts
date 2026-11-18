@@ -32,7 +32,7 @@ export const Default: Story = {
           <PrDescriptionItem label="Statut"><PrBadge variant="warning">En cours</PrBadge></PrDescriptionItem>
           <PrDescriptionItem label="Décidée par"><a href="#alex">Alex DURAND</a></PrDescriptionItem>
         </PrDescriptionList>
-        <div style="width: 320px;">
+        <div style="width: min(320px, 100%);">
           <PrDescriptionList :items="items.slice(0, 1)" data-testid="narrow" />
         </div>
       </div>
@@ -47,10 +47,14 @@ export const Default: Story = {
     await expect(values[2]).toHaveTextContent('Non renseigné')
     await expect(within(values[4] as HTMLElement).getByRole('link', { name: 'Alex DURAND' })).toBeTruthy()
 
-    // Two columns: every value starts at the same x, right of the longest label.
-    const lefts = Array.from(values).map(value => Math.round(value.getBoundingClientRect().left))
-    await expect(new Set(lefts).size).toBe(1)
-    await expect(lefts[0]).toBeGreaterThan(Math.round(terms[2].getBoundingClientRect().right))
+    // Two columns from 24rem wide (the @sm container query): every value starts at the same x,
+    // right of the longest label. Narrower, on a phone, it is one column like the narrow list.
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
+    if (wide.clientWidth >= 24 * rem) {
+      const lefts = Array.from(values).map(value => Math.round(value.getBoundingClientRect().left))
+      await expect(new Set(lefts).size).toBe(1)
+      await expect(lefts[0]).toBeGreaterThan(Math.round(terms[2].getBoundingClientRect().right))
+    }
 
     const narrow = canvas.getByTestId('narrow')
     await expect(narrow.querySelector('dd')!.getBoundingClientRect().top).toBeGreaterThanOrEqual(narrow.querySelector('dt')!.getBoundingClientRect().bottom)

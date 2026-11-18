@@ -344,10 +344,12 @@ function labelFor(value: string) {
         />
       </ComboboxAnchor>
       <ComboboxPortal>
+        <!-- collision-padding: keeps 8 px between the popup and the edges of a phone screen instead of touching them; the available-width/height variables of reka-ui cap it to the room left. -->
         <ComboboxContent
-          class="pr-combobox__content pr:z-[95] pr:max-h-[min(20rem,calc(100vh-var(--pr-space-8)))] pr:w-[var(--reka-combobox-trigger-width)] pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=bottom]:origin-top"
+          class="pr-combobox__content pr:z-[95] pr:max-h-[min(20rem,var(--reka-combobox-content-available-height))] pr:w-[var(--reka-combobox-trigger-width)] pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=bottom]:origin-top"
           position="popper"
           :side-offset="8"
+          :collision-padding="8"
         >
           <ComboboxViewport class="pr-combobox__viewport pr:p-[var(--pr-space-2)]">
             <!-- Server-side search says where it stands: type more, searching, no result, failure.

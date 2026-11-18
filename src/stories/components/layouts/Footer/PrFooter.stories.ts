@@ -37,3 +37,9 @@ export const Minimal: Story = {
     legalLinks: [{ label: 'Mentions légales', href: '#mentions-legales' }],
   },
 }
+
+// Content centered on the width of the sections above (`width="wide"`), right after a full-width
+// section (`flush`, no margin above). The background still spans the page.
+export const Wide: Story = {
+  args: { width: 'wide', flush: true },
+}

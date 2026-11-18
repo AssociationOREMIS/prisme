@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { PrSection } from '../Section'
 
 export interface PrHeroProps {
   /** Title of the page (or the `title` slot). */
@@ -8,8 +9,21 @@ export interface PrHeroProps {
   description?: string
   /** Level of the title: `h1` (default) when the hero opens the page, `h2` otherwise. */
   headingLevel?: 1 | 2
-  /** Decorative squares on the right half. Hidden on small screens and in forced colors. */
+  /** Decorative squares on the right half. Hidden on small screens and in forced colors. Off with a `background`. */
   pattern?: boolean
+  /**
+   * Image behind the hero (a URL): the hero then spans the page, under a dark veil, its text in the
+   * dark theme (a `PrSection`). Put it outside any `PrContainer`.
+   */
+  background?: string
+  /** With `background`: the image stays still while the page scrolls (off on touch screens and with reduced motion). */
+  parallax?: boolean
+  /** With `background`: strength of the dark veil, in percent (70 by default). */
+  overlay?: number
+  /** With `background`: starts under the floating navbar, the image showing behind it. */
+  underNavbar?: boolean
+  /** `start` (default): text on the left. `center`: title, text and actions centered. */
+  align?: 'start' | 'center'
 }
 
 const props = withDefaults(defineProps<PrHeroProps>(), {
@@ -17,7 +31,26 @@ const props = withDefaults(defineProps<PrHeroProps>(), {
   description: undefined,
   headingLevel: 1,
   pattern: true,
+  background: undefined,
+  parallax: false,
+  overlay: 70,
+  underNavbar: false,
+  align: 'start',
 })
+
+const showPattern = computed(() => props.pattern && !props.background)
+
+const sectionProps = computed(() => props.background
+  ? {
+      as: 'div',
+      width: 'narrow',
+      spacing: 'lg',
+      background: props.background,
+      parallax: props.parallax,
+      overlay: props.overlay,
+      underNavbar: props.underNavbar,
+    }
+  : {})
 
 /** The decorative squares, in percent of the pattern layer: left, top, size (rem), accent color (filled, no outline). */
 const squares: Array<{ x: number, y: number, size: number, accent?: boolean }> = [
@@ -40,16 +73,24 @@ function squareStyle(square: { x: number, y: number, size: number }) {
 }
 
 // Next to the pattern, the text keeps to the left half so the squares never sit under a word.
-const contentClass = computed(() => props.pattern
-  ? 'pr:max-w-[48rem] pr:min-[1024px]:max-w-[min(48rem,55%)]'
-  : 'pr:max-w-[48rem]')
+const contentClass = computed(() => [
+  showPattern.value ? 'pr:max-w-[48rem] pr:min-[1024px]:max-w-[min(48rem,55%)]' : 'pr:max-w-[48rem]',
+  props.align === 'center' && 'pr:mx-auto pr:text-center pr:justify-items-center',
+])
 </script>
 
 <template>
-  <div class="pr-hero pr:relative pr:isolate pr:overflow-hidden pr:py-[var(--pr-space-12)] pr:max-[780px]:py-[var(--pr-space-8)]">
+  <component
+    :is="background ? PrSection : 'div'"
+    v-bind="sectionProps"
+    class="pr-hero pr:relative pr:isolate pr:overflow-hidden"
+    :class="background ? 'pr-hero--image' : 'pr:py-[var(--pr-space-12)] pr:max-[780px]:py-[var(--pr-space-8)]'"
+  >
+    <!-- With an image the root is a PrSection: full width, veil, dark theme, parallax, the content in
+         a narrow column. Without, a block of the page, in the page's container. -->
     <!-- A div, not a <header>: outside <main> that would be a second banner landmark. -->
     <div
-      v-if="pattern"
+      v-if="showPattern"
       class="pr-hero__pattern pr:pointer-events-none pr:absolute pr:inset-y-0 pr:right-0 pr:z-[-1] pr:w-[42%] pr:opacity-60 pr:max-[1024px]:hidden pr:forced-colors:hidden"
       aria-hidden="true"
     >
@@ -76,10 +117,14 @@ const contentClass = computed(() => props.pattern
       >
         <slot name="description">{{ description }}</slot>
       </div>
-      <div v-if="$slots.actions" class="pr-hero__actions pr:mt-[var(--pr-space-2)] pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-3)]">
+      <div
+        v-if="$slots.actions"
+        class="pr-hero__actions pr:mt-[var(--pr-space-2)] pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-3)]"
+        :class="{ 'pr:justify-center': align === 'center' }"
+      >
         <slot name="actions" />
       </div>
       <slot />
     </div>
-  </div>
+  </component>
 </template>

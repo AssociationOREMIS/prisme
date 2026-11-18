@@ -5,6 +5,11 @@ import { describe, expect, it } from 'vitest'
 import { PrInput } from './atoms/Input'
 import { PrTextarea } from './atoms/Textarea'
 import { PrDatePicker } from './molecules/DatePicker'
+// Static imports: compiled when the file loads, not inside a test's 5 s timeout (a dynamic import
+// in the test body ran out of time when the whole suite loaded the machine).
+import { PrRadioGroup } from './molecules/RadioGroup'
+import { PrTagInput } from './atoms/TagInput'
+import { usePrForm } from '../composables/usePrForm'
 
 describe.each([['PrInput', PrInput, 'input'], ['PrTextarea', PrTextarea, 'textarea']] as const)('%s value', (_name, component, tag) => {
   it('keeps what is typed when a Blade model-value has no listener, through a re-render', async () => {
@@ -45,9 +50,6 @@ describe('PrDatePicker value', () => {
 
 describe('reset to an undefined initial value', () => {
   it('clears a radio group and a tag input bound with v-model', async () => {
-    const { usePrForm } = await import('../composables/usePrForm')
-    const { PrRadioGroup } = await import('./molecules/RadioGroup')
-    const { PrTagInput } = await import('./atoms/TagInput')
     const Form = defineComponent({
       components: { PrRadioGroup, PrTagInput },
       setup: () => usePrForm({

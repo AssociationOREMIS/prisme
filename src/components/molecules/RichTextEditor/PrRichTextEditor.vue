@@ -181,6 +181,9 @@ const isEmojiPickerOpen = ref(false)
 const emojiPickerRef = ref<HTMLElement | null>(null)
 const emojiTriggerRef = ref<HTMLButtonElement | null>(null)
 const emojiMenuRef = ref<HTMLElement | null>(null)
+// Left shift of the emoji popover, in px: anchored to the left of its button, it ran off the right
+// edge of a phone screen (320 px) when the button sat near the end of the toolbar.
+const emojiPopoverShift = ref(0)
 const toolbarRef = ref<HTMLElement | null>(null)
 // Images without an `alt` attribute (older content): an author-facing warning under the editor.
 const imagesMissingAlt = ref(0)
@@ -601,9 +604,20 @@ function focusEmojiItem(index: number) {
 }
 
 async function openEmojiPicker(focus: 'first' | 'last' = 'first') {
+  emojiPopoverShift.value = 0
   isEmojiPickerOpen.value = true
   await nextTick()
+  keepEmojiPopoverOnScreen()
   focusEmojiItem(focus === 'first' ? 0 : emojiItems().length - 1)
+}
+
+/** Moves the open popover left until it fits the viewport, keeping an 8 px margin on both sides. */
+function keepEmojiPopoverOnScreen() {
+  const rect = emojiMenuRef.value?.getBoundingClientRect()
+  if (!rect) return
+  const margin = 8
+  const overflow = rect.right - (document.documentElement.clientWidth - margin)
+  if (overflow > 0) emojiPopoverShift.value = Math.min(overflow, Math.max(0, rect.left - margin))
 }
 
 function closeEmojiPicker(returnFocus: boolean) {
@@ -877,7 +891,7 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
             container's width, so they size correctly regardless of it.
           -->
           <!-- eslint-disable-next-line vuejs-accessibility/interactive-supports-focus -- roving focus: the emoji items take focus, not the menu (WAI-ARIA menu pattern) -->
-          <div v-if="isEmojiPickerOpen" :id="emojiMenuId" ref="emojiMenuRef" class="pr-rich-text-editor__emoji-popover pr:absolute pr:left-0 pr:top-[calc(100%+0.25rem)] pr:z-20 pr:grid pr:grid-cols-[repeat(6,2rem)] pr:gap-[0.125rem] pr:rounded-[var(--pr-radius-lg)] pr:border! pr:border-[var(--pr-color-border)]! pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)] pr:shadow-[var(--pr-shadow-md)]"
+          <div v-if="isEmojiPickerOpen" :id="emojiMenuId" ref="emojiMenuRef" :style="emojiPopoverShift ? { left: `${-emojiPopoverShift}px` } : undefined" class="pr-rich-text-editor__emoji-popover pr:absolute pr:left-0 pr:top-[calc(100%+0.25rem)] pr:z-20 pr:grid pr:grid-cols-[repeat(6,2rem)] pr:gap-[0.125rem] pr:rounded-[var(--pr-radius-lg)] pr:border! pr:border-[var(--pr-color-border)]! pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)] pr:shadow-[var(--pr-shadow-md)]"
                role="menu" :aria-labelledby="emojiTriggerId" @keydown="onEmojiMenuKeydown">
             <button v-for="item in emojiPickerEmojis" :key="item.name" type="button" tabindex="-1"
                     class="pr-rich-text-editor__emoji-item pr:inline-flex pr:h-8 pr:w-8 pr:items-center pr:justify-center pr:rounded-[var(--pr-radius-md)] pr:border-none pr:bg-[transparent] pr:text-[length:1.125rem] pr:hover:not-disabled:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-0 pr:focus-visible:outline-[var(--pr-color-focus)] pr:focus-visible:bg-[var(--pr-color-surface-subtle)]" role="menuitem"

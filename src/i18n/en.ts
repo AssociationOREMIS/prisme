@@ -124,6 +124,12 @@ export const prMessagesEn: PrMessages = {
     kilobytes: 'KB',
     megabytes: 'MB',
   },
+  embed: {
+    consentTitle: provider => `Content from ${provider}`,
+    consentText: provider => `To show it, the page must load ${provider}. This service may receive your IP address and set cookies.`,
+    load: provider => `Show the content from ${provider}`,
+    openExternal: provider => `Open on the ${provider} website (new tab)`,
+  },
   footer: {
     legalNav: 'Legal information',
     socials: 'Social networks',
@@ -135,6 +141,8 @@ export const prMessagesEn: PrMessages = {
   navbar: {
     unknownRole: 'Unknown role',
     home: 'home',
+    menu: 'Menu',
+    closeMenu: 'Close the menu',
   },
   navigationMenu: {
     label: 'Navigation',

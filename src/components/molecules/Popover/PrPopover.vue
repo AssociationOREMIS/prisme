@@ -50,11 +50,13 @@ const emit = defineEmits<{
       <slot name="trigger" />
     </PopoverTrigger>
     <PopoverPortal>
+      <!-- collision-padding: keeps 8 px between the popup and the edges of a phone screen instead of touching them. -->
       <PopoverContent
         class="pr-popover pr:z-[95] pr:w-[min(22rem,calc(100vw-var(--pr-space-6)))] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-4)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=right]:origin-left pr:data-[side=bottom]:origin-top pr:data-[side=left]:origin-right"
         :side="side"
         :align="align"
         :side-offset="8"
+        :collision-padding="8"
         :aria-labelledby="title ? titleId : undefined"
       >
         <div v-if="title || $slots.header" class="pr-popover__header pr:mb-[var(--pr-space-3)] pr:flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-3)]">

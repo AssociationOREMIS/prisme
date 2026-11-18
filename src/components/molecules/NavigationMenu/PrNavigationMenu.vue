@@ -1,9 +1,19 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { PrLink, type PrLinkTo } from '../../atoms/Link'
 import { usePrMessages } from '../../../i18n/context'
+import { usePrNavigationOrientation } from './context'
+
 export interface PrNavigationMenuItem {
   label: string
-  href: string
-  /** Defaults to comparing `href` against `window.location.pathname` (matching sub-paths too) when omitted — same auto-detection as `PrSidebarItem`. */
+  /** Address of the page. */
+  href?: string
+  /** Route of the app's Vue Router, instead of `href`: navigates without reloading (see `PrLink`). */
+  to?: PrLinkTo
+  /**
+   * Marks the current page. Worked out when omitted: from the router with `to`, otherwise by
+   * comparing `href` with the address (sub-pages too, never for `/`), as `PrSidebarItem` does.
+   */
   active?: boolean
 }
 
@@ -23,54 +33,62 @@ export interface PrNavigationMenuProps {
    * underlined (not by its color alone, WCAG 1.4.1).
    */
   variant?: 'default' | 'subtle'
+  /**
+   * `horizontal` (default): links side by side, wrapping onto a new line when they run out of
+   * room. `vertical`: one link per line, the whole width, large touch targets: the menu of a
+   * phone. Inside a `PrNavbarMenu`, vertical unless set otherwise.
+   */
+  orientation?: 'horizontal' | 'vertical'
 }
 
 const props = withDefaults(defineProps<PrNavigationMenuProps>(), {
   items: () => [],
   ariaLabel: undefined,
   variant: 'default',
+  orientation: undefined,
 })
 
 const messages = usePrMessages()
+const inherited = usePrNavigationOrientation()
+const orientation = computed(() => props.orientation ?? inherited ?? 'horizontal')
 
-const linkBaseClass = 'pr-navigation-menu__link pr:inline-flex pr:min-h-[2.375rem] pr:items-center pr:rounded-[var(--pr-radius-md)] pr:text-[length:var(--pr-font-size-sm)] pr:no-underline pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]'
+const linkBaseClass = 'pr-navigation-menu__link pr:inline-flex pr:min-h-[2.375rem] pr:items-center pr:rounded-[var(--pr-radius-md)] pr:text-[length:var(--pr-font-size-sm)] pr:no-underline pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:[overflow-wrap:break-word]'
 
+// The current page is styled from `data-current`, set by PrLink: the same rule whether the
+// link was found current by the router or by the address.
 const variantClass = {
-  default: {
-    link: 'pr:px-[var(--pr-space-3)] pr:font-[650] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)]',
-    idle: 'pr:text-[color:var(--pr-color-text-muted)]',
-    active: 'pr-navigation-menu__link--active pr:bg-[var(--pr-color-primary-soft)] pr:text-[color:var(--pr-color-primary)]',
-  },
-  subtle: {
-    link: 'pr:px-[var(--pr-space-4)] pr:font-medium pr:underline-offset-[6px] pr:decoration-2 pr:hover:underline',
-    idle: 'pr:text-[color:var(--pr-color-text)]',
-    active: 'pr-navigation-menu__link--active pr:text-[color:var(--pr-color-primary)] pr:underline',
-  },
+  default: 'pr:px-[var(--pr-space-3)] pr:font-[650] pr:text-[color:var(--pr-color-text-muted)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:hover:text-[color:var(--pr-color-text)] pr:data-[current=true]:bg-[var(--pr-color-primary-soft)] pr:data-[current=true]:text-[color:var(--pr-color-primary)]',
+  subtle: 'pr:px-[var(--pr-space-4)] pr:font-medium pr:text-[color:var(--pr-color-text)] pr:underline-offset-[6px] pr:decoration-2 pr:hover:underline pr:data-[current=true]:text-[color:var(--pr-color-primary)] pr:data-[current=true]:underline',
 } as const
 
-function linkClass(item: PrNavigationMenuItem) {
-  const classes = variantClass[props.variant]
-  return [linkBaseClass, classes.link, isActive(item) ? classes.active : classes.idle]
-}
-
-function isActive(item: PrNavigationMenuItem): boolean {
-  if (item.active !== undefined) return item.active
-  if (typeof window === 'undefined') return false
-  const path = window.location.pathname
-  return path === item.href || path.startsWith(`${item.href}/`)
-}
+// Vertical: a phone menu, every link a full-width row of 44 px at least (WCAG 2.5.5), in the
+// regular text size; the current one also gets the soft primary background.
+const orientationClass = {
+  horizontal: '',
+  vertical: 'pr:w-full pr:min-h-[2.75rem] pr:text-[length:var(--pr-font-size-md)] pr:data-[current=true]:bg-[var(--pr-color-primary-soft)]',
+} as const
 </script>
 
 <template>
-  <nav class="pr-navigation-menu pr:inline-flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)]" :class="`pr-navigation-menu--${variant}`" :aria-label="ariaLabel ?? messages.navigationMenu.label">
-    <a
+  <nav
+    class="pr-navigation-menu pr:gap-[var(--pr-space-1)]"
+    :class="[
+      `pr-navigation-menu--${variant}`,
+      `pr-navigation-menu--${orientation}`,
+      orientation === 'vertical' ? 'pr:flex pr:flex-col pr:items-stretch' : 'pr:inline-flex pr:flex-wrap pr:items-center',
+    ]"
+    :aria-label="ariaLabel ?? messages.navigationMenu.label"
+  >
+    <PrLink
       v-for="item in items"
-      :key="item.href"
-      :class="linkClass(item)"
+      :key="item.href ?? JSON.stringify(item.to)"
+      :class="[linkBaseClass, variantClass[variant], orientationClass[orientation]]"
       :href="item.href"
-      :aria-current="isActive(item) ? 'page' : undefined"
+      :to="item.to"
+      :current="item.active"
+      current-detection
     >
       {{ item.label }}
-    </a>
+    </PrLink>
   </nav>
 </template>

@@ -62,9 +62,13 @@ const emit = defineEmits<{
 </script>
 
 <template>
+  <!-- min-w-0: in a grid or flex parent, the row of tabs (which scrolls sideways) no longer widens
+       the page column to its full length on a phone. Vertical tabs go above their panel below
+       780 px (still a column, as wide as its labels): beside it, the panel kept about 100 px of a
+       320 px screen. -->
   <TabsRoot
-    class="pr-tabs pr:flex"
-    :class="orientation === 'vertical' ? 'pr:flex-row pr:gap-[var(--pr-space-4)]' : 'pr:flex-col'"
+    class="pr-tabs pr:flex pr:min-w-0"
+    :class="orientation === 'vertical' ? 'pr:flex-row pr:gap-[var(--pr-space-4)] pr:max-[780px]:flex-col' : 'pr:flex-col'"
     :model-value="modelValue"
     :default-value="defaultValue"
     :orientation="orientation"
@@ -73,7 +77,7 @@ const emit = defineEmits<{
     <TabsList
       :aria-label="ariaLabel"
       class="pr-tabs__list pr:relative pr:flex pr:shrink-0"
-      :class="listClass"
+      :class="[listClass, { 'pr:max-[780px]:self-start': orientation === 'vertical' }]"
     >
       <TabsIndicator
         v-if="variant === 'underline'"
@@ -96,7 +100,7 @@ const emit = defineEmits<{
     <TabsContent
       v-for="tab in tabs"
       :key="tab.value"
-      class="pr-tabs__content pr:grow pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+      class="pr-tabs__content pr:min-w-0 pr:grow pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
       :value="tab.value"
       :class="{ 'pr:pt-[var(--pr-space-4)]': variant === 'pills' }"
     >

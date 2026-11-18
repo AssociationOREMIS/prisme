@@ -95,7 +95,7 @@ export const WithHeader: Story = {
           </template>
           <p style="margin: 0;">Aucune sanction en cours.</p>
         </PrCard>
-        <div style="width: 300px;">
+        <div style="width: min(300px, 100%);">
           <PrCard data-testid="narrow" title="Notes" description="Notes internes de l'équipe.">
             <template #actions>
               <PrButton action="add" variant="secondary" size="sm">Ajouter une note</PrButton>
@@ -120,8 +120,14 @@ export const WithHeader: Story = {
       return { title, actions, root: root.getBoundingClientRect() }
     }
     const wide = position('wide')
-    await expect(wide.actions.top).toBeLessThan(wide.title.bottom)
-    await expect(wide.root.right - wide.actions.right).toBeLessThan(30)
+    // Beside the title only when the header has room for the heading (16rem at least) and the
+    // actions: on a phone the wide card wraps too, which is the expected layout there.
+    const header = canvas.getByTestId('wide').querySelector('.pr-card__header')!
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
+    if (header.clientWidth >= 16 * rem + wide.actions.width + 0.75 * rem) {
+      await expect(wide.actions.top).toBeLessThan(wide.title.bottom)
+      await expect(wide.root.right - wide.actions.right).toBeLessThan(30)
+    }
     const narrow = position('narrow')
     await expect(narrow.actions.top).toBeGreaterThanOrEqual(narrow.title.bottom)
   },

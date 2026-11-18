@@ -29,10 +29,11 @@ const messages = usePrMessages()
        the title when there is no room. A div, not a <header>: outside <main> that would be a second
        banner landmark next to the navbar's. -->
   <div class="pr-page-header pr:grid pr:gap-[var(--pr-space-2)]">
+    <!-- min-h-6: the back link, a line of small text, stays a 24 px high touch target (WCAG 2.5.8). -->
     <a
       v-if="backHref"
       :href="backHref"
-      class="pr-page-header__back pr:inline-flex pr:w-fit pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-sm)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:no-underline pr:hover:text-[color:var(--pr-color-text)] pr:hover:underline pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+      class="pr-page-header__back pr:inline-flex pr:min-h-6 pr:w-fit pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-sm)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)] pr:no-underline pr:hover:text-[color:var(--pr-color-text)] pr:hover:underline pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
     >
       <ArrowLeft :size="16" aria-hidden="true" />
       {{ backLabel ?? messages.common.back }}

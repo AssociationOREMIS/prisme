@@ -33,3 +33,14 @@ export const Default: Story = {}
 export const Subtle: Story = {
   args: { variant: 'subtle' },
 }
+
+// One link per line, the whole width, large touch targets: the menu of a phone. Inside a
+// PrNavbarMenu the links are vertical without asking.
+export const Vertical: Story = {
+  args: { orientation: 'vertical', variant: 'subtle' },
+  render: args => ({
+    components: { PrNavigationMenu },
+    setup: () => ({ args }),
+    template: '<div style="max-width: 20rem;"><PrNavigationMenu v-bind="args" /></div>',
+  }),
+}

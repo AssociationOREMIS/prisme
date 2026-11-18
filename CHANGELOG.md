@@ -2,6 +2,44 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.13 (2026-11-18)
+
+Treizieme version candidate, sous le tag npm `next`. Les composants des sites publics, completes pour un site entier et pour le telephone, un modele de site public dans Storybook, et une revue responsive de tout Prisme a 320 px. Un seul changement cassant : la classe `pr-navigation-menu__link--active` disparait (voir `PrNavigationMenu`).
+
+### Nouveaux composants
+
+- **`PrLink`** : le lien de base des autres composants, `href` ou `to` (le `RouterLink` de l'application, sans reglage), detection de la page courante (`aria-current`, `data-current`).
+- **`PrSection`** : section pleine largeur, fond doux ou image sous un voile sombre (contenu en theme sombre), parallaxe, sous la barre flottante.
+- **`PrSplit`** : texte et illustration en deux colonnes, inversables sans changer l'ordre de lecture, une colonne sous 900 px.
+- **`PrImage`** : image jamais plus large que sa colonne, `alt` obligatoire.
+- **`PrReveal`** : apparition au defilement, rien ne bouge avec moins d'animations, aucun defilement horizontal.
+- **`PrEmbed`** : service tiers dans un cadre, consentement avant chargement (RGPD).
+- **`PrNavbarMenu`** : le menu d'un telephone, un bouton et un panneau lateral.
+- Nouveaux messages : `embed`, `navbar.menu`, `navbar.closeMenu`. Nouveau token : `--pr-space-16`. Variable `--pr-navbar-floating-height`.
+
+### Composants existants
+
+- **`PrNavbar`** (`floating`) : `width` (aligne sur `PrContainer`), menu mobile sous 780 px (`mobile-menu`, `menu-label`), titre seulement lu sous 400 px, fond opaque avec `prefers-reduced-transparency`, ombre renforcee au defilement, `home-to`.
+- **`PrFooter`** : `width`, `flush`, liens et `home-to` avec `to`.
+- **`PrHero`** : `background`, `parallax`, `overlay`, `under-navbar`, `align="center"`.
+- **`PrButton`** : `to`, `variant="cta"`, `pulse`.
+- **`PrNavigationMenu`** : `orientation="vertical"`, liens `to`. La page courante se style par `data-current` : la classe `pr-navigation-menu__link--active` disparait. `/adherer/` (barre finale) est reconnu comme `/adherer`.
+
+### Corrections
+
+- **`PrSheet`** : sans pied, l'en-tete prenait la moitie de la hauteur (un grand vide sous le titre). Lignes de grille explicites. Hauteurs en `100dvh` quand le navigateur le connait : le panneau ne passe plus sous la barre d'adresse d'un telephone.
+
+### Responsive : tout Prisme a 320 px (WCAG 1.4.10, 1.4.12, 2.5.8)
+
+Revue des 270 stories a 320 et 390 px, avec l'espacement de texte agrandi et le texte a 200 %, et des fenetres ouvertes a 320 px.
+
+- **Plus de defilement horizontal de la page** : `PrDataTable` (jusqu'a 745 px de trop, a cause des textes pour lecteurs d'ecran qui sortaient du conteneur), `PrTable` et `PrStepper` horizontal. `PrDataTable` et `PrTabs` ne font plus grandir une colonne de grille ou de flex.
+- **`PrTabs` vertical** : sous 780 px, la liste des onglets passe au-dessus du panneau.
+- **Fenetres** : `PrTooltip`, `PrPopover`, `PrHoverCard`, `PrDropdownMenu`, `PrSelect` et `PrCombobox` gardent 8 px du bord de l'ecran et ne depassent plus sa largeur ; hauteur maximale selon la place disponible. Le selecteur d'emoji de `PrRichTextEditor` se decale pour tenir a l'ecran. `PrDialog`, `PrAlertDialog` et les toasts en `dvh`.
+- **Cibles tactiles de 24 px** (WCAG 2.5.8) : zone de clic invisible de 24 x 24 autour de `PrCheckbox`, `PrRadioGroup`, `PrSwitch` et du curseur de `PrSlider`, sans changement visuel ; declencheur compact de `PrCollapsible` et lien retour de `PrPageHeader` a 24 px.
+- **`PrDialog` et `PrAlertDialog`** sans description : plus d'`aria-describedby` vers un element absent.
+- **Storybook** : stories qui marchent a 320 px, et une story « Foundations/Reflow » qui verifie en navigateur qu'une colonne de 320 px ne deborde jamais.
+
 ## 1.0.0-rc.12 (2026-11-16)
 
 Douzieme version candidate, sous le tag npm `next`. Les composants des sites publics d'OREMIS : theme de la charte, en-tete flottant, pied de page, blocs de mise en page, securite des personnes aidees et chat. Aucun changement cassant.
