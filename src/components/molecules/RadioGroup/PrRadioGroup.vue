@@ -99,9 +99,10 @@ function updateValue(value: unknown) {
         class="pr-radio-group__option pr:inline-flex pr:items-start pr:gap-[var(--pr-space-3)]"
         :class="{ 'pr-radio-group__option--disabled pr:cursor-not-allowed pr:text-[color:var(--pr-color-text-muted)]': disabled || option.disabled }"
       >
+        <!-- touch target: an invisible ::after is a 24 x 24 px square centred on the control, the clickable area (WCAG 2.5.8) without changing the look, for a radio of 18 px used without a label (a table row, a toolbar). -->
         <RadioGroupItem
           :id="`${generatedId}-${option.value}`"
-          class="pr-radio-group__item pr:inline-grid pr:size-[1.125rem] pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-full)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-primary)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[state=checked]:border-[var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
+          class="pr-radio-group__item pr:relative pr:after:absolute pr:after:left-1/2 pr:after:top-1/2 pr:after:size-6 pr:after:-translate-x-1/2 pr:after:-translate-y-1/2 pr:inline-grid pr:size-[1.125rem] pr:shrink-0 pr:cursor-pointer pr:place-items-center pr:rounded-[var(--pr-radius-full)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-primary)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[state=checked]:border-[var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
           :value="option.value"
           :disabled="disabled || option.disabled"
           :aria-labelledby="option.description ? `${generatedId}-${option.value}-label` : undefined"

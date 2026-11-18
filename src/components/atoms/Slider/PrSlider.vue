@@ -82,7 +82,8 @@ function focusThumb() {
       <SliderTrack class="pr-slider__track pr:relative pr:h-1.5 pr:flex-auto pr:overflow-hidden pr:rounded-[var(--pr-radius-full)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface-subtle)]">
         <SliderRange class="pr-slider__range pr:absolute pr:h-full pr:rounded-[var(--pr-radius-full)] pr:bg-[var(--pr-color-primary)]" />
       </SliderTrack>
-      <SliderThumb :id="sliderId" class="pr-slider__thumb pr:block pr:size-4 pr:cursor-grab pr:rounded-[var(--pr-radius-full)] pr:border-2 pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-sm)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:active:cursor-grabbing" :aria-label="label || messages.slider.value" />
+      <!-- touch target: an invisible ::after is a 24 x 24 px square centred on the thumb of 16 px, the clickable area (WCAG 2.5.8) without changing the look. -->
+      <SliderThumb :id="sliderId" class="pr-slider__thumb pr:relative pr:after:absolute pr:after:left-1/2 pr:after:top-1/2 pr:after:size-6 pr:after:-translate-x-1/2 pr:after:-translate-y-1/2 pr:block pr:size-4 pr:cursor-grab pr:rounded-[var(--pr-radius-full)] pr:border-2 pr:border-[var(--pr-color-primary)] pr:bg-[var(--pr-color-surface)] pr:shadow-[var(--pr-shadow-sm)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:active:cursor-grabbing" :aria-label="label || messages.slider.value" />
     </SliderRoot>
   </div>
 </template>
