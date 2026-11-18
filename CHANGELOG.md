@@ -2,9 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.13 (2026-11-18)
 
-Les composants des sites publics, completes pour un site entier et pour le telephone, et un modele de site public dans Storybook.
+Treizieme version candidate, sous le tag npm `next`. Les composants des sites publics, completes pour un site entier et pour le telephone, un modele de site public dans Storybook, et une revue responsive de tout Prisme a 320 px. Un seul changement cassant : la classe `pr-navigation-menu__link--active` disparait (voir `PrNavigationMenu`).
 
 ### Nouveaux composants
 
