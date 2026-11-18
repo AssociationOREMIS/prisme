@@ -137,10 +137,12 @@ function triggerAttrs() {
         </SelectIcon>
       </SelectTrigger>
       <SelectPortal>
+        <!-- collision-padding: keeps 8 px between the popup and the edges of a phone screen instead of touching them; the available-width/height variables of reka-ui cap it to the room left. -->
         <SelectContent
-          class="pr-select__content pr:z-[95] pr:max-h-[min(20rem,calc(100vh-var(--pr-space-8)))] pr:min-w-[var(--reka-select-trigger-width)] pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=right]:origin-left pr:data-[side=bottom]:origin-top pr:data-[side=left]:origin-right"
+          class="pr-select__content pr:z-[95] pr:max-h-[min(20rem,var(--reka-select-content-available-height))] pr:min-w-[var(--reka-select-trigger-width)] pr:max-w-[var(--reka-select-content-available-width)] pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=right]:origin-left pr:data-[side=bottom]:origin-top pr:data-[side=left]:origin-right"
           position="popper"
           :side-offset="8"
+          :collision-padding="8"
         >
           <SelectScrollUpButton class="pr-select__scroll-button pr:grid pr:h-7 pr:place-items-center pr:text-[color:var(--pr-color-text-muted)]">
             <ChevronUp :size="16" aria-hidden="true" />
