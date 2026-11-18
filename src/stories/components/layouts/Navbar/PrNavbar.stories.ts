@@ -77,7 +77,7 @@ export const ActionsVisibleOnMobile: Story = {
   render: () => ({
     components: { PrButton, PrNavbar },
     template: `
-      <div class="nav-story-navbar-frame" style="width: 390px;">
+      <div class="nav-story-navbar-frame" style="width: min(390px, 100%);">
         <PrNavbar title="Navbar Title">
           <PrButton size="sm">Action</PrButton>
           <template #user>
@@ -100,7 +100,7 @@ export const HideActionsOnMobile: Story = {
       return { args }
     },
     template: `
-      <div class="nav-story-navbar-frame" style="width: 390px;">
+      <div class="nav-story-navbar-frame" style="width: min(390px, 100%);">
         <PrNavbar v-bind="args">
           <PrButton size="sm">Action</PrButton>
         </PrNavbar>

@@ -44,7 +44,7 @@ const IsolatedFrame = defineComponent({
       h('iframe', {
         ref: iframe,
         title: `Thème ${props.theme}`,
-        style: 'width: 22rem; height: 5rem; border: 1px dashed var(--pr-color-border)',
+        style: 'width: min(22rem, 100%); height: 5rem; border: 1px dashed var(--pr-color-border)',
       })
   },
 })
