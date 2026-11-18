@@ -18,3 +18,9 @@ export type { PrPanelProps } from './Panel'
 
 export { PrFooter } from './Footer'
 export type { PrFooterProps, PrFooterColumn, PrFooterLink, PrFooterSocial } from './Footer'
+
+export { PrSection } from './Section'
+export type { PrSectionProps } from './Section'
+
+export { PrSplit } from './Split'
+export type { PrSplitProps } from './Split'

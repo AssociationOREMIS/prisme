@@ -71,4 +71,13 @@ describe('PrFooter', () => {
     await wrapper.vm.$nextTick()
     expect(wrapper.find('img').attributes('src')).toBe('https://static.oremis.fr/img/logos/oremis-logo-white.svg')
   })
+
+  it('centers its content on a container width, the background still full width, and can follow a section flush', () => {
+    const wrapper = mount(PrFooter, { props: { width: 'wide', flush: true, columns, legalLinks: [{ label: 'Mentions légales', to: '/mentions' }] } })
+    expect(wrapper.classes()).toContain('pr:mt-0')
+    for (const part of ['.pr-footer__grid', '.pr-footer__bottom']) {
+      expect(wrapper.find(part).classes()).toContain('pr:max-w-[calc(80rem-2*var(--pr-space-10))]')
+    }
+    expect(wrapper.find('.pr-footer__legal a').attributes('href')).toBe('/mentions')
+  })
 })

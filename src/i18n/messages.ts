@@ -128,6 +128,14 @@ export interface PrMessages {
     kilobytes: string
     megabytes: string
   }
+  embed: {
+    /** Title of the consent box: the service, then what it shows. */
+    consentTitle: (provider: string) => string
+    consentText: (provider: string) => string
+    load: (provider: string) => string
+    /** Link to the content on the service's own site, the way around the frame. */
+    openExternal: (provider: string) => string
+  }
   footer: {
     /** Name of the navigation holding the legal links. */
     legalNav: string
@@ -142,6 +150,9 @@ export interface PrMessages {
     unknownRole: string
     /** Added for screen readers to the brand link of `homeHref`. */
     home: string
+    /** The button of the mobile menu, and the title of its panel. */
+    menu: string
+    closeMenu: string
   }
   navigationMenu: {
     label: string
@@ -428,6 +439,12 @@ export const prMessagesFr: PrMessages = {
     kilobytes: 'Ko',
     megabytes: 'Mo',
   },
+  embed: {
+    consentTitle: provider => `Contenu proposé par ${provider}`,
+    consentText: provider => `Pour l'afficher, la page doit charger ${provider}. Ce service peut recevoir votre adresse IP et déposer des cookies.`,
+    load: provider => `Afficher le contenu de ${provider}`,
+    openExternal: provider => `Ouvrir sur le site de ${provider} (nouvel onglet)`,
+  },
   footer: {
     legalNav: 'Informations légales',
     socials: 'Réseaux sociaux',
@@ -439,6 +456,8 @@ export const prMessagesFr: PrMessages = {
   navbar: {
     unknownRole: 'Rôle inconnu',
     home: 'accueil',
+    menu: 'Menu',
+    closeMenu: 'Fermer le menu',
   },
   navigationMenu: {
     label: 'Navigation',

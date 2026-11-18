@@ -27,7 +27,7 @@ export { PrHoverCard } from './components/molecules/HoverCard'
 export { PrInput } from './components/atoms/Input'
 export { PrLabel } from './components/atoms/Label'
 export { PrListItem } from './components/molecules/ListItem'
-export { PrNavbar, PrNavbarUserMenu } from './components/layouts/Navbar'
+export { PrNavbar, PrNavbarMenu, PrNavbarUserMenu } from './components/layouts/Navbar'
 export { PrNavigationMenu } from './components/molecules/NavigationMenu'
 export { PrNumberInput } from './components/atoms/NumberInput'
 export { PrPagination } from './components/molecules/Pagination'
@@ -88,6 +88,12 @@ export {
 } from './icons/brand'
 export type { PrBrandIconProps } from './icons/brand'
 export { PrChatWindow } from './components/molecules/ChatWindow'
+export { PrLink } from './components/atoms/Link'
+export { PrImage } from './components/atoms/Image'
+export { PrReveal } from './components/atoms/Reveal'
+export { PrSection } from './components/layouts/Section'
+export { PrSplit } from './components/layouts/Split'
+export { PrEmbed } from './components/molecules/Embed'
 export type {
   PrAccordionItem,
   PrAccordionProps,
@@ -193,6 +199,14 @@ export type {
   PrFooterLink,
   PrFooterSocial,
   PrChatWindowProps,
+  PrNavbarMenuProps,
+  PrLinkProps,
+  PrLinkTo,
+  PrImageProps,
+  PrRevealProps,
+  PrSectionProps,
+  PrSplitProps,
+  PrEmbedProps,
 } from './components/registry'
 
 export { fromLaravelPaginator } from './components/registry'

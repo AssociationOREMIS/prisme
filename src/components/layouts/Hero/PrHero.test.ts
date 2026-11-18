@@ -24,4 +24,16 @@ describe('PrHero', () => {
     expect(wrapper.find('.pr-hero__pattern').exists()).toBe(false)
     expect(wrapper.find('.pr-hero__description').exists()).toBe(false)
   })
+
+  it('spans the page on an image, under the navbar, without the pattern, centered', () => {
+    const wrapper = mount(PrHero, {
+      props: { title: 'Ensemble', background: '/bg.svg', underNavbar: true, align: 'center' },
+      slots: { actions: '<a href="/adherer">Adhérer</a>' },
+    })
+    expect(wrapper.classes()).toEqual(expect.arrayContaining(['pr-hero', 'pr-hero--image', 'pr-section--image', 'pr-section--under-navbar']))
+    expect(wrapper.attributes('data-pr-theme')).toBe('dark')
+    expect(wrapper.find('.pr-hero__pattern').exists()).toBe(false)
+    expect(wrapper.find('h1').text()).toBe('Ensemble')
+    expect(wrapper.find('.pr-hero__actions').classes()).toContain('pr:justify-center')
+  })
 })

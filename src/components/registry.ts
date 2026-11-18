@@ -77,8 +77,8 @@ export type { PrDialogProps } from './molecules/Dialog'
 import { PrHoverCard } from './molecules/HoverCard'
 export type { PrHoverCardProps } from './molecules/HoverCard'
 
-import { PrNavbar, PrNavbarUserMenu } from './layouts/Navbar'
-export type { PrNavbarProps, PrNavbarUserMenuProps } from './layouts/Navbar'
+import { PrNavbar, PrNavbarMenu, PrNavbarUserMenu } from './layouts/Navbar'
+export type { PrNavbarMenuProps, PrNavbarProps, PrNavbarUserMenuProps } from './layouts/Navbar'
 
 import { PrNavigationMenu } from './molecules/NavigationMenu'
 export type { PrNavigationMenuItem, PrNavigationMenuProps } from './molecules/NavigationMenu'
@@ -245,6 +245,24 @@ export type { PrFooterProps, PrFooterColumn, PrFooterLink, PrFooterSocial } from
 import { PrChatWindow } from './molecules/ChatWindow'
 export type { PrChatWindowProps } from './molecules/ChatWindow'
 
+import { PrLink } from './atoms/Link'
+export type { PrLinkProps, PrLinkTo } from './atoms/Link'
+
+import { PrImage } from './atoms/Image'
+export type { PrImageProps } from './atoms/Image'
+
+import { PrReveal } from './atoms/Reveal'
+export type { PrRevealProps } from './atoms/Reveal'
+
+import { PrSection } from './layouts/Section'
+export type { PrSectionProps } from './layouts/Section'
+
+import { PrSplit } from './layouts/Split'
+export type { PrSplitProps } from './layouts/Split'
+
+import { PrEmbed } from './molecules/Embed'
+export type { PrEmbedProps } from './molecules/Embed'
+
 export const componentRegistry = {
   PrAccordion,
   PrAlert,
@@ -325,4 +343,11 @@ export const componentRegistry = {
   PrPanel,
   PrFooter,
   PrChatWindow,
+  PrNavbarMenu,
+  PrLink,
+  PrImage,
+  PrReveal,
+  PrSection,
+  PrSplit,
+  PrEmbed,
 } satisfies Record<string, Component>

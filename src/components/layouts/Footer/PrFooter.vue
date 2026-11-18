@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { computed, useId, type Component } from 'vue'
 import { PrButton } from '../../atoms/Button'
+import { PrLink, type PrLinkTo } from '../../atoms/Link'
 import { usePrMessages } from '../../../i18n/context'
 import { usePrTheme } from '../../../composables/usePrTheme'
 
 export interface PrFooterLink {
   label: string
-  href: string
+  /** Address of the page. */
+  href?: string
+  /** Route of the app's Vue Router, instead of `href` (see `PrLink`). */
+  to?: PrLinkTo
 }
 
 export interface PrFooterColumn {
@@ -34,6 +38,8 @@ export interface PrFooterProps {
   logoAlt?: string
   /** Makes the logo and the site name a link to this address, the home page. */
   homeHref?: string
+  /** Same as `homeHref` with a route of the app's Vue Router (see `PrLink`). */
+  homeTo?: PrLinkTo
   /** Short text under the brand (or the `description` slot). */
   description?: string
   /** One to four columns of links, each a navigation landmark named by its title. */
@@ -44,6 +50,14 @@ export interface PrFooterProps {
   legalLinks?: PrFooterLink[]
   /** Text of the bottom line, `© <year> Association OREMIS` by default. */
   copyright?: string
+  /**
+   * Width of the content, as `PrContainer`: `full` (default) spans the page, `wide` (80rem) and
+   * `narrow` (48rem) center it on the text of a container of the same width. The background
+   * always spans the page.
+   */
+  width?: 'full' | 'wide' | 'narrow'
+  /** No margin above: the footer follows a full-width section (an image, a colored band) directly. */
+  flush?: boolean
 }
 
 const props = withDefaults(defineProps<PrFooterProps>(), {
@@ -52,12 +66,26 @@ const props = withDefaults(defineProps<PrFooterProps>(), {
   logoSrcDark: 'https://static.oremis.fr/img/logos/oremis-logo-white.svg',
   logoAlt: 'OREMIS',
   homeHref: undefined,
+  homeTo: undefined,
   description: undefined,
   columns: () => [],
   socials: () => [],
   legalLinks: () => [],
   copyright: undefined,
+  width: 'full',
+  flush: false,
 })
+
+// The footer's padding is PrContainer's gutter: capping the content at the container's width minus
+// two gutters lines it up with the text of the sections above.
+const contentWidthClass = {
+  full: '',
+  wide: 'pr:mx-auto pr:max-w-[calc(80rem-2*var(--pr-space-10))]',
+  narrow: 'pr:mx-auto pr:max-w-[calc(48rem-2*var(--pr-space-10))]',
+} as const
+
+/** A link given by `to` or `href`, keyed by either. */
+const linkKey = (link: PrFooterLink) => link.href ?? JSON.stringify(link.to)
 
 const messages = usePrMessages()
 const { isDark } = usePrTheme()
@@ -72,18 +100,22 @@ const linkClass = 'pr-footer__link pr:inline-flex pr:min-h-6 pr:items-center pr:
 </script>
 
 <template>
-  <footer class="pr-footer pr:box-border pr:mt-[var(--pr-space-12)] pr:w-full pr:bg-[var(--pr-color-surface-subtle)] pr:p-[var(--pr-space-10)] pr:text-[color:var(--pr-color-text)] pr:max-[780px]:px-[var(--pr-space-4)] pr:max-[780px]:py-[var(--pr-space-8)]">
+  <footer
+    class="pr-footer pr:box-border pr:w-full pr:bg-[var(--pr-color-surface-subtle)] pr:p-[var(--pr-space-10)] pr:text-[color:var(--pr-color-text)] pr:max-[780px]:px-[var(--pr-space-4)] pr:max-[780px]:py-[var(--pr-space-8)]"
+    :class="flush ? 'pr:mt-0' : 'pr:mt-[var(--pr-space-12)]'"
+  >
     <!-- A <footer>: the contentinfo landmark of the page. -->
     <!-- The brand, then one column per group of links. Below 780px: the brand on its own row, the columns two by two. -->
     <div
+      :class="contentWidthClass[width]"
       class="pr-footer__grid pr:grid pr:grid-cols-[minmax(0,2.2fr)_repeat(var(--pr-footer-columns),minmax(0,1fr))] pr:gap-[var(--pr-space-8)] pr:max-[780px]:grid-cols-2 pr:max-[780px]:gap-[var(--pr-space-6)]"
       :style="gridStyle"
     >
       <div class="pr-footer__brand pr:grid pr:content-start pr:gap-[var(--pr-space-4)] pr:max-[780px]:col-span-full">
         <slot name="brand">
           <component
-            :is="homeHref ? 'a' : 'div'"
-            :href="homeHref"
+            :is="homeHref || homeTo ? PrLink : 'div'"
+            v-bind="homeHref || homeTo ? { href: homeHref, to: homeTo } : {}"
             class="pr-footer__home pr:inline-flex pr:w-fit pr:max-w-full pr:items-center pr:gap-[var(--pr-space-3)] pr:rounded-[var(--pr-radius-md)] pr:text-inherit pr:no-underline pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
           >
             <img class="pr-footer__logo pr:block pr:h-9 pr:w-auto pr:shrink-0" :src="resolvedLogoSrc" :alt="logoAlt">
@@ -93,7 +125,7 @@ const linkClass = 'pr-footer__link pr:inline-flex pr:min-h-6 pr:items-center pr:
                 {{ siteName }}
               </p>
             </template>
-            <span v-if="homeHref" class="pr:sr-only">({{ messages.navbar.home }})</span>
+            <span v-if="homeHref || homeTo" class="pr:sr-only">({{ messages.navbar.home }})</span>
           </component>
         </slot>
         <div
@@ -126,25 +158,25 @@ const linkClass = 'pr-footer__link pr:inline-flex pr:min-h-6 pr:items-center pr:
           {{ column.title }}
         </p>
         <ul class="pr-footer__links pr:m-0 pr:grid pr:list-none pr:gap-[var(--pr-space-1)] pr:p-0">
-          <li v-for="link in column.links" :key="link.href">
-            <a :href="link.href" :class="linkClass">{{ link.label }}</a>
+          <li v-for="link in column.links" :key="linkKey(link)">
+            <PrLink :href="link.href" :to="link.to" :class="linkClass">{{ link.label }}</PrLink>
           </li>
         </ul>
       </nav>
     </div>
 
-    <div v-if="$slots.default" class="pr-footer__extra pr:mt-[var(--pr-space-8)]">
+    <div v-if="$slots.default" class="pr-footer__extra pr:mt-[var(--pr-space-8)]" :class="contentWidthClass[width]">
       <slot />
     </div>
 
-    <div class="pr-footer__bottom pr:mt-[var(--pr-space-8)] pr:flex pr:flex-wrap pr:items-center pr:justify-between pr:gap-x-[var(--pr-space-6)] pr:gap-y-[var(--pr-space-3)] pr:border-t pr:border-[var(--pr-color-border)] pr:pt-[var(--pr-space-6)]">
+    <div :class="contentWidthClass[width]" class="pr-footer__bottom pr:mt-[var(--pr-space-8)] pr:flex pr:flex-wrap pr:items-center pr:justify-between pr:gap-x-[var(--pr-space-6)] pr:gap-y-[var(--pr-space-3)] pr:border-t pr:border-[var(--pr-color-border)] pr:pt-[var(--pr-space-6)]">
       <p class="pr-footer__copyright pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]">
         {{ resolvedCopyright }}
       </p>
       <nav v-if="legalLinks.length" class="pr-footer__legal" :aria-label="messages.footer.legalNav">
         <ul class="pr:m-0 pr:flex pr:list-none pr:flex-wrap pr:gap-x-[var(--pr-space-5)] pr:gap-y-[var(--pr-space-1)] pr:p-0">
-          <li v-for="link in legalLinks" :key="link.href">
-            <a :href="link.href" :class="linkClass">{{ link.label }}</a>
+          <li v-for="link in legalLinks" :key="linkKey(link)">
+            <PrLink :href="link.href" :to="link.to" :class="linkClass">{{ link.label }}</PrLink>
           </li>
         </ul>
       </nav>

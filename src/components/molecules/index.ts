@@ -125,3 +125,6 @@ export type { PrLinkListProps, PrLinkListItem, PrLinkListTag } from './LinkList'
 
 export { PrChatWindow } from './ChatWindow'
 export type { PrChatWindowProps } from './ChatWindow'
+
+export { PrEmbed } from './Embed'
+export type { PrEmbedProps } from './Embed'

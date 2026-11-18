@@ -2,6 +2,33 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## Non publie
+
+Les composants des sites publics, completes pour un site entier et pour le telephone, et un modele de site public dans Storybook.
+
+### Nouveaux composants
+
+- **`PrLink`** : le lien de base des autres composants, `href` ou `to` (le `RouterLink` de l'application, sans reglage), detection de la page courante (`aria-current`, `data-current`).
+- **`PrSection`** : section pleine largeur, fond doux ou image sous un voile sombre (contenu en theme sombre), parallaxe, sous la barre flottante.
+- **`PrSplit`** : texte et illustration en deux colonnes, inversables sans changer l'ordre de lecture, une colonne sous 900 px.
+- **`PrImage`** : image jamais plus large que sa colonne, `alt` obligatoire.
+- **`PrReveal`** : apparition au defilement, rien ne bouge avec moins d'animations, aucun defilement horizontal.
+- **`PrEmbed`** : service tiers dans un cadre, consentement avant chargement (RGPD).
+- **`PrNavbarMenu`** : le menu d'un telephone, un bouton et un panneau lateral.
+- Nouveaux messages : `embed`, `navbar.menu`, `navbar.closeMenu`. Nouveau token : `--pr-space-16`. Variable `--pr-navbar-floating-height`.
+
+### Composants existants
+
+- **`PrNavbar`** (`floating`) : `width` (aligne sur `PrContainer`), menu mobile sous 780 px (`mobile-menu`, `menu-label`), titre seulement lu sous 400 px, fond opaque avec `prefers-reduced-transparency`, ombre renforcee au defilement, `home-to`.
+- **`PrFooter`** : `width`, `flush`, liens et `home-to` avec `to`.
+- **`PrHero`** : `background`, `parallax`, `overlay`, `under-navbar`, `align="center"`.
+- **`PrButton`** : `to`, `variant="cta"`, `pulse`.
+- **`PrNavigationMenu`** : `orientation="vertical"`, liens `to`. La page courante se style par `data-current` : la classe `pr-navigation-menu__link--active` disparait. `/adherer/` (barre finale) est reconnu comme `/adherer`.
+
+### Corrections
+
+- **`PrSheet`** : sans pied, l'en-tete prenait la moitie de la hauteur (un grand vide sous le titre). Lignes de grille explicites. Hauteurs en `100dvh` : le panneau ne passe plus sous la barre d'adresse d'un telephone.
+
 ## 1.0.0-rc.12 (2026-11-16)
 
 Douzieme version candidate, sous le tag npm `next`. Les composants des sites publics d'OREMIS : theme de la charte, en-tete flottant, pied de page, blocs de mise en page, securite des personnes aidees et chat. Aucun changement cassant.

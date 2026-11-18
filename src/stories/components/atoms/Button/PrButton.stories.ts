@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
-import { ArrowRight, Eye, Pencil, Save, Trash2 } from '@lucide/vue'
+import { ArrowRight, Eye, HandHeart, Pencil, Save, Trash2 } from '@lucide/vue'
 import { PrButton, prButtonActions } from '../../../../components/atoms/Button'
 import '../../../stories.css'
 
@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'ghost', 'danger', 'link'],
+      options: ['primary', 'secondary', 'ghost', 'danger', 'link', 'cta'],
     },
     size: {
       control: 'select',
@@ -292,5 +292,24 @@ export const LinkWithIconAtEnd: Story = {
     // The icon comes after the label.
     await expect(content.lastElementChild?.classList.contains('pr-button__icon--end')).toBe(true)
     await expect(getComputedStyle(link).backgroundColor).toBe('rgba(0, 0, 0, 0)')
+  },
+}
+
+// The call to action of a public page: a pill in a primary gradient, in capitals. `pulse` adds a
+// halo that draws the eye; it plays once when the user asks for less motion. One per page.
+export const CallToAction: Story = {
+  render: () => ({
+    components: { PrButton },
+    setup: () => ({ HandHeart }),
+    template: `
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--pr-space-8); padding: var(--pr-space-8);">
+        <PrButton variant="cta" size="lg" href="#adherer" pulse>Adhérer à OREMIS</PrButton>
+        <PrButton variant="cta" :icon="HandHeart" href="#don">Faire un don</PrButton>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const cta = within(canvasElement).getByRole('link', { name: 'Adhérer à OREMIS' })
+    await expect(cta.classList.contains('pr-button--pulse')).toBe(true)
   },
 }

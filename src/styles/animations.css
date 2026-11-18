@@ -218,3 +218,15 @@
   }
 }
 
+
+/* The halo of PrButton `pulse`: a ring that grows and fades out. */
+@keyframes pr-pulse-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
