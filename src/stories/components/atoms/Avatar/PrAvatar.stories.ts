@@ -40,7 +40,7 @@ export const Sizes: Story = {
       return { PHOTO, IDENTICON }
     },
     template: `
-      <div style="display: flex; gap: 16px; align-items: center;">
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
         <PrAvatar :src="PHOTO" :size="28" />
         <PrAvatar :src="PHOTO" :size="40" />
         <PrAvatar :src="IDENTICON" :size="64" />

@@ -43,10 +43,11 @@ const emit = defineEmits<{
     :disabled="disabled"
     @update:open="emit('update:open', $event)"
   >
+    <!-- min-h-6: the compact trigger, a line of small text, stays a 24 px high touch target (WCAG 2.5.8). -->
     <CollapsibleTrigger
       class="pr-collapsible__trigger pr:group pr:flex pr:cursor-pointer pr:items-center pr:gap-[var(--pr-space-3)] pr:border-0 pr:bg-transparent pr:text-left pr:text-[length:var(--pr-font-size-sm)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
       :class="isCompact
-        ? 'pr:w-fit pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-sm)] pr:p-0 pr:font-semibold pr:text-[color:var(--pr-color-primary)] pr:hover:underline'
+        ? 'pr:min-h-6 pr:w-fit pr:gap-[var(--pr-space-1)] pr:rounded-[var(--pr-radius-sm)] pr:p-0 pr:font-semibold pr:text-[color:var(--pr-color-primary)] pr:hover:underline'
         : 'pr:w-full pr:justify-between pr:p-[var(--pr-space-4)] pr:font-[750] pr:text-[color:var(--pr-color-text)] pr:hover:bg-[var(--pr-color-surface-subtle)]'"
     >
       <slot name="trigger">

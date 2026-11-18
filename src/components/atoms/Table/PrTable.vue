@@ -27,8 +27,9 @@ const borderless = computed(() => props.variant === 'borderless')
 </script>
 
 <template>
+  <!-- relative: an absolutely positioned child (a visually hidden caption or cell text) stays inside the scroll container, instead of widening the page. -->
   <div
-    class="pr-table-wrap pr:w-full pr:overflow-x-auto"
+    class="pr-table-wrap pr:relative pr:w-full pr:overflow-x-auto"
     :class="borderless
       ? 'pr-table-wrap--borderless'
       : 'pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)]'"

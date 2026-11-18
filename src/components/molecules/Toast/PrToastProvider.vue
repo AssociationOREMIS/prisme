@@ -55,6 +55,7 @@ onBeforeUnmount(() => releaseToastQueue(owner))
         @action="toast.onAction?.()"
       />
     </template>
-    <ToastViewport :label="messages.toast.region" class="pr-toast__viewport pr:fixed pr:left-0 pr:right-0 pr:top-0 pr:z-[100] pr:m-0 pr:flex pr:max-h-screen pr:w-full pr:list-none pr:flex-col-reverse pr:gap-[var(--pr-space-3)] pr:p-[var(--pr-space-4)] pr:sm:bottom-0 pr:sm:left-auto pr:sm:right-0 pr:sm:top-auto pr:sm:w-[min(26.25rem,calc(100vw-var(--pr-space-8)))] pr:sm:flex-col" />
+    <!-- max-h-dvh where supported: 100vh is the tallest viewport of mobile browsers, a toolbar can hide the last toast. -->
+    <ToastViewport :label="messages.toast.region" class="pr-toast__viewport pr:fixed pr:left-0 pr:right-0 pr:top-0 pr:z-[100] pr:m-0 pr:flex pr:max-h-screen pr:supports-[height:100dvh]:max-h-dvh pr:w-full pr:list-none pr:flex-col-reverse pr:gap-[var(--pr-space-3)] pr:p-[var(--pr-space-4)] pr:sm:bottom-0 pr:sm:left-auto pr:sm:right-0 pr:sm:top-auto pr:sm:w-[min(26.25rem,calc(100vw-var(--pr-space-8)))] pr:sm:flex-col" />
   </ToastProvider>
 </template>

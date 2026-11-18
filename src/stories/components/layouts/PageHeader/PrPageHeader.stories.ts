@@ -34,7 +34,7 @@ export const Default: Story = {
             <PrButton action="add">Nouvelle sanction</PrButton>
           </template>
         </PrPageHeader>
-        <div style="width: 320px;">
+        <div style="width: min(320px, 100%);">
           <PrPageHeader title="Nouvelle sanction" data-testid="narrow">
             <template #actions>
               <PrButton action="back" variant="secondary">Annuler</PrButton>
@@ -50,7 +50,13 @@ export const Default: Story = {
     await expect(canvas.getByRole('link', { name: 'Retour aux bénévoles' })).toHaveAttribute('href', '#benevoles')
 
     const box = (id: string, selector: string) => canvas.getByTestId(id).querySelector(selector)!.getBoundingClientRect()
-    await expect(box('wide', '.pr-page-header__actions').top).toBeLessThan(box('wide', '.pr-page-header__title').bottom)
+    // Beside the title only when there is room for the heading (20rem at least) and the actions:
+    // on a phone the wide header wraps too, which is the expected layout there.
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
+    const actions = box('wide', '.pr-page-header__actions')
+    if (canvas.getByTestId('wide').clientWidth >= 20 * rem + actions.width + rem) {
+      await expect(actions.top).toBeLessThan(box('wide', '.pr-page-header__title').bottom)
+    }
     await expect(box('narrow', '.pr-page-header__actions').top).toBeGreaterThanOrEqual(box('narrow', '.pr-page-header__title').bottom)
   },
 }

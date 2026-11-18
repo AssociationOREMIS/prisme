@@ -80,10 +80,11 @@ const switchClass = computed(() => [
       <span v-if="description" :id="descriptionId" class="pr-switch__description pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">{{ description }}</span>
     </span>
     <input v-if="name && uncheckedValue !== undefined" type="hidden" :name="name" :value="uncheckedValue" :disabled="disabled">
+    <!-- touch target: an invisible ::after makes the track of 22 px high 24 px high to the touch (WCAG 2.5.8) without changing the look. -->
     <SwitchRoot
       v-bind="$attrs"
       :id="id"
-      class="pr-switch__control pr:relative pr:inline-flex pr:h-[1.375rem] pr:w-[2.375rem] pr:shrink-0 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-full)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface-subtle)] pr:p-0.5 pr:transition-[background-color,border-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[state=checked]:border-[var(--pr-color-primary)] pr:data-[state=checked]:bg-[var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
+      class="pr-switch__control pr:relative pr:after:absolute pr:after:-inset-x-px pr:after:top-1/2 pr:after:h-6 pr:after:-translate-y-1/2 pr:inline-flex pr:h-[1.375rem] pr:w-[2.375rem] pr:shrink-0 pr:cursor-pointer pr:items-center pr:rounded-[var(--pr-radius-full)] pr:border pr:border-[var(--pr-color-border-strong)] pr:bg-[var(--pr-color-surface-subtle)] pr:p-0.5 pr:transition-[background-color,border-color] pr:duration-[var(--pr-duration-fast)] pr:ease-[var(--pr-ease-standard)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:data-[state=checked]:border-[var(--pr-color-primary)] pr:data-[state=checked]:bg-[var(--pr-color-primary)] pr:data-[disabled]:cursor-not-allowed pr:data-[disabled]:opacity-60"
       :model-value="modelValue"
       :default-value="defaultChecked"
       :disabled="disabled"

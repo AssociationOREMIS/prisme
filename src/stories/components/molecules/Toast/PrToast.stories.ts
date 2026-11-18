@@ -301,6 +301,9 @@ export const WithAppUtilities: Story = {
     if (window.innerWidth < 640) return
     const box = viewport.getBoundingClientRect()
     await expect(box.bottom).toBeCloseTo(window.innerHeight, -1)
-    await expect(box.width).toBeLessThan(window.innerWidth / 2)
+    // At most 26.25rem wide, not the full width (half the screen failed on a 640 to 840 px window).
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
+    await expect(box.width).toBeLessThanOrEqual(26.25 * rem + 1)
+    await expect(box.width).toBeLessThan(window.innerWidth)
   },
 }

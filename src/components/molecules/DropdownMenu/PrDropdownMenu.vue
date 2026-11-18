@@ -51,11 +51,13 @@ const separatorClass = 'pr-dropdown-menu__separator pr:my-[var(--pr-space-1)] pr
       <slot name="trigger" />
     </DropdownMenuTrigger>
     <DropdownMenuPortal>
+      <!-- collision-padding: keeps 8 px between the popup and the edges of a phone screen instead of touching them; the available-width/height variables of reka-ui cap it to the room left. -->
       <DropdownMenuContent
-        class="pr-dropdown-menu pr:z-[95] pr:min-w-[12rem] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=right]:origin-left pr:data-[side=bottom]:origin-top pr:data-[side=left]:origin-right"
+        class="pr-dropdown-menu pr:z-[95] pr:min-w-[min(12rem,var(--reka-dropdown-menu-content-available-width))] pr:max-w-[var(--reka-dropdown-menu-content-available-width)] pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-floating-in_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-floating-out_var(--pr-duration-fast)_var(--pr-ease-standard)] pr:data-[side=top]:origin-bottom pr:data-[side=right]:origin-left pr:data-[side=bottom]:origin-top pr:data-[side=left]:origin-right"
         :side="side"
         :align="align"
         :side-offset="8"
+        :collision-padding="8"
         :aria-describedby="descriptionId"
       >
         <DropdownMenuLabel v-if="label" class="pr-dropdown-menu__label pr:px-[var(--pr-space-3)] pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-xs)] pr:font-[750] pr:uppercase pr:tracking-[0.04em] pr:text-[color:var(--pr-color-text-muted)]">

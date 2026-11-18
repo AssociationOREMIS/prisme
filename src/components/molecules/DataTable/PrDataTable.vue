@@ -300,7 +300,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="pr-data-table pr:flex pr:flex-col pr:gap-[var(--pr-space-4)]">
+  <!-- min-w-0: in a grid or flex parent, the table (which scrolls inside its own container) no
+       longer widens the page column to the width of all its columns on a phone. -->
+  <div class="pr-data-table pr:flex pr:min-w-0 pr:flex-col pr:gap-[var(--pr-space-4)]">
     <div v-if="$slots.toolbar || filterColumnKey || displayViewOptions" class="pr-data-table__toolbar pr:flex pr:flex-wrap pr:items-center pr:justify-between pr:gap-[var(--pr-space-3)]">
       <div class="pr-data-table__toolbar-content pr:flex pr:min-w-[min(100%,16rem)] pr:flex-1 pr:items-center pr:gap-[var(--pr-space-2)]">
         <slot name="toolbar" :filter-value="filterValue">
@@ -323,7 +325,12 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="pr-data-table__shell pr:overflow-hidden pr:rounded-[var(--pr-radius-md)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)]">
-      <div class="pr-data-table__scroll pr:w-full pr:overflow-auto">
+      <!--
+        relative: the visually hidden texts of the table (sort state, actions header) are absolutely
+        positioned. Without a positioned scroll container they escaped its clipping and widened the
+        whole page on a phone (a horizontal page scroll of 700 px at 320 px wide).
+      -->
+      <div class="pr-data-table__scroll pr:relative pr:w-full pr:overflow-auto">
         <table
           class="pr-data-table__table pr:w-full pr:caption-bottom pr:border-collapse pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)]"
           :aria-label="caption ? undefined : ariaLabel"
