@@ -151,3 +151,44 @@
   outline: 2px solid var(--pr-color-focus);
   outline-offset: 2px;
 }
+
+/*
+ * Blocks variant (`variant="blocks"`): room on the left for the block handle (a 24 px target), the
+ * placeholder on the empty block holding the cursor, and the "/" being typed.
+ */
+.pr-rich-text-editor--blocks .pr-rich-text-editor__content .tiptap {
+  padding-left: calc(var(--pr-space-2) + 1.5rem + var(--pr-space-2));
+}
+
+.pr-rich-text-editor--blocks .pr-rich-text-editor__content .tiptap.ProseMirror-focused > .is-empty::before {
+  content: attr(data-placeholder);
+  color: var(--pr-color-text-subtle);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.pr-rich-text-editor__content .pr-rich-text-editor__slash-query {
+  border-radius: var(--pr-radius-sm);
+  background: var(--pr-color-surface-subtle);
+}
+
+/* The active option of the "/" menu and the focused item of the block menu, with forced colors too. */
+@media (forced-colors: active) {
+  .pr-rich-text-editor__slash-option[aria-selected="true"],
+  .pr-rich-text-editor__block-menu-item:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .pr-rich-text-editor__slash-menu,
+  .pr-rich-text-editor__block-menu,
+  .pr-rich-text-editor__selection-toolbar {
+    border: 1px solid CanvasText;
+  }
+
+  .pr-rich-text-editor__tab[aria-selected="true"] {
+    border-color: Highlight !important;
+    text-decoration: underline;
+  }
+}

@@ -4,6 +4,17 @@ Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement 
 
 ## Non publie
 
+Un mode blocs facon Notion pour `PrRichTextEditor`. Aucun changement cassant : la variante par defaut ne change pas.
+
+### `PrRichTextEditor`
+
+- **`variant="blocks"`** : un editeur par blocs, sur le modele de celui de PIO. Menu « / » pour inserer un bloc (Texte, Titre, Sous-titre, listes, Citation, encadres, Image, Tableau, Video YouTube, Section repliable, Separateur), filtre par ce qui suit la barre, au clavier (motif « listbox » de l'APG, `aria-activedescendant`), a 8 px des bords de l'ecran. Poignee pour glisser un bloc et menu Monter, Descendre, Dupliquer, Supprimer ; au clavier, Alt + fleches et le bouton « Options du bloc » (WCAG 2.5.7), avec des annonces polies. Barre de mise en forme sur le texte selectionne (Gras, Italique, Souligne, Barre, Lien, Surligner, Titre, Sous-titre), atteinte par Alt + F10. Onglets « Ecrire », « Apercu » et « Code HTML » (un bloc par ligne, recharge dans l'editeur en revenant sur « Ecrire ») ; le champ cache `name` envoie toujours le dernier HTML, meme depuis l'onglet du code.
+- **`extensions`** : des extensions tiptap ajoutees apres celles de l'editeur (les blocs de mise en page d'un site).
+- **`slashItems`** : des entrees du menu « / » (`PrRichTextEditorSlashItem` : `title`, `hint`, `icon`, `keywords`, `group`, `command`), apres celles de l'editeur, regroupees par `group`.
+- `@oremis/prisme/editor` exporte `PrRichTextEditorSlashItem`, `PrRichTextEditorBlock`, `filterSlashItems`, `keepSlashMenuOpen`, `moveBlock`, `duplicateBlock`, `deleteBlock`, `topBlockPos`, `htmlToSource`, `SlashCommand` et `BlockKeys`.
+- Nouveaux messages `richTextEditor` : `blocksPlaceholder`, `blocksHelp`, `slashMenu`, `slashEmpty`, `slashBlock`, `blockHandle`, `blockHandleTitle`, `blockMenu`, `blockMoveUp`, `blockMoveDown`, `blockDuplicate`, `blockDelete`, `blockMovedUp`, `blockMovedDown`, `blockAlreadyFirst`, `blockAlreadyLast`, `blockDuplicated`, `blockDeleted`, `selectionToolbar`, `underline`, `strike`, `views`, `viewWrite`, `viewPreview`, `viewSource`, `sourceHint`, `sourceLoaded`.
+- Nouvelles `peerDependencies` optionnelles de l'editeur : `@tiptap/pm` et `@tiptap/extension-bubble-menu` (3.31.3). La poignee est faite maison plutot qu'avec `@tiptap/extension-drag-handle`, qui importe Yjs et l'extension de collaboration.
+
 ### Corrections
 
 - **`PrNavbar` `variant="floating"`** : la barre mesure sa vraie hauteur (`ResizeObserver`) et l'ecrit dans `--pr-navbar-floating-height`, sur `<html>`. Une `PrSection` ou un `PrHero` `under-navbar` passe ainsi exactement dessous, quel que soit le contenu de la barre : avec la hauteur fixe de `layout.css` (7,5 rem, 5,25 rem sur telephone), une barre un peu plus haute laissait une bande du fond de la page au-dessus de l'image. Les valeurs fixes restent pour le premier affichage.

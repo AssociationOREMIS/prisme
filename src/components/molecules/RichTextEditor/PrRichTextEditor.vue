@@ -7,6 +7,11 @@ import {
   ChevronsDownUp,
   Clapperboard,
   Code,
+  GripVertical,
+  Minus,
+  Pilcrow,
+  Strikethrough,
+  Underline as UnderlineIcon,
   Eraser,
   Heading2,
   Heading3,
@@ -32,7 +37,7 @@ import {
   TriangleAlert,
   Undo2,
 } from '@lucide/vue'
-import type { Editor } from '@tiptap/core'
+import type { AnyExtension, Editor } from '@tiptap/core'
 import { CharacterCount } from '@tiptap/extension-character-count'
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight'
 import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details'
@@ -49,8 +54,10 @@ import { TextStyleKit } from '@tiptap/extension-text-style'
 import { Typography } from '@tiptap/extension-typography'
 import { StarterKit } from '@tiptap/starter-kit'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
+import { BubbleMenu } from '@tiptap/vue-3/menus'
+import type { SuggestionFloatingUiOptions, SuggestionProps } from '@tiptap/suggestion'
 import { common, createLowlight } from 'lowlight'
-import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, reactive, ref, useId, watch, type ComponentPublicInstance } from 'vue'
 import { AccessibleImage, imageWidthAttributes, PR_IMAGE_WIDTHS, type PrImageWidth } from '../../../tiptap/accessible-image'
 import { AccessibleTaskItem, taskText } from '../../../tiptap/accessible-task-item'
 import { AccessibleYoutube } from '../../../tiptap/accessible-youtube'
@@ -62,6 +69,10 @@ import { PrInput } from '../../atoms/Input'
 import { PrLabel } from '../../atoms/Label'
 import { useErrorText, type PrFieldError } from '../../fieldError'
 import { usePrMessages } from '../../../i18n/context'
+import type { PrRichTextEditorBlock } from '../../../i18n/messages'
+import { BlockKeys, htmlToSource, SlashCommand, type PrBlockMoveResult, type PrRichTextEditorSlashItem, type PrSlashMenuRenderer } from './blocks'
+import PrRichTextEditorBlockHandle from './PrRichTextEditorBlockHandle.vue'
+import PrRichTextEditorSlashMenu from './PrRichTextEditorSlashMenu.vue'
 
 export interface PrRichTextEditorProps {
   modelValue?: string
@@ -80,6 +91,16 @@ export interface PrRichTextEditorProps {
    * message instead. Without this prop, image insertion is disabled.
    */
   uploadImage?: (file: File, onProgress?: (percent: number) => void) => Promise<string>
+  /**
+   * `toolbar` (default): the fixed formatting toolbar. `blocks`: a Notion-like editor, with a "/"
+   * menu to insert blocks, a handle and a menu to move them, a toolbar over selected text, and the
+   * "Écrire" / "Aperçu" / "Code HTML" tabs. Read once, when the editor is created.
+   */
+  variant?: 'toolbar' | 'blocks'
+  /** Extra tiptap extensions, added after the editor's own (an app's layout blocks). Read once. */
+  extensions?: AnyExtension[]
+  /** Extra items of the "/" menu (`variant="blocks"`), listed after the editor's own blocks. */
+  slashItems?: PrRichTextEditorSlashItem[]
 }
 
 const props = withDefaults(defineProps<PrRichTextEditorProps>(), {
@@ -93,6 +114,9 @@ const props = withDefaults(defineProps<PrRichTextEditorProps>(), {
   id: undefined,
   name: undefined,
   uploadImage: undefined,
+  variant: 'toolbar',
+  extensions: () => [],
+  slashItems: () => [],
 })
 
 const messages = usePrMessages()
@@ -155,10 +179,18 @@ const labelId = computed(() => `${fieldId.value}-label`)
 const emojiTriggerId = computed(() => `${fieldId.value}-emoji-trigger`)
 const emojiMenuId = computed(() => `${fieldId.value}-emoji-menu`)
 const imagePanelTitleId = computed(() => `${fieldId.value}-image-panel-title`)
-// The error, then the hint: the hint stays shown with the error (RGAA 11.10).
+const blocksHelpId = computed(() => `${fieldId.value}-blocks-help`)
+const slashMenuId = computed(() => `${fieldId.value}-slash-menu`)
+const blockMenuId = computed(() => `${fieldId.value}-block-menu`)
+const sourceFieldId = computed(() => `${fieldId.value}-source`)
+// Read once, like the extensions: switching variants would mean another editor.
+const isBlocks = props.variant === 'blocks'
+// The error, then the hint: the hint stays shown with the error (RGAA 11.10). In the blocks
+// variant, the help line (the "/" menu, Alt+arrows) comes last.
 const describedBy = computed(() => [
   errorText.value ? errorId.value : undefined,
   props.hint ? hintId.value : undefined,
+  isBlocks ? blocksHelpId.value : undefined,
 ].filter(Boolean).join(' ') || undefined)
 
 // Name and state go on ProseMirror's contenteditable itself, the element screen readers
@@ -238,6 +270,337 @@ function countImagesMissingAlt(instance: Editor) {
   imagesMissingAlt.value = count
 }
 
+/*
+ * Blocks variant (`variant="blocks"`): live announcements, the "/" menu, the toolbar over selected
+ * text, the block handle and the "Écrire" / "Aperçu" / "Code HTML" tabs.
+ */
+const blockStatus = ref('')
+let announceTimer: ReturnType<typeof setTimeout> | undefined
+
+/** Says `message` in the polite live region (emptied first, so the same message is said again). */
+function announce(message: string) {
+  blockStatus.value = ''
+  clearTimeout(announceTimer)
+  announceTimer = setTimeout(() => {
+    blockStatus.value = message
+  }, 30)
+}
+
+function announceMove(result: PrBlockMoveResult) {
+  announce({
+    up: messages.richTextEditor.blockMovedUp,
+    down: messages.richTextEditor.blockMovedDown,
+    first: messages.richTextEditor.blockAlreadyFirst,
+    last: messages.richTextEditor.blockAlreadyLast,
+  }[result])
+}
+
+function slashItem(block: PrRichTextEditorBlock, icon: PrRichTextEditorSlashItem['icon'], command: (instance: Editor) => void): PrRichTextEditorSlashItem {
+  return { ...messages.richTextEditor.slashBlock(block), icon, command }
+}
+
+/** The editor's own blocks, then the app's (`slashItems`). The image needs `uploadImage`. */
+const allSlashItems = computed<PrRichTextEditorSlashItem[]>(() => [
+  slashItem('paragraph', Pilcrow, instance => instance.chain().focus().setParagraph().run()),
+  slashItem('heading', Heading2, instance => instance.chain().focus().setHeading({ level: 2 }).run()),
+  slashItem('subheading', Heading3, instance => instance.chain().focus().setHeading({ level: 3 }).run()),
+  slashItem('bulletList', List, instance => instance.chain().focus().toggleBulletList().run()),
+  slashItem('orderedList', ListOrdered, instance => instance.chain().focus().toggleOrderedList().run()),
+  slashItem('taskList', ListChecks, instance => instance.chain().focus().toggleTaskList().run()),
+  slashItem('blockquote', Quote, instance => instance.chain().focus().toggleBlockquote().run()),
+  slashItem('calloutInfo', Info, instance => instance.chain().focus().toggleCallout('info').run()),
+  slashItem('calloutSuccess', CircleCheck, instance => instance.chain().focus().toggleCallout('success').run()),
+  slashItem('calloutWarning', TriangleAlert, instance => instance.chain().focus().toggleCallout('warning').run()),
+  slashItem('calloutDanger', OctagonX, instance => instance.chain().focus().toggleCallout('danger').run()),
+  ...(props.uploadImage ? [slashItem('image', Image, () => pickAndUploadImage())] : []),
+  slashItem('table', Table2, () => insertTable()),
+  slashItem('youtube', Clapperboard, () => promptForYoutubeVideo()),
+  slashItem('details', ChevronsDownUp, instance => instance.chain().focus().setDetails().run()),
+  slashItem('separator', Minus, instance => instance.chain().focus().setHorizontalRule().run()),
+  ...props.slashItems,
+])
+
+/*
+ * The "/" menu: the suggestion plugin finds the query and positions the list (Floating UI, `fixed`);
+ * this component renders it and keeps it 8 px away from the edges of the screen.
+ */
+const slash = reactive({
+  open: false,
+  items: [] as PrRichTextEditorSlashItem[],
+  index: 0,
+})
+let slashCommand: ((item: PrRichTextEditorSlashItem) => void) | null = null
+let slashUnmount: (() => void) | null = null
+const slashMenuRef = ref<ComponentPublicInstance<{ root: HTMLElement | null, optionId: (index: number) => string }> | null>(null)
+
+const slashFloatingUi: SuggestionFloatingUiOptions = {
+  strategy: 'fixed',
+  middleware: [{
+    name: 'prKeepOnScreen',
+    fn: ({ x, y, rects }) => ({
+      x: Math.max(8, Math.min(x, document.documentElement.clientWidth - rects.floating.width - 8)),
+      y: Math.max(8, y),
+    }),
+  }],
+}
+
+/** The text field points to the list and to its active option (aria-controls, aria-activedescendant). */
+function syncSlashAria() {
+  const dom = editor.value?.view.dom
+  if (!dom) return
+  if (slash.open) dom.setAttribute('aria-controls', slashMenuId.value)
+  else dom.removeAttribute('aria-controls')
+  if (slash.open && slash.items.length > 0) dom.setAttribute('aria-activedescendant', `${slashMenuId.value}-option-${slash.index}`)
+  else dom.removeAttribute('aria-activedescendant')
+}
+
+function takeSlashProps(suggestion: SuggestionProps<PrRichTextEditorSlashItem, PrRichTextEditorSlashItem>) {
+  const sameItems = suggestion.items.length === slash.items.length && suggestion.items.every((item, index) => item === slash.items[index])
+  slash.items = suggestion.items
+  if (!sameItems) slash.index = 0
+  slashCommand = suggestion.command
+}
+
+function slashRenderer(): PrSlashMenuRenderer {
+  return {
+    onStart: async (suggestion) => {
+      takeSlashProps(suggestion)
+      slash.index = 0
+      slash.open = true
+      await nextTick()
+      const element = slashMenuRef.value?.root
+      if (slash.open && element) {
+        slashUnmount?.()
+        slashUnmount = suggestion.mount(element)
+      }
+      syncSlashAria()
+    },
+    onUpdate: async (suggestion) => {
+      takeSlashProps(suggestion)
+      await nextTick()
+      syncSlashAria()
+    },
+    onKeyDown: ({ event }) => {
+      if (!slash.open) return false
+      const count = Math.max(slash.items.length, 1)
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        slash.index = (slash.index + (event.key === 'ArrowDown' ? 1 : count - 1)) % count
+        void nextTick(syncSlashAria)
+
+        return true
+      }
+      if (event.key === 'Enter' || event.key === 'Tab') {
+        const item = slash.items[slash.index]
+        if (!item) return false
+        selectSlashItem(slash.index)
+
+        return true
+      }
+
+      // Escape: the plugin closes the menu; the focus never left the text.
+      return event.key === 'Escape'
+    },
+    onExit: () => {
+      slashUnmount?.()
+      slashUnmount = null
+      slash.open = false
+      slash.items = []
+      slashCommand = null
+      syncSlashAria()
+    },
+  }
+}
+
+function selectSlashItem(index: number) {
+  const item = slash.items[index]
+  if (item) slashCommand?.(item)
+}
+
+/* Toolbar over selected text: shown while writing, over a text selection, in the focused editor. */
+const selectionToolbarRef = ref<ComponentPublicInstance | null>(null)
+const bubbleOptions = { placement: 'top' as const, offset: 8, flip: { padding: 8 }, shift: { padding: 8 } }
+
+function selectionToolbarElement(): HTMLElement | null {
+  const element = selectionToolbarRef.value?.$el
+
+  return element instanceof HTMLElement ? element : null
+}
+
+function shouldShowSelectionToolbar({ editor: instance, view, from, to }: { editor: Editor, view: Editor['view'], from: number, to: number }) {
+  const toolbar = selectionToolbarElement()
+
+  return from !== to
+    && currentView.value === 'write'
+    && instance.isEditable
+    && (view.hasFocus() || Boolean(toolbar?.contains(document.activeElement)))
+    && !instance.isActive(AccessibleImage.name) && !instance.isActive('youtube') && !instance.isActive('table')
+}
+
+function selectionToolbarItems(): HTMLElement[] {
+  return Array.from(selectionToolbarElement()?.querySelectorAll<HTMLElement>('button') ?? [])
+}
+
+function focusSelectionToolbar(): boolean {
+  const toolbar = selectionToolbarElement()
+  if (!toolbar || toolbar.style.visibility !== 'visible') return false
+  const items = selectionToolbarItems()
+  items.forEach((item, index) => item.setAttribute('tabindex', index === 0 ? '0' : '-1'))
+  items[0]?.focus()
+
+  return true
+}
+
+function onSelectionToolbarKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    event.stopPropagation()
+    focusEditor()
+
+    return
+  }
+  const items = selectionToolbarItems()
+  const current = items.indexOf(event.target as HTMLElement)
+  if (current === -1) return
+  const next = {
+    ArrowRight: (current + 1) % items.length,
+    ArrowLeft: (current - 1 + items.length) % items.length,
+    Home: 0,
+    End: items.length - 1,
+  }[event.key]
+  if (next === undefined) return
+  event.preventDefault()
+  items.forEach((item, index) => item.setAttribute('tabindex', index === next ? '0' : '-1'))
+  items[next].focus()
+}
+
+const SELECTION_MARKS = [
+  { mark: 'bold', label: messages.richTextEditor.bold, icon: Bold, toggle: (instance: Editor) => instance.chain().focus().toggleBold().run() },
+  { mark: 'italic', label: messages.richTextEditor.italic, icon: Italic, toggle: (instance: Editor) => instance.chain().focus().toggleItalic().run() },
+  { mark: 'underline', label: messages.richTextEditor.underline, icon: UnderlineIcon, toggle: (instance: Editor) => instance.chain().focus().toggleUnderline().run() },
+  { mark: 'strike', label: messages.richTextEditor.strike, icon: Strikethrough, toggle: (instance: Editor) => instance.chain().focus().toggleStrike().run() },
+]
+
+/* Block handle, and its menu opened from the "Options du bloc" button. */
+const surfaceRef = ref<HTMLElement | null>(null)
+const blockHandleRef = ref<InstanceType<typeof PrRichTextEditorBlockHandle> | null>(null)
+
+function openBlockMenu(event: MouseEvent) {
+  blockHandleRef.value?.openMenuForCursor(event.currentTarget as HTMLElement)
+}
+
+function editImageAt(pos: number) {
+  editor.value?.chain().focus().setNodeSelection(pos).run()
+  openSelectedImageProperties()
+}
+
+/*
+ * "Écrire" / "Aperçu" / "Code HTML" (WAI-ARIA APG "Tabs", automatic activation). The preview shows
+ * the HTML read-only with the content styles; the code is one block per line, loaded back into the
+ * editor (cleaned by its schema) when leaving the tab, or when the form is sent from it.
+ */
+type EditorView = 'write' | 'preview' | 'source'
+const VIEWS: EditorView[] = ['write', 'preview', 'source']
+const currentView = ref<EditorView>('write')
+const previewHtml = ref('')
+const sourceCode = ref('')
+/** The code as shown when the tab opened: unchanged, nothing to load back. */
+let shownSource = ''
+const tablistRef = ref<HTMLElement | null>(null)
+
+const viewLabels = computed<Record<EditorView, string>>(() => ({
+  write: messages.richTextEditor.viewWrite,
+  preview: messages.richTextEditor.viewPreview,
+  source: messages.richTextEditor.viewSource,
+}))
+
+function tabId(view: EditorView) {
+  return `${fieldId.value}-tab-${view}`
+}
+
+function panelId(view: EditorView) {
+  return `${fieldId.value}-panel-${view}`
+}
+
+/** Loads the "Code HTML" tab into the editor, as one step "Annuler" can undo. */
+function applySource() {
+  if (!editor.value || sourceCode.value === shownSource) return
+  editor.value.commands.setContent(sourceCode.value, { emitUpdate: true })
+  shownSource = sourceCode.value
+  announce(messages.richTextEditor.sourceLoaded)
+}
+
+function showView(view: EditorView, focus: 'editor' | 'tab' | 'none' = 'none') {
+  if (currentView.value === 'source' && view !== 'source') applySource()
+  currentView.value = view
+  blockHandleRef.value?.closeMenu(false)
+  const instance = editor.value
+  if (view === 'preview' && instance) previewHtml.value = instance.isEmpty ? '' : instance.getHTML()
+  if (view === 'source' && instance) {
+    sourceCode.value = htmlToSource(instance.isEmpty ? '' : instance.getHTML())
+    shownSource = sourceCode.value
+  }
+  if (view !== 'write') instance?.view.dispatch(instance.state.tr.setMeta('bubbleMenu', 'hide').setMeta('addToHistory', false))
+  if (focus === 'editor' && view === 'write') focusEditor()
+  else if (focus === 'tab') void nextTick(() => tablistRef.value?.querySelector<HTMLElement>(`[id="${tabId(view)}"]`)?.focus())
+}
+
+function onTabKeydown(event: KeyboardEvent, index: number) {
+  const target = {
+    ArrowLeft: VIEWS[(index + VIEWS.length - 1) % VIEWS.length],
+    ArrowRight: VIEWS[(index + 1) % VIEWS.length],
+    Home: VIEWS[0],
+    End: VIEWS[VIEWS.length - 1],
+  }[event.key]
+  if (!target) return
+  event.preventDefault()
+  showView(target, 'tab')
+}
+
+function onLabelClick() {
+  if (currentView.value === 'write') focusEditor()
+  else showView('write', 'editor')
+}
+
+/*
+ * The hidden input always sends the latest HTML: a form sent from the "Code HTML" tab loads the code
+ * first, and the value is written into the input (and the form data) directly, as Vue would patch
+ * the input too late. `submit` is listened to in the capture phase, before the app's own handlers.
+ */
+const hiddenInputRef = ref<HTMLInputElement | null>(null)
+let watchedForm: HTMLFormElement | null = null
+
+function syncHiddenInput(): string | null {
+  if (!props.name || !editor.value) return null
+  if (currentView.value === 'source') applySource()
+  const latest = editor.value.getHTML()
+  html.value = latest
+  if (hiddenInputRef.value) hiddenInputRef.value.value = latest
+
+  return latest
+}
+
+function onFormData(event: FormDataEvent) {
+  const latest = syncHiddenInput()
+  if (latest !== null && props.name) event.formData.set(props.name, latest)
+}
+
+function watchForm() {
+  const form = hiddenInputRef.value?.form ?? null
+  if (form === watchedForm) return
+  watchedForm?.removeEventListener('submit', syncHiddenInput, true)
+  watchedForm?.removeEventListener('formdata', onFormData)
+  form?.addEventListener('submit', syncHiddenInput, true)
+  form?.addEventListener('formdata', onFormData)
+  watchedForm = form
+}
+
+onMounted(() => {
+  if (isBlocks) watchForm()
+})
+onUpdated(() => {
+  if (isBlocks) watchForm()
+})
+
 // What the hidden input submits. Without a v-model (a plain Blade form passing the initial
 // HTML once), `modelValue` never follows the edits, so the form would post the original text.
 const html = ref(props.modelValue)
@@ -252,7 +615,7 @@ const editor = useEditor({
     AccessibleYoutube.configure({ nocookie: true, width: 640, height: 360, defaultTitle: messages.richTextEditor.youtubeDefaultTitle }),
     TableKit.configure({ table: { resizable: true }, tableHeader: false }),
     ScopedTableHeader,
-    Placeholder.configure({ placeholder: props.placeholder ?? messages.richTextEditor.placeholder }),
+    Placeholder.configure({ placeholder: props.placeholder ?? (isBlocks ? messages.richTextEditor.blocksPlaceholder : messages.richTextEditor.placeholder) }),
     Highlight,
     TextStyleKit.configure({ fontFamily: false, fontSize: false, lineHeight: false, backgroundColor: false }),
     TextAlign.configure({ types: ['heading', 'paragraph'] }),
@@ -283,9 +646,22 @@ const editor = useEditor({
         danger: messages.richTextEditor.calloutPrefixDanger,
       },
     }),
+    ...(isBlocks
+      ? [
+          SlashCommand.configure({ items: () => allSlashItems.value, renderer: slashRenderer, floatingUi: slashFloatingUi }),
+          BlockKeys.configure({ onMove: announceMove }),
+        ]
+      : []),
+    ...props.extensions,
   ],
   editorProps: {
     attributes: () => contentAttributes(),
+    handleKeyDown(_view, event) {
+      // Alt+F10 goes to the toolbar of the selected text (the usual shortcut of rich text editors).
+      if (isBlocks && event.altKey && event.key === 'F10') return focusSelectionToolbar()
+
+      return false
+    },
     handleDrop(_view, event) {
       const file = event.dataTransfer?.files?.[0]
 
@@ -310,6 +686,7 @@ const editor = useEditor({
   },
 })
 
+
 watch(() => props.modelValue, (value) => {
   html.value = value
   if (editor.value && value !== editor.value.getHTML()) {
@@ -329,6 +706,9 @@ watch(() => props.disabled, (disabled) => {
 onBeforeUnmount(() => {
   editor.value?.destroy()
   document.removeEventListener('click', closeEmojiPickerOnOutsideClick)
+  watchedForm?.removeEventListener('submit', syncHiddenInput, true)
+  watchedForm?.removeEventListener('formdata', onFormData)
+  clearTimeout(announceTimer)
 })
 
 function focusEditor() {
@@ -710,14 +1090,14 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
 <template>
   <!-- minmax(0, 1fr): an implicit grid column grows with its widest content, so a large image or table would
        widen the editor past its container. -->
-  <div class="pr-rich-text-editor pr:grid pr:grid-cols-[minmax(0,1fr)] pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]">
+  <div class="pr-rich-text-editor pr:grid pr:grid-cols-[minmax(0,1fr)] pr:gap-[var(--pr-space-2)] pr:text-[color:var(--pr-color-text)]" :class="{ 'pr-rich-text-editor--blocks': isBlocks }">
     <PrLabel
       v-if="label"
       :id="labelId"
       :for="fieldId"
       :required="required"
       :disabled="disabled"
-      @click="focusEditor"
+      @click="onLabelClick"
     >
       {{ label }}
     </PrLabel>
@@ -752,6 +1132,7 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
       -->
       <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- a toolbar (roving focus): arrow keys move between its controls (WAI-ARIA toolbar pattern) -->
       <div
+        v-if="!isBlocks"
         ref="toolbarRef"
         class="pr-rich-text-editor__toolbar pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-t-[var(--pr-radius-lg)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]"
         role="toolbar"
@@ -913,57 +1294,221 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
         </button>
       </div>
 
-      <!-- Alternative text (and width) of the image being inserted or of the selected image. -->
-      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- Escape cancels and Enter confirms from the fields inside -->
+      <!--
+        Blocks variant: the tabs and a small toolbar (the block menu for the keyboard, undo, redo).
+        The formatting is in the "/" menu and in the toolbar over selected text.
+      -->
       <div
-        v-if="imagePanel"
-        ref="imagePanelRef"
-        class="pr-rich-text-editor__image-panel pr:grid pr:gap-[var(--pr-space-3)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface-subtle)] pr:px-[var(--pr-space-5)] pr:py-[var(--pr-space-4)]"
-        role="group"
-        :aria-labelledby="imagePanelTitleId"
-        @keydown="onImagePanelKeydown"
+        v-else
+        class="pr-rich-text-editor__topbar pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:justify-between pr:gap-[var(--pr-space-2)] pr:rounded-t-[var(--pr-radius-lg)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]"
       >
-        <p :id="imagePanelTitleId" class="pr:m-0 pr:font-semibold">
-          {{ messages.richTextEditor.imagePanelTitle }}
-        </p>
-        <PrInput
-          v-model="imageAlt"
-          :label="messages.richTextEditor.imageAlt"
-          :hint="messages.richTextEditor.imageAltHint"
-          :error="imageAltError"
-          :disabled="imageIsDecorative"
-          :required="!imageIsDecorative"
-          type="text"
-        />
-        <PrCheckbox v-model="imageIsDecorative" :label="messages.richTextEditor.imageDecorative" />
-        <div class="pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-2)]" role="group" :aria-label="messages.richTextEditor.imageWidth">
-          <span class="pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold" aria-hidden="true">{{ messages.richTextEditor.imageWidth }}</span>
-          <PrButton
-            v-for="option in IMAGE_WIDTHS"
-            :key="option.width"
-            size="sm"
-            :variant="imageWidth === option.width ? 'primary' : 'secondary'"
-            :aria-pressed="imageWidth === option.width"
-            @click="imageWidth = imageWidth === option.width ? null : option.width"
+        <div ref="tablistRef" class="pr-rich-text-editor__tabs pr:flex pr:flex-wrap pr:gap-[var(--pr-space-1)]" role="tablist" :aria-label="label ? `${messages.richTextEditor.views} : ${label}` : messages.richTextEditor.views">
+          <button
+            v-for="(view, index) in VIEWS"
+            :id="tabId(view)"
+            :key="view"
+            type="button"
+            role="tab"
+            class="pr-rich-text-editor__tab pr:min-h-9 pr:rounded-[var(--pr-radius-md)] pr:border! pr:border-transparent! pr:bg-[transparent] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:motion-reduce:transition-none"
+            :class="currentView === view ? 'pr:bg-[var(--pr-color-surface-subtle)]! pr:text-[color:var(--pr-color-text)]! pr:border-[var(--pr-color-border-strong)]!' : ''"
+            :aria-selected="currentView === view"
+            :aria-controls="panelId(view)"
+            :tabindex="currentView === view ? 0 : -1"
+            @click="showView(view, view === 'write' ? 'editor' : 'none')"
+            @keydown="onTabKeydown($event, index)"
           >
-            {{ option.label }}
-          </PrButton>
+            {{ viewLabels[view] }}
+          </button>
         </div>
-        <div class="pr:flex pr:flex-wrap pr:gap-[var(--pr-space-2)]">
-          <PrButton size="sm" @click="confirmImagePanel">
-            {{ imagePanel.mode === 'insert' ? messages.richTextEditor.imageInsert : messages.richTextEditor.imageSave }}
-          </PrButton>
-          <PrButton size="sm" variant="ghost" @click="closeImagePanel(true)">
-            {{ messages.richTextEditor.cancel }}
-          </PrButton>
+        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- a toolbar (roving focus): arrow keys move between its controls (WAI-ARIA toolbar pattern) -->
+        <div
+          ref="toolbarRef"
+          class="pr-rich-text-editor__toolbar pr:flex pr:items-center pr:gap-[var(--pr-space-1)]"
+          role="toolbar"
+          :aria-label="messages.richTextEditor.toolbar"
+          @keydown="onToolbarKeydown"
+          @focusin="onToolbarFocusin"
+        >
+          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor || disabled || currentView !== 'write'"
+                  :title="messages.richTextEditor.blockMenu" :aria-label="messages.richTextEditor.blockMenu"
+                  aria-haspopup="menu" @click="openBlockMenu">
+            <GripVertical :size="16" aria-hidden="true" />
+          </button>
+          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor?.can().undo() || currentView !== 'write'"
+                  :title="messages.richTextEditor.undo" :aria-label="messages.richTextEditor.undo" @click="editor?.chain().focus().undo().run()">
+            <Undo2 :size="16" aria-hidden="true" />
+          </button>
+          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor?.can().redo() || currentView !== 'write'"
+                  :title="messages.richTextEditor.redo" :aria-label="messages.richTextEditor.redo" @click="editor?.chain().focus().redo().run()">
+            <Redo2 :size="16" aria-hidden="true" />
+          </button>
         </div>
       </div>
 
-      <EditorContent
-        :id="fieldId"
-        :editor="editor"
-        class="pr-rich-text-editor__content pr-editor-content"
-      />
+      <!-- The "Écrire" panel (the whole editing area without tabs, in the toolbar variant). -->
+      <div
+        v-show="currentView === 'write'"
+        :id="isBlocks ? panelId('write') : undefined"
+        :role="isBlocks ? 'tabpanel' : undefined"
+        :aria-labelledby="isBlocks ? tabId('write') : undefined"
+        class="pr-rich-text-editor__write"
+      >
+        <!-- Alternative text (and width) of the image being inserted or of the selected image. -->
+        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- Escape cancels and Enter confirms from the fields inside -->
+        <div
+          v-if="imagePanel"
+          ref="imagePanelRef"
+          class="pr-rich-text-editor__image-panel pr:grid pr:gap-[var(--pr-space-3)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface-subtle)] pr:px-[var(--pr-space-5)] pr:py-[var(--pr-space-4)]"
+          role="group"
+          :aria-labelledby="imagePanelTitleId"
+          @keydown="onImagePanelKeydown"
+        >
+          <p :id="imagePanelTitleId" class="pr:m-0 pr:font-semibold">
+            {{ messages.richTextEditor.imagePanelTitle }}
+          </p>
+          <PrInput
+            v-model="imageAlt"
+            :label="messages.richTextEditor.imageAlt"
+            :hint="messages.richTextEditor.imageAltHint"
+            :error="imageAltError"
+            :disabled="imageIsDecorative"
+            :required="!imageIsDecorative"
+            type="text"
+          />
+          <PrCheckbox v-model="imageIsDecorative" :label="messages.richTextEditor.imageDecorative" />
+          <div class="pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-2)]" role="group" :aria-label="messages.richTextEditor.imageWidth">
+            <span class="pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold" aria-hidden="true">{{ messages.richTextEditor.imageWidth }}</span>
+            <PrButton
+              v-for="option in IMAGE_WIDTHS"
+              :key="option.width"
+              size="sm"
+              :variant="imageWidth === option.width ? 'primary' : 'secondary'"
+              :aria-pressed="imageWidth === option.width"
+              @click="imageWidth = imageWidth === option.width ? null : option.width"
+            >
+              {{ option.label }}
+            </PrButton>
+          </div>
+          <div class="pr:flex pr:flex-wrap pr:gap-[var(--pr-space-2)]">
+            <PrButton size="sm" @click="confirmImagePanel">
+              {{ imagePanel.mode === 'insert' ? messages.richTextEditor.imageInsert : messages.richTextEditor.imageSave }}
+            </PrButton>
+            <PrButton size="sm" variant="ghost" @click="closeImagePanel(true)">
+              {{ messages.richTextEditor.cancel }}
+            </PrButton>
+          </div>
+        </div>
+
+        <div ref="surfaceRef" class="pr-rich-text-editor__surface pr:relative">
+          <EditorContent
+            :id="fieldId"
+            :editor="editor"
+            class="pr-rich-text-editor__content pr-editor-content"
+          />
+          <PrRichTextEditorBlockHandle
+            v-if="isBlocks && editor"
+            ref="blockHandleRef"
+            :editor="editor"
+            :surface="surfaceRef"
+            :menu-id="blockMenuId"
+            :disabled="disabled"
+            @announce="announce"
+            @image-properties="editImageAt"
+          />
+        </div>
+
+        <!-- Toolbar over selected text (blocks variant): Tab or Alt+F10 from the text, Escape goes back. -->
+        <BubbleMenu
+          v-if="isBlocks && editor"
+          ref="selectionToolbarRef"
+          :editor="editor"
+          :should-show="shouldShowSelectionToolbar"
+          :options="bubbleOptions"
+          class="pr-rich-text-editor__selection-toolbar pr:z-20 pr:flex pr:max-w-[calc(100vw-1rem)] pr:flex-wrap pr:items-center pr:gap-[0.125rem] pr:rounded-[var(--pr-radius-lg)] pr:border! pr:border-[var(--pr-color-border)]! pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-1)] pr:shadow-[var(--pr-shadow-md)]"
+          role="toolbar"
+          :aria-label="messages.richTextEditor.selectionToolbar"
+          @keydown="onSelectionToolbarKeydown"
+        >
+          <button v-for="(item, index) in SELECTION_MARKS" :key="item.mark" type="button" :tabindex="index === 0 ? 0 : -1"
+                  :class="[toolbarButtonClass, editor.isActive(item.mark) ? toolbarButtonActiveClass : '']" :aria-pressed="editor.isActive(item.mark)"
+                  :title="item.label" :aria-label="item.label" @mousedown.prevent @click="item.toggle(editor)">
+            <component :is="item.icon" :size="16" aria-hidden="true" />
+          </button>
+          <button type="button" tabindex="-1" :class="[toolbarButtonClass, editor.isActive('link') ? toolbarButtonActiveClass : '']"
+                  :title="messages.richTextEditor.link" :aria-label="messages.richTextEditor.link" @mousedown.prevent @click="promptForLink">
+            <LinkIcon :size="16" aria-hidden="true" />
+          </button>
+          <button type="button" tabindex="-1" :class="[toolbarButtonClass, editor.isActive('highlight') ? toolbarButtonActiveClass : '']" :aria-pressed="editor.isActive('highlight')"
+                  :title="messages.richTextEditor.highlight" :aria-label="messages.richTextEditor.highlight" @mousedown.prevent @click="editor.chain().focus().toggleHighlight().run()">
+            <Highlighter :size="16" aria-hidden="true" />
+          </button>
+          <span class="pr-rich-text-editor__separator pr:mx-[0.125rem] pr:my-[var(--pr-space-1)] pr:w-px pr:self-stretch pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
+          <button type="button" tabindex="-1" :class="[toolbarButtonClass, editor.isActive('heading', { level: 2 }) ? toolbarButtonActiveClass : '']" :aria-pressed="editor.isActive('heading', { level: 2 })"
+                  :title="messages.richTextEditor.heading" :aria-label="messages.richTextEditor.heading" @mousedown.prevent @click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
+            <Heading2 :size="16" aria-hidden="true" />
+          </button>
+          <button type="button" tabindex="-1" :class="[toolbarButtonClass, editor.isActive('heading', { level: 3 }) ? toolbarButtonActiveClass : '']" :aria-pressed="editor.isActive('heading', { level: 3 })"
+                  :title="messages.richTextEditor.subheading" :aria-label="messages.richTextEditor.subheading" @mousedown.prevent @click="editor.chain().focus().toggleHeading({ level: 3 }).run()">
+            <Heading3 :size="16" aria-hidden="true" />
+          </button>
+        </BubbleMenu>
+
+        <PrRichTextEditorSlashMenu
+          v-if="isBlocks && slash.open"
+          :id="slashMenuId"
+          ref="slashMenuRef"
+          :items="slash.items"
+          :active-index="slash.index"
+          :label="messages.richTextEditor.slashMenu"
+          :empty-text="messages.richTextEditor.slashEmpty"
+          @select="selectSlashItem"
+          @activate="slash.index = $event; syncSlashAria()"
+        />
+      </div>
+
+      <template v-if="isBlocks">
+        <div
+          v-show="currentView === 'preview'"
+          :id="panelId('preview')"
+          class="pr-rich-text-editor__preview pr:min-h-[20rem] pr:px-[var(--pr-space-5)] pr:py-[var(--pr-space-4)]"
+          role="tabpanel"
+          :aria-labelledby="tabId('preview')"
+          tabindex="0"
+        >
+          <!-- eslint-disable-next-line vue/no-v-html -- the editor's own HTML, already cleaned by its schema -->
+          <div class="pr-editor-content" v-html="previewHtml" />
+        </div>
+        <div
+          v-show="currentView === 'source'"
+          :id="panelId('source')"
+          class="pr-rich-text-editor__source pr:grid pr:gap-[var(--pr-space-2)] pr:px-[var(--pr-space-5)] pr:py-[var(--pr-space-4)]"
+          role="tabpanel"
+          :aria-labelledby="tabId('source')"
+        >
+          <label :for="sourceFieldId" class="pr:font-semibold">{{ label ? `${messages.richTextEditor.viewSource} : ${label}` : messages.richTextEditor.viewSource }}</label>
+          <p :id="`${sourceFieldId}-hint`" class="pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]">
+            {{ messages.richTextEditor.sourceHint }}
+          </p>
+          <textarea
+            :id="sourceFieldId"
+            v-model="sourceCode"
+            class="pr-rich-text-editor__source-field pr:min-h-[20rem] pr:w-full pr:resize-y pr:rounded-[var(--pr-radius-md)] pr:border! pr:border-[var(--pr-color-border-strong)]! pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-3)] pr:font-mono pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)]"
+            :aria-describedby="`${sourceFieldId}-hint`"
+            :disabled="disabled"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            translate="no"
+            wrap="soft"
+          />
+        </div>
+        <p :id="blocksHelpId" class="pr-rich-text-editor__help pr:m-0 pr:border-t pr:border-[var(--pr-color-border)] pr:px-[var(--pr-space-5)] pr:py-[var(--pr-space-2)] pr:text-[length:var(--pr-font-size-sm)] pr:text-[color:var(--pr-color-text-muted)]" :hidden="currentView !== 'write'">
+          {{ messages.richTextEditor.blocksHelp }}
+        </p>
+        <p class="pr:sr-only" role="status">
+          {{ blockStatus }}
+        </p>
+      </template>
 
       <p class="pr:sr-only" role="status">
         {{ uploadStatus }}
@@ -981,7 +1526,7 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
         {{ messages.richTextEditor.counts(editor.storage.characterCount.characters(), editor.storage.characterCount.words()) }}
       </p>
     </div>
-    <input v-if="name" type="hidden" :name="name" :value="html">
+    <input v-if="name" ref="hiddenInputRef" type="hidden" :name="name" :value="html">
     <p v-if="hint" :id="hintId" class="pr-rich-text-editor__message pr-field-message pr:m-0 pr:text-[length:var(--pr-font-size-sm)] pr:leading-[var(--pr-line-height-tight)] pr:text-[color:var(--pr-color-text-muted)]">
       {{ hint }}
     </p>

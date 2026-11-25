@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { describe, expect, it } from 'vitest'
 import Prisme from './index'
-import { Callout, PrismeEditor, PrRichTextEditor } from './editor'
+import { Callout, filterSlashItems, moveBlock, PrismeEditor, PrRichTextEditor, SlashCommand } from './editor'
 import { Callout as CalloutFromTiptapEntry } from './tiptap/callout'
 
 describe('@oremis/prisme/editor', () => {
@@ -25,6 +25,12 @@ describe('@oremis/prisme/editor', () => {
 
     expect(app.component('PrButton')).toBeDefined()
     expect(app.component('PrRichTextEditor')).toBe(PrRichTextEditor)
+  })
+
+  it('exports the helpers of the blocks variant, for an app\'s own slash items', () => {
+    expect(typeof filterSlashItems).toBe('function')
+    expect(typeof moveBlock).toBe('function')
+    expect(SlashCommand.name).toBe('prSlashCommand')
   })
 
   it('re-exports the same Callout node as @oremis/prisme/tiptap/callout', () => {

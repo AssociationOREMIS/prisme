@@ -192,6 +192,51 @@ Comme `PrCombobox`/`PrTagInput`, le contenu de l'editeur n'est pas un `<textarea
 <PrRichTextEditor v-model="content" name="body" />
 ```
 
+#### Variante blocs (`variant="blocks"`)
+
+`variant="blocks"` donne un editeur facon Notion, pour les articles et les pages : pas de grande barre d'outils, mais des blocs. `variant="toolbar"` (par defaut) ne change pas. La variante, comme `extensions`, est lue une seule fois, a la creation de l'editeur.
+
+```vue
+<PrRichTextEditor v-model="content" variant="blocks" label="Article" name="body" :upload-image="uploadImage" />
+```
+
+- **Menu « / »** : taper `/` au debut d'un bloc vide ou apres une espace ouvre la liste des blocs (Texte, Titre, Sous-titre, Liste a puces, Liste numerotee, Liste de taches, Citation, les quatre encadres, Image si `uploadImage` est fourni, Tableau, Video YouTube, Section repliable, Separateur), filtree par ce qui suit la barre, espaces compris (« /encadre att »), sans tenir compte des accents ni des majuscules. Fleches haut et bas, Entree ou Tab pour choisir, Echap pour fermer : le focus reste dans le texte (`aria-activedescendant`, motif « listbox » de l'APG). Le menu se ferme seul quand ce qui suit la barre n'est plus une recherche (« et/ou », une adresse web, deux mots sans resultat). Il garde 8 px des bords de l'ecran.
+- **Deplacer un bloc** : une poignee a gauche du bloc survole (ou du bloc du curseur) se glisse pour le deplacer, et ouvre au clic un menu Monter, Descendre, Dupliquer, Supprimer (et « Texte alternatif et taille de l'image » sur une image). Le glisser n'est jamais le seul moyen (WCAG 2.5.7) : Alt + fleche haut ou bas deplace le bloc du curseur, et le bouton « Options du bloc » de la barre du haut ouvre le meme menu au clavier. Chaque deplacement est annonce (« Bloc monte », « Ce bloc est deja le premier »).
+- **Barre de la selection** : sur du texte selectionne, Gras, Italique, Souligne, Barre, Lien, Surligner, Titre, Sous-titre. Alt + F10 (ou Tab) y va depuis le texte, fleches gauche et droite entre les boutons, Echap revient au texte.
+- **Onglets « Ecrire », « Apercu », « Code HTML »** (motif « tabs » de l'APG) : l'apercu montre le HTML en lecture seule dans `.pr-editor-content` ; le code montre un bloc par ligne, et ses modifications sont chargees dans l'editeur (nettoyees par son schema : ce qu'il ne connait pas disparait) en revenant sur « Ecrire ». Un formulaire envoye depuis l'onglet du code envoie bien le code modifie dans le champ cache `name`.
+- Texte indicatif par defaut : « Ecrivez, ou tapez / pour inserer un bloc » ; une ligne d'aide sous l'editeur rappelle les raccourcis (elle decrit aussi le champ, `aria-describedby`).
+
+**Blocs d'une application** : `extensions` ajoute des extensions tiptap apres celles de l'editeur, `slashItems` ajoute des entrees au menu « / », apres celles de l'editeur, regroupees sous un intitule avec `group`.
+
+```ts
+import { Node } from '@tiptap/core'
+import { PanelTop } from '@lucide/vue'
+import type { PrRichTextEditorSlashItem } from '@oremis/prisme/editor'
+
+const Banner = Node.create({
+  name: 'banner',
+  group: 'block',
+  content: 'inline*',
+  parseHTML: () => [{ tag: 'section[data-banner]' }],
+  renderHTML: () => ['section', { 'data-banner': '' }, 0],
+})
+
+const slashItems: PrRichTextEditorSlashItem[] = [{
+  title: 'Banniere', // ce que montre le menu, et ce que la recherche trouve d'abord
+  hint: 'Un grand bandeau d\'accueil', // facultatif
+  icon: PanelTop, // facultatif : un composant (icone Lucide) ou un texte court
+  keywords: 'bandeau accueil', // facultatif : d'autres mots pour la recherche
+  group: 'Mise en page', // facultatif : intitule du groupe
+  command: editor => editor.chain().focus().setNode('banner').run(), // la barre et la recherche sont deja effacees
+}]
+```
+
+```vue
+<PrRichTextEditor v-model="content" variant="blocks" :extensions="[Banner]" :slash-items="slashItems" />
+```
+
+`@oremis/prisme/editor` exporte aussi les outils de la variante : `filterSlashItems`, `keepSlashMenuOpen`, `moveBlock`, `duplicateBlock`, `deleteBlock`, `topBlockPos`, `htmlToSource`, et les extensions `SlashCommand` et `BlockKeys`. Les textes (titres et mots-cles des blocs, menu, onglets) passent par `messages.richTextEditor` (`slashBlock`, `blockMenu`, `viewWrite`...). La variante utilise en plus deux paquets tiptap, eux aussi en `peerDependencies` optionnelles : `@tiptap/pm` et `@tiptap/extension-bubble-menu` (3.31.3).
+
 #### Accessibilite de l'editeur et du contenu produit
 
 - **Barre d'outils** : un seul arret de tabulation (motif "toolbar" de l'APG), fleches gauche/droite, Debut et Fin entre les boutons, Tab revient au dernier bouton utilise. Les boutons bascule (gras, italique, listes, encadres...) portent `aria-pressed`. Le bouton emoji ouvre un menu (fleches, Debut/Fin, Echap rend le focus au bouton), avec des noms d'emoji en francais (`messages.richTextEditor.emojiName`).
