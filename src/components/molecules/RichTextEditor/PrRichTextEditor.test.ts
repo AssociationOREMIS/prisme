@@ -168,6 +168,19 @@ describe('prRichTextEditor', () => {
     wrapper.unmount()
   })
 
+  it('keeps an image inside a <figure> (WordPress), its caption as text', async () => {
+    const wrapper = mount(PrRichTextEditor, {
+      props: { modelValue: '<figure><img src="/storage/ag.jpg" alt="Les adhérents votent"><figcaption>Photo : OREMIS</figcaption></figure>' },
+      attachTo: document.body,
+    })
+    const editor = await waitForEditor(wrapper)
+
+    expect(editor.getHTML()).toContain('src="/storage/ag.jpg"')
+    expect(editor.getHTML()).toContain('alt="Les adhérents votent"')
+    expect(editor.getHTML()).toContain('Photo : OREMIS')
+    wrapper.unmount()
+  })
+
   it('refuses an empty alt text unless the image is marked decorative, then inserts alt=""', async () => {
     const wrapper = mount(PrRichTextEditor, {
       props: { modelValue: '<p></p>', uploadImage: async () => 'https://cdn.example.com/deco.png' },
