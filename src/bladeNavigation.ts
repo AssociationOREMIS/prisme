@@ -28,6 +28,22 @@ export const MARKER = 'data-prisme'
 /** Links never handled: opened elsewhere, downloads, logouts, opted out with `data-prisme-reload`. */
 const EXCLUDED_LINKS = '[download], [target]:not([target="_self"]), [data-prisme-reload] a, a[data-prisme-reload]'
 
+/**
+ * What a public page says about itself in its `<head>`, different on every page: its description,
+ * canonical address, robots rule, share cards and structured data (JSON-LD). Replaced on each swap,
+ * so the document keeps describing the page shown (a share button, a crawler running the page).
+ */
+const PAGE_METADATA = [
+  'meta[name="description"]',
+  'meta[name="robots"]',
+  'link[rel="canonical"]',
+  'link[rel="alternate"][hreflang]',
+  'meta[property^="og:"]',
+  'meta[property^="article:"]',
+  'meta[name^="twitter:"]',
+  'script[type="application/ld+json"]',
+].join(', ')
+
 /** On the button of a form being sent, styled in layout.css. */
 const SUBMITTING = 'data-prisme-submitting'
 
@@ -43,6 +59,8 @@ interface FetchedPage {
   title: string
   template: string
   assets: string[]
+  /** The page's metadata (PAGE_METADATA), as HTML, to replace the current one. */
+  metadata: string[]
   csrfToken: string | null
   /** The new page's `<html lang>`: screen readers pronounce its text in that language (RGAA 8.3). */
   lang: string | null
@@ -69,13 +87,16 @@ const isInjectedByProxy = (element: Element): boolean =>
  * The scripts and stylesheets of a document, outside the app. A page that brings one the current
  * document lacks (its own `@push('scripts')`) cannot be swapped. The current document may have more,
  * added while it ran (Vite's dev styles, a script the app loaded): those do not prevent a swap.
+ *
+ * Not counted: data that runs nothing (JSON-LD, JSON), different on every page of a public site,
+ * and what sits in `<noscript>`, plain text in a browser running scripts but elements in a parsed page.
  */
 function assetsOf(doc: Document, app: Element | null): string[] {
   const assets: string[] = []
 
   for (const element of doc.querySelectorAll(`script, link[rel="stylesheet"], link[rel="modulepreload"], style`)) {
-    if (element.hasAttribute(MARKER) || (app && app.contains(element))) continue
-    if (element.matches('script[type="speculationrules"]') || isInjectedByProxy(element)) continue
+    if (element.hasAttribute(MARKER) || (app && app.contains(element)) || element.closest('noscript')) continue
+    if (element.matches('script[type="speculationrules"], script[type="application/ld+json"], script[type="application/json"]') || isInjectedByProxy(element)) continue
     assets.push(element.getAttribute('src') ?? element.getAttribute('href') ?? element.textContent ?? '')
   }
 
@@ -267,6 +288,7 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
       title: doc.title,
       template: appElement.innerHTML,
       assets: assetsOf(doc, appElement),
+      metadata: [...doc.head.querySelectorAll(PAGE_METADATA)].map(element => element.outerHTML),
       csrfToken: doc.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? null,
       lang: doc.documentElement.getAttribute('lang'),
     }
@@ -404,6 +426,7 @@ export function enableSwapNavigation(app: App, container: Element, options: { pr
       document.title = page.title
       if (page.lang && page.lang !== document.documentElement.lang) document.documentElement.lang = page.lang
       if (page.csrfToken) document.querySelector('meta[name="csrf-token"]')?.setAttribute('content', page.csrfToken)
+      replaceMetadata(page.metadata)
       await nextTick()
       afterRender()
     }
@@ -537,6 +560,18 @@ function restoreScroll(scrollY: number, hash: string): void {
   } else {
     window.scrollTo(0, scrollY)
   }
+}
+
+/**
+ * The `<head>` describes the page shown: its description, canonical address, share cards and JSON-LD.
+ * Built from a parsed document, the new elements never run (a JSON-LD block is data anyway).
+ */
+function replaceMetadata(metadata: string[]): void {
+  for (const element of document.head.querySelectorAll(PAGE_METADATA)) element.remove()
+
+  const template = document.createElement('template')
+  template.innerHTML = metadata.join('')
+  document.head.append(template.content)
 }
 
 /** Screen readers hear the new page's title, and keyboard focus restarts at the content. */

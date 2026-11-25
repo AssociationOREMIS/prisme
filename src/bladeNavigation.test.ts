@@ -208,6 +208,31 @@ describe("registerPrisme navigation: 'swap'", () => {
     expect(location.pathname).toBe('/regions')
   })
 
+  it('swaps the pages of a public site, whose JSON-LD and noscript styles differ from page to page', async () => {
+    const head = (title: string, description: string) => `<title>${title}</title>`
+      + `<meta name="description" content="${description}">`
+      + `<link rel="canonical" href="https://oremis.fr/${title.toLowerCase()}/">`
+      + `<meta property="og:title" content="${title}">`
+      + `<script type="application/ld+json">{"@type":"WebPage","name":"${title}"}</script>`
+      + '<noscript><style>[v-cloak] { display: block; }</style></noscript>'
+    const page = (title: string, description: string, content: string) => `<!doctype html><html><head>${head(title, description)}</head><body>
+      <div id="app" v-cloak><shell-counter active="${title}"></shell-counter><main>${content}</main></div></body></html>`
+    stubServer({ '/association': { html: page('Association', 'Qui sommes-nous', '<h1>Association</h1>') } })
+    mountFirstPage('<h1>Accueil</h1><a id="association" href="/association">Association</a>')
+    document.head.innerHTML = head('Accueil', 'Bienvenue')
+
+    click('#association')
+    await settle()
+
+    expect(loads).not.toHaveBeenCalled()
+    expect(location.pathname).toBe('/association')
+    expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe('Qui sommes-nous')
+    expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe('https://oremis.fr/association/')
+    expect(document.querySelector('meta[property="og:title"]')?.getAttribute('content')).toBe('Association')
+    expect(document.querySelectorAll('script[type="application/ld+json"]')).toHaveLength(1)
+    expect(document.querySelector('script[type="application/ld+json"]')?.textContent).toContain('"name":"Association"')
+  })
+
   it('is on by default, and can be turned off in one browser through localStorage', async () => {
     const mountWithoutOption = () => {
       document.body.innerHTML = new DOMParser().parseFromString(pageHtml('Accueil', '<a id="to-users" href="/users">Benevoles</a>'), 'text/html').body.innerHTML
