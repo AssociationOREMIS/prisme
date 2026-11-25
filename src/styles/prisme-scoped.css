@@ -14,6 +14,7 @@
    the root itself, where Prisme puts most of its classes. */
 @import "tailwindcss/theme.css" layer(theme) prefix(pr);
 @import "./tokens.css";
+@import "./corners-scoped.css";
 @import "./themes.css";
 @import "./brand-charte.css";
 @import "./animations.css";

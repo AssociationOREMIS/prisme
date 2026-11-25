@@ -219,14 +219,18 @@
 }
 
 
-/* The halo of PrButton `pulse`: a ring that grows and fades out. */
-@keyframes pr-pulse-out {
-  from {
-    transform: scale(1);
-    opacity: 1;
+/* The halo of PrButton `pulse`: a glow that breathes in and out around the button, at most 8 px
+   wide (a ring of 4 px and a blur), never scaled. Starts and ends invisible so the loop has no jump. */
+@keyframes pr-pulse-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 color-mix(in srgb, var(--pr-color-primary) 0%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--pr-color-primary) 0%, transparent);
   }
-  to {
-    transform: scale(1.5);
-    opacity: 0;
+  50% {
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--pr-color-primary) 22%, transparent),
+      0 0 14px 2px color-mix(in srgb, var(--pr-color-primary) 30%, transparent);
   }
 }

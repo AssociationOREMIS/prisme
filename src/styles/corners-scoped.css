@@ -1,0 +1,29 @@
+/* corners.css for styles-scoped.css: the same squircles, on Prisme elements only (the host page's
+   own rounded blocks keep their corners). The radius tokens are global, as every token. */
+@supports (corner-shape: squircle) {
+  :root {
+    --pr-corner-shape: squircle;
+    --pr-radius-xs: 0.25rem;
+    --pr-radius-sm: 0.375rem;
+    --pr-radius-md: 0.5625rem;
+    --pr-radius-lg: 0.75rem;
+    --pr-radius-xl: 1.5rem;
+  }
+
+  :where([class*='pr-'], [class*='pr-'] *),
+  [class*='pr-']::before,
+  [class*='pr-']::after,
+  [class*='pr-'] *::before,
+  [class*='pr-'] *::after {
+    corner-shape: var(--pr-corner-shape);
+  }
+
+  /* Pills, round badges, switches and avatars (`--pr-radius-full`) stay circle arcs: a squircle
+     capsule looks boxy. Their ::after (the halo of a CTA, `rounded-[inherit]`) follows them. */
+  [class*='radius-full'],
+  [class*='rounded-full'],
+  [class*='radius-full']::before,
+  [class*='radius-full']::after {
+    corner-shape: round;
+  }
+}
