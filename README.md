@@ -194,7 +194,9 @@ Comme `PrCombobox`/`PrTagInput`, le contenu de l'editeur n'est pas un `<textarea
 
 #### Variante blocs (`variant="blocks"`)
 
-`variant="blocks"` donne un editeur facon Notion, pour les articles et les pages : pas de grande barre d'outils, mais des blocs. `variant="toolbar"` (par defaut) ne change pas. La variante, comme `extensions`, est lue une seule fois, a la creation de l'editeur.
+`variant="blocks"` donne un editeur facon Notion, pour les articles et les pages : des blocs, inseres par le menu « / », deplaces par leur poignee. `variant="toolbar"` (par defaut) ne change pas. La variante, comme `extensions`, est lue une seule fois, a la creation de l'editeur.
+
+La barre de mise en forme reste sous les onglets, menee par le bouton « Inserer un bloc » qui ouvre le meme menu que « / » (blocs de l'app compris) : qui n'a jamais utilise Notion s'y retrouve. Ferme sans choix, le menu retire le « / » qu'il avait ajoute. `:formatting-toolbar="false"` ne garde qu'une petite barre (options du bloc, annuler, retablir) : la mise en forme passe alors par « / » et par la barre qui apparait sur le texte selectionne.
 
 ```vue
 <PrRichTextEditor v-model="content" variant="blocks" label="Article" name="body" :upload-image="uploadImage" />

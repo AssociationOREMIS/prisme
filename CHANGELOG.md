@@ -2,6 +2,14 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.17 (2026-11-25)
+
+Dix-septieme version candidate, sous le tag npm `next`. L'editeur par blocs garde sa barre de mise en forme. Aucun changement cassant.
+
+### `PrRichTextEditor`
+
+- **`variant="blocks"`** : la barre de mise en forme reste, sous les onglets, menee par un bouton « Inserer un bloc » qui ouvre le menu « / » (blocs de l'app compris) ; ferme sans choix, le menu retire le « / » ajoute. Pour qui ne connait pas Notion. `formattingToolbar` (par defaut `true`) : `false` ne garde que la petite barre (options du bloc, annuler, retablir). Nouveau message `richTextEditor.insertBlock`.
+
 ## 1.0.0-rc.16 (2026-11-25)
 
 Seizieme version candidate, sous le tag npm `next`. Un mode blocs facon Notion pour l'editeur, et trois corrections : les images dans un `<figure>`, les liens sans `nofollow`, la hauteur de la barre flottante. Aucun changement cassant : la variante par defaut de l'editeur ne change pas.

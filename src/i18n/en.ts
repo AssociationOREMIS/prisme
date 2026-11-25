@@ -253,6 +253,7 @@ export const prMessagesEn: PrMessages = {
     blockHandle: 'Block handle',
     blockHandleTitle: 'Drag to move, click for options',
     blockMenu: 'Block options',
+    insertBlock: 'Insert a block',
     blockMoveUp: 'Move up',
     blockMoveDown: 'Move down',
     blockDuplicate: 'Duplicate',

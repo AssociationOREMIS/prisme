@@ -267,6 +267,8 @@ export interface PrMessages {
     blockHandle: string
     blockHandleTitle: string
     blockMenu: string
+    /** Button of the toolbar opening the "/" menu (`variant="blocks"`). */
+    insertBlock: string
     blockMoveUp: string
     blockMoveDown: string
     blockDuplicate: string
@@ -634,6 +636,7 @@ export const prMessagesFr: PrMessages = {
     blockHandle: 'Poignée du bloc',
     blockHandleTitle: 'Glisser pour déplacer, cliquer pour les options',
     blockMenu: 'Options du bloc',
+    insertBlock: 'Insérer un bloc',
     blockMoveUp: 'Monter',
     blockMoveDown: 'Descendre',
     blockDuplicate: 'Dupliquer',
