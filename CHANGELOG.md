@@ -2,6 +2,14 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.15 (2026-11-25)
+
+Quinzieme version candidate, sous le tag npm `next`. La navigation sans rechargement fonctionne sur les sites publics. Aucun changement cassant.
+
+### Corrections
+
+- **Navigation sans rechargement** (`navigation: 'swap'`) sur un site public : chaque page rechargeait completement, car ses donnees structurees (`<script type="application/ld+json">`, differentes sur chaque page) et le `<style>` d'un `<noscript>` comptaient comme des scripts et styles nouveaux. Ils sont ignores, et le `<head>` suit la page affichee : description, adresse canonique, `robots`, cartes de partage (`og:*`, `twitter:*`, `article:*`) et JSON-LD.
+
 ## 1.0.0-rc.14 (2026-11-25)
 
 Quatorzieme version candidate, sous le tag npm `next`. Des coins plus doux (squircles) et un appel a l'action qui bouge sans a-coups. Aucun changement cassant ; les keyframes `pr-pulse-out` deviennent `pr-pulse-glow`.

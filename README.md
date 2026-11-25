@@ -589,6 +589,8 @@ Ne sont jamais precharges : les liens vers un autre site, ceux qui ont `download
 
 Par defaut, un clic sur un lien ou l'envoi d'un formulaire ne recharge plus la page, dans tous les navigateurs. Prisme recupere la page suivante (le serveur renvoie toujours sa page Blade complete) et remplace seulement le contenu de `#app` : la navbar et la sidebar restent en place avec leur etat (sidebar repliee, defilement), leurs props sont mises a jour (element actif, badges), et le contenu (`.pr-shell-grid__content`, sinon tout `#app`) est reconstruit. Le titre, l'adresse, le token CSRF, les boutons Precedent/Suivant et le defilement suivent ; le focus passe au contenu et les lecteurs d'ecran entendent le titre de la nouvelle page. Le survol d'un lien precharge la page (sans Speculation Rules, inutiles ici), et sur un ecran tactile, le simple contact du doigt sur le lien, juste avant le clic.
 
+Sur un site public, le `<head>` suit aussi : la description, l'adresse canonique, la regle `robots`, les cartes de partage (`og:*`, `twitter:*`, `article:*`) et les donnees structurees (`<script type="application/ld+json">`) de la nouvelle page remplacent celles de l'ancienne. Ces blocs de donnees, differents sur chaque page, et le contenu des `<noscript>` n'empechent pas la navigation sans rechargement.
+
 Rien a changer dans les controleurs ni dans les vues. La page se recharge normalement :
 
 - si la page suivante apporte un script ou une feuille de style que la page actuelle n'a pas (`@push('scripts')`, carte, editeur...) ;
