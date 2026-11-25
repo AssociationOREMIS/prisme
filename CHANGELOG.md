@@ -2,7 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.15 (2026-11-25)
+
+Quinzieme version candidate, sous le tag npm `next`. La navigation sans rechargement fonctionne sur les sites publics. Aucun changement cassant.
 
 ### Corrections
 
