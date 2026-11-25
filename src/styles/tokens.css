@@ -110,5 +110,9 @@
   --pr-line-height-normal: 1.5;
 
   --pr-duration-fast: 120ms;
+  /* Larger movements a person follows with the eye: a call to action lifting on hover. */
+  --pr-duration-moderate: 320ms;
   --pr-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  /* Starts quickly and settles slowly, without overshooting: hover of the large buttons of a public page. */
+  --pr-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }

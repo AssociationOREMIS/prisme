@@ -22,8 +22,9 @@ export interface PrButtonProps {
   /** Route of the app's Vue Router: a link that navigates without reloading the page (see `PrLink`). */
   to?: PrLinkTo
   /**
-   * A halo that pulses around the button, to draw the eye to the one action of a page. It plays
-   * once only when the user asks for less motion. Keep it to one button per page.
+   * A soft glow that breathes around the button, to draw the eye to the one action of a page,
+   * without flashing nor overflowing onto its neighbours. It plays once only when the user asks
+   * for less motion. Keep it to one button per page.
    */
   pulse?: boolean
   /** Icon (a Lucide component) shown before the label, or after it with `icon-position="end"`. */
@@ -152,10 +153,13 @@ const buttonVariantClass: Record<NonNullable<PrButtonProps['variant']>, string> 
   danger:
     'pr:bg-[var(--pr-color-danger-solid)] pr:text-[color:var(--pr-neutral-0)] pr:shadow-[var(--pr-shadow-xs)] pr:[&:not(:disabled):hover]:bg-[var(--pr-color-danger-solid-hover)]',
   link: 'pr:bg-transparent pr:text-[color:var(--pr-color-primary)] pr:[&:not(:disabled):hover]:text-[color:var(--pr-color-primary-hover)]',
-  // A pill in a gradient of the primary color, lifted on hover. The text keeps the primary contrast
-  // color, readable on both ends of the gradient (checked in the contrast tests).
+  // A pill in a gradient of the primary color. The text keeps the primary contrast color, readable on
+  // both ends of the gradient (checked in the contrast tests). On hover the gradient slides, the button
+  // lifts and its shadow grows, all in 320 ms easing out, so it moves softly instead of jumping;
+  // pressed, it sinks back. The gradient runs over twice the width (primary, active, primary) so its
+  // position can move: a gradient itself cannot be animated.
   cta:
-    'pr-button--cta pr:rounded-[var(--pr-radius-full)] pr:bg-[linear-gradient(90deg,var(--pr-color-primary)_0%,var(--pr-color-primary-active)_100%)] pr:text-[color:var(--pr-color-primary-contrast)] pr:font-[family-name:var(--pr-font-heading)] pr:uppercase pr:tracking-[0.04em] pr:shadow-[0_0.75rem_1.5rem_color-mix(in_srgb,var(--pr-color-primary-active)_40%,transparent)] pr:transition-[transform,box-shadow] pr:[&:not(:disabled):hover]:-translate-y-0.5',
+    'pr-button--cta pr:rounded-[var(--pr-radius-full)] pr:bg-[linear-gradient(90deg,var(--pr-color-primary)_0%,var(--pr-color-primary-active)_50%,var(--pr-color-primary)_100%)] pr:bg-[length:200%_100%] pr:bg-[position:0%_50%] pr:text-[color:var(--pr-color-primary-contrast)] pr:font-[family-name:var(--pr-font-heading)] pr:uppercase pr:tracking-[0.04em] pr:shadow-[0_0.75rem_1.5rem_color-mix(in_srgb,var(--pr-color-primary-active)_35%,transparent)] pr:transition-[translate,box-shadow,background-position]! pr:duration-[var(--pr-duration-moderate)]! pr:ease-[var(--pr-ease-out)]! pr:[&:not(:disabled):hover]:-translate-y-0.5 pr:[&:not(:disabled):hover]:bg-[position:100%_50%] pr:[&:not(:disabled):hover]:shadow-[0_1.125rem_2.25rem_color-mix(in_srgb,var(--pr-color-primary-active)_45%,transparent)] pr:[&:not(:disabled):active]:translate-y-0 pr:[&:not(:disabled):active]:shadow-[0_0.5rem_1rem_color-mix(in_srgb,var(--pr-color-primary-active)_35%,transparent)]',
 }
 
 /** The call to action is roomier than a button of the same size. */
@@ -165,9 +169,10 @@ const ctaSizeClass: Record<NonNullable<PrButtonProps['size']>, string> = {
   lg: 'pr:min-h-[3.5rem] pr:px-[var(--pr-space-8)]',
 }
 
-// The halo: a ring drawn by ::after that grows and fades out, every second. pointer-events-none so
-// it never catches a click meant for the page around.
-const pulseClass = "pr-button--pulse pr:after:pointer-events-none pr:after:absolute pr:after:inset-[-4px] pr:after:rounded-[inherit] pr:after:border-4 pr:after:border-[var(--pr-color-primary)] pr:after:opacity-0 pr:after:shadow-[0_0_3.75rem_color-mix(in_srgb,var(--pr-color-primary)_50%,transparent)] pr:after:content-[''] pr:after:animate-[pr-pulse-out_1s_ease-out_infinite] pr:forced-colors:after:hidden"
+// The halo: a soft glow drawn by ::after, hugging the button, that breathes in and out every 3 s
+// (pr-pulse-glow). It never grows past 8 px, so it stays clear of a button next to it (gap of 12 px),
+// and never scales: nothing jumps. pointer-events-none so it never catches a click meant for the page.
+const pulseClass = "pr-button--pulse pr:after:pointer-events-none pr:after:absolute pr:after:inset-0 pr:after:rounded-[inherit] pr:after:content-[''] pr:after:animate-[pr-pulse-glow_3s_ease-in-out_infinite] pr:forced-colors:after:hidden"
 
 // A link reads as text: no side padding (it lines up with the text around it), a lighter weight,
 // underlined on hover. It keeps the height of its size, a target of 24 px at least (WCAG 2.5.8).

@@ -160,6 +160,7 @@ html:has(.pr-navbar--floating) {
   border: 2px solid currentColor;
   border-right-color: transparent;
   border-radius: var(--pr-radius-full);
+  corner-shape: round;
   opacity: 0;
   animation: pr-submitting-show 0s linear 150ms forwards, pr-submitting-spin 720ms linear infinite;
 }

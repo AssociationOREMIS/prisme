@@ -2,6 +2,17 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.14 (2026-11-25)
+
+Quatorzieme version candidate, sous le tag npm `next`. Des coins plus doux (squircles) et un appel a l'action qui bouge sans a-coups. Aucun changement cassant ; les keyframes `pr-pulse-out` deviennent `pr-pulse-glow`.
+
+### Apparence
+
+- **Squircles** : les coins arrondis deviennent continus, comme sur les interfaces d'Apple (`corner-shape: squircle`), dans les navigateurs qui le connaissent (Chrome et Edge 139+) ; les autres gardent les arcs de cercle. Les rayons `--pr-radius-xs` a `--pr-radius-xl` grandissent de moitie la ou les squircles s'appliquent, pour garder la meme taille visuelle. Les pilules (`--pr-radius-full`) gardent des bouts ronds. Pour s'en passer sur une page : `--pr-corner-shape: round`.
+- **`PrButton` `variant="cta"`** : le survol est doux (320 ms, courbe qui ralentit) : le degrade glisse, le bouton se souleve et son ombre grandit ; il s'enfonce au clic. Avant, il sautait de 2 px en 120 ms.
+- **`PrButton` `pulse`** : une lueur qui respire autour du bouton toutes les 3 s, au plus 8 px, au lieu d'un anneau qui grossissait de moitie chaque seconde et debordait sur le bouton voisin. Keyframes `pr-pulse-glow` (remplace `pr-pulse-out`).
+- Nouveaux tokens : `--pr-duration-moderate` (320 ms), `--pr-ease-out`, `--pr-corner-shape`.
+
 ## 1.0.0-rc.13 (2026-11-18)
 
 Treizieme version candidate, sous le tag npm `next`. Les composants des sites publics, completes pour un site entier et pour le telephone, un modele de site public dans Storybook, et une revue responsive de tout Prisme a 320 px. Un seul changement cassant : la classe `pr-navigation-menu__link--active` disparait (voir `PrNavigationMenu`).
