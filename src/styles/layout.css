@@ -79,7 +79,8 @@ html:has(.pr-navbar) {
 }
 
 /* The floating navbar of a public site is taller, with its margin around it. Its height is a
-   variable: PrSection `under-navbar` moves up by as much. */
+   variable: PrSection `under-navbar` moves up by as much. These are its usual heights, for the first
+   paint: once mounted, PrNavbar writes its measured height (ResizeObserver) on <html>. */
 :root,
 :host {
   --pr-navbar-floating-height: 7.5rem;

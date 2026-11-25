@@ -93,6 +93,27 @@ onMounted(() => {
 })
 onBeforeUnmount(() => window.removeEventListener('scroll', updateScrolled))
 
+// The floating bar's real height, margin included, in --pr-navbar-floating-height: PrSection
+// `under-navbar` moves up by exactly as much, whatever the bar holds (a taller logo, larger links,
+// a title on two lines). With the fixed default of layout.css, a bar a few pixels taller left a
+// strip of page background above the image. layout.css keeps the default for the first paint.
+const header = ref<HTMLElement | null>(null)
+let heightObserver: ResizeObserver | null = null
+onMounted(() => {
+  if (!floating.value || !header.value || typeof ResizeObserver === 'undefined') return
+  const root = document.documentElement
+  const update = () => {
+    if (header.value) root.style.setProperty('--pr-navbar-floating-height', `${header.value.offsetHeight}px`)
+  }
+  heightObserver = new ResizeObserver(update)
+  heightObserver.observe(header.value)
+  update()
+})
+onBeforeUnmount(() => {
+  heightObserver?.disconnect()
+  if (floating.value) document.documentElement.style.removeProperty('--pr-navbar-floating-height')
+})
+
 // Lined up with PrContainer: its 80rem (or 48rem) box, side gutters included, is the bar's box,
 // whose own padding (the same gutter) puts the logo on the edge of the container's text.
 const widthClass = {
@@ -142,7 +163,7 @@ const resolvedLogoAlt = computed(() => {
   <!-- Focus rings sit on the dark navbar here: a light blue (8:1) instead of the default blue-500 (2.35:1). -->
   <!-- floating: the header of a public site, a light rounded bar floating in a margin; its inner
        box carries the look, the <header> only the sticky position and the margin around it. -->
-  <header :class="headerClass">
+  <header ref="header" :class="headerClass">
     <div :class="innerClass" :data-scrolled="floating ? String(scrolled) : undefined">
       <div class="pr-navbar__brand pr:inline-flex pr:min-w-0 pr:items-center pr:gap-[var(--pr-space-3)]">
         <slot name="brand">

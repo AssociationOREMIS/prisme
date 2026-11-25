@@ -2,6 +2,25 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.16 (2026-11-25)
+
+Seizieme version candidate, sous le tag npm `next`. Un mode blocs facon Notion pour l'editeur, et trois corrections : les images dans un `<figure>`, les liens sans `nofollow`, la hauteur de la barre flottante. Aucun changement cassant : la variante par defaut de l'editeur ne change pas.
+
+### `PrRichTextEditor`
+
+- **`variant="blocks"`** : un editeur par blocs, sur le modele de celui de PIO. Menu « / » pour inserer un bloc (Texte, Titre, Sous-titre, listes, Citation, encadres, Image, Tableau, Video YouTube, Section repliable, Separateur), filtre par ce qui suit la barre, au clavier (motif « listbox » de l'APG, `aria-activedescendant`), a 8 px des bords de l'ecran. Poignee pour glisser un bloc et menu Monter, Descendre, Dupliquer, Supprimer ; au clavier, Alt + fleches et le bouton « Options du bloc » (WCAG 2.5.7), avec des annonces polies. Barre de mise en forme sur le texte selectionne (Gras, Italique, Souligne, Barre, Lien, Surligner, Titre, Sous-titre), atteinte par Alt + F10. Onglets « Ecrire », « Apercu » et « Code HTML » (un bloc par ligne, recharge dans l'editeur en revenant sur « Ecrire ») ; le champ cache `name` envoie toujours le dernier HTML, meme depuis l'onglet du code.
+- **`extensions`** : des extensions tiptap ajoutees apres celles de l'editeur (les blocs de mise en page d'un site).
+- **`slashItems`** : des entrees du menu « / » (`PrRichTextEditorSlashItem` : `title`, `hint`, `icon`, `keywords`, `group`, `command`), apres celles de l'editeur, regroupees par `group`.
+- `@oremis/prisme/editor` exporte `PrRichTextEditorSlashItem`, `PrRichTextEditorBlock`, `filterSlashItems`, `keepSlashMenuOpen`, `moveBlock`, `duplicateBlock`, `deleteBlock`, `topBlockPos`, `htmlToSource`, `SlashCommand` et `BlockKeys`.
+- Nouveaux messages `richTextEditor` : `blocksPlaceholder`, `blocksHelp`, `slashMenu`, `slashEmpty`, `slashBlock`, `blockHandle`, `blockHandleTitle`, `blockMenu`, `blockMoveUp`, `blockMoveDown`, `blockDuplicate`, `blockDelete`, `blockMovedUp`, `blockMovedDown`, `blockAlreadyFirst`, `blockAlreadyLast`, `blockDuplicated`, `blockDeleted`, `selectionToolbar`, `underline`, `strike`, `views`, `viewWrite`, `viewPreview`, `viewSource`, `sourceHint`, `sourceLoaded`.
+- Nouvelles `peerDependencies` optionnelles de l'editeur : `@tiptap/pm` et `@tiptap/extension-bubble-menu` (3.31.3). La poignee est faite maison plutot qu'avec `@tiptap/extension-drag-handle`, qui importe Yjs et l'extension de collaboration.
+
+### Corrections
+
+- **`PrRichTextEditor`** : les liens ne recoivent plus `target="_blank" rel="noopener noreferrer nofollow"` (le reglage par defaut de tiptap) : un lien du site s'ouvre sur place et les moteurs de recherche le suivent. Un lien qui avait deja une `target` la garde.
+- **`PrRichTextEditor`** : une image placee dans un `<figure>` (presque toutes celles d'un contenu venu de WordPress) disparaissait du texte ouvert dans l'editeur, et donc a l'enregistrement : `tiptap-extension-resize-image` les ignore (`img[src]:not(figure img)`). Elles sont lues comme les autres ; leur legende reste, en paragraphe.
+- **`PrNavbar` `variant="floating"`** : la barre mesure sa vraie hauteur (`ResizeObserver`) et l'ecrit dans `--pr-navbar-floating-height`, sur `<html>`. Une `PrSection` ou un `PrHero` `under-navbar` passe ainsi exactement dessous, quel que soit le contenu de la barre : avec la hauteur fixe de `layout.css` (7,5 rem, 5,25 rem sur telephone), une barre un peu plus haute laissait une bande du fond de la page au-dessus de l'image. Les valeurs fixes restent pour le premier affichage.
+
 ## 1.0.0-rc.15 (2026-11-25)
 
 Quinzieme version candidate, sous le tag npm `next`. La navigation sans rechargement fonctionne sur les sites publics. Aucun changement cassant.

@@ -25,8 +25,16 @@ declare module '@tiptap/core' {
  * `tiptap-extension-resize-image`'s image node (same name, `imageResize`, same HTML) with an
  * `alt` attribute that keeps the difference between a decorative image (`alt=""`) and an image
  * with no alternative text at all (no `alt`), and is never turned into a number (`alt="2024"`).
+ *
+ * It also reads an image inside a `<figure>` (WordPress puts nearly all its images there): the
+ * package skips them (`img[src]:not(figure img)`, for figure nodes Prisme does not register), so
+ * they vanished from a text opened in the editor. Their caption stays, as a paragraph.
  */
 export const AccessibleImage = ImageResize.extend({
+  parseHTML() {
+    return [{ tag: 'img[src]' }]
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),

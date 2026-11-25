@@ -6,6 +6,12 @@ import type { PrButtonAction } from '../components/atoms/Button/actions'
  * part through `app.use(Prisme, { messages })`. A prop on the component (`closeLabel`,
  * `placeholder`...) still wins for that one instance.
  */
+/** The editor's own blocks of the "/" menu of `PrRichTextEditor` (`variant="blocks"`). */
+export type PrRichTextEditorBlock =
+  | 'paragraph' | 'heading' | 'subheading' | 'bulletList' | 'orderedList' | 'taskList' | 'blockquote'
+  | 'calloutInfo' | 'calloutSuccess' | 'calloutWarning' | 'calloutDanger'
+  | 'image' | 'table' | 'youtube' | 'details' | 'separator'
+
 export interface PrMessages {
   /** BCP 47 tag for dates and numbers (month names, day names, file sizes). */
   locale: string
@@ -248,6 +254,41 @@ export interface PrMessages {
     calloutPrefixDanger: string
     /** Name of an emoji of the emoji picker, from its tiptap shortcode (`white_check_mark`). */
     emojiName: (name: string) => string
+    /** Placeholder of the blocks variant (`variant="blocks"`). */
+    blocksPlaceholder: string
+    /** Help line under the blocks variant: "/" menu, moving blocks, formatting the selection. */
+    blocksHelp: string
+    /** Name of the "/" menu (a listbox), and its text when nothing matches. */
+    slashMenu: string
+    slashEmpty: string
+    /** Title, hint and search keywords of a block of the "/" menu. */
+    slashBlock: (block: PrRichTextEditorBlock) => { title: string, hint: string, keywords: string }
+    /** The drag handle of a block (also opens its menu), its tooltip, and the menu itself. */
+    blockHandle: string
+    blockHandleTitle: string
+    blockMenu: string
+    blockMoveUp: string
+    blockMoveDown: string
+    blockDuplicate: string
+    blockDelete: string
+    /** Live announcements after a block was moved, duplicated or deleted. */
+    blockMovedUp: string
+    blockMovedDown: string
+    blockAlreadyFirst: string
+    blockAlreadyLast: string
+    blockDuplicated: string
+    blockDeleted: string
+    /** The formatting toolbar that appears over selected text, and its two extra marks. */
+    selectionToolbar: string
+    underline: string
+    strike: string
+    /** The "Écrire" / "Aperçu" / "Code HTML" tabs of the blocks variant. */
+    views: string
+    viewWrite: string
+    viewPreview: string
+    viewSource: string
+    sourceHint: string
+    sourceLoaded: string
   }
   sidebar: {
     label: string
@@ -568,6 +609,50 @@ export const prMessagesFr: PrMessages = {
       tada: 'Fête',
       blush: 'Visage souriant',
     } as Record<string, string>)[name] ?? name.replaceAll('_', ' '),
+    blocksPlaceholder: 'Écrivez, ou tapez / pour insérer un bloc',
+    blocksHelp: 'Astuce : tapez / pour insérer un bloc. Alt + flèche haut ou bas déplace le bloc, Alt + F10 met en forme le texte sélectionné.',
+    slashMenu: 'Insérer un bloc',
+    slashEmpty: 'Aucun bloc ne correspond',
+    slashBlock: block => ({
+      paragraph: { title: 'Texte', hint: 'Un paragraphe simple', keywords: 'paragraphe texte normal' },
+      heading: { title: 'Titre', hint: 'Grand titre de partie', keywords: 'titre h2 partie' },
+      subheading: { title: 'Sous-titre', hint: 'Titre plus petit', keywords: 'sous titre h3' },
+      bulletList: { title: 'Liste à puces', hint: 'Une liste simple', keywords: 'liste puces' },
+      orderedList: { title: 'Liste numérotée', hint: 'Des étapes dans l\'ordre', keywords: 'liste numero etapes ordre' },
+      taskList: { title: 'Liste de tâches', hint: 'Des cases à cocher', keywords: 'liste taches cases cocher todo' },
+      blockquote: { title: 'Citation', hint: 'Les mots de quelqu\'un', keywords: 'citation guillemets' },
+      calloutInfo: { title: 'Encadré info', hint: 'Une information à retenir', keywords: 'encadre info note information' },
+      calloutSuccess: { title: 'Encadré succès', hint: 'Une bonne nouvelle, une réussite', keywords: 'encadre succes reussite bravo' },
+      calloutWarning: { title: 'Encadré avertissement', hint: 'Un point de vigilance', keywords: 'encadre avertissement attention vigilance' },
+      calloutDanger: { title: 'Encadré danger', hint: 'Un risque, une interdiction', keywords: 'encadre danger risque interdit' },
+      image: { title: 'Image', hint: 'Depuis votre ordinateur', keywords: 'image photo illustration' },
+      table: { title: 'Tableau', hint: '3 colonnes, 3 lignes', keywords: 'tableau grille colonnes' },
+      youtube: { title: 'Vidéo YouTube', hint: 'Une vidéo avec son titre', keywords: 'video youtube film' },
+      details: { title: 'Section repliable', hint: 'Un contenu à déplier', keywords: 'section repliable details deplier accordeon' },
+      separator: { title: 'Séparateur', hint: 'Une ligne entre deux parties', keywords: 'separateur ligne trait' },
+    })[block],
+    blockHandle: 'Poignée du bloc',
+    blockHandleTitle: 'Glisser pour déplacer, cliquer pour les options',
+    blockMenu: 'Options du bloc',
+    blockMoveUp: 'Monter',
+    blockMoveDown: 'Descendre',
+    blockDuplicate: 'Dupliquer',
+    blockDelete: 'Supprimer',
+    blockMovedUp: 'Bloc monté',
+    blockMovedDown: 'Bloc descendu',
+    blockAlreadyFirst: 'Ce bloc est déjà le premier',
+    blockAlreadyLast: 'Ce bloc est déjà le dernier',
+    blockDuplicated: 'Bloc dupliqué',
+    blockDeleted: 'Bloc supprimé',
+    selectionToolbar: 'Mise en forme de la sélection',
+    underline: 'Souligné',
+    strike: 'Barré',
+    views: 'Affichage du contenu',
+    viewWrite: 'Écrire',
+    viewPreview: 'Aperçu',
+    viewSource: 'Code HTML',
+    sourceHint: 'Un bloc par ligne. Vos modifications sont chargées dans l\'éditeur en revenant sur « Écrire » ; ce que l\'éditeur ne sait pas afficher est retiré.',
+    sourceLoaded: 'Le code a été chargé dans l\'éditeur.',
   },
   sidebar: {
     label: 'Navigation principale',

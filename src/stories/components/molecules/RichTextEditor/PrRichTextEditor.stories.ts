@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
+import { PanelTop } from '@lucide/vue'
+import { Node } from '@tiptap/core'
 import { ref } from 'vue'
 import { PrButton } from '../../../../components/atoms/Button'
-import { PrRichTextEditor } from '../../../../components/molecules/RichTextEditor'
+import { PrRichTextEditor, type PrRichTextEditorSlashItem } from '../../../../components/molecules/RichTextEditor'
 import '../../../stories.css'
 
 const meta = {
@@ -349,5 +351,221 @@ export const Lists: Story = {
     await expect(getComputedStyle(nested).listStyleType).toBe('circle')
     await expect(getComputedStyle(numbers).listStyleType).toBe('decimal')
     await expect(parseFloat(getComputedStyle(bullets).paddingLeft)).toBeGreaterThan(0)
+  },
+}
+
+const blocksContent = `
+  <h2>Journée de sensibilisation</h2>
+  <p>Merci à toutes et tous pour votre venue. Voici <strong>le programme</strong> de la journée.</p>
+  <ul><li><p>Accueil à 9 h</p></li><li><p>Ateliers en petits groupes</p></li></ul>
+  <div data-callout data-variant="info"><p>Le repas est offert.</p></div>
+`
+
+// The Notion-like variant: "/" inserts a block, the handle (or "Options du bloc") moves it, a
+// toolbar appears over selected text, and the tabs show the preview and the HTML code.
+export const Blocks: Story = {
+  render: () => ({
+    components: { PrRichTextEditor },
+    setup() {
+      const value = ref(blocksContent)
+      const uploadImage = async (file: File) => `https://picsum.photos/seed/${encodeURIComponent(file.name)}/640/360`
+      return { value, uploadImage }
+    },
+    template: '<div class="story-column"><PrRichTextEditor v-model="value" variant="blocks" label="Article" :upload-image="uploadImage" /></div>',
+  }),
+}
+
+// Typing "/" lists the blocks, filtered by what follows; arrows and Enter choose one. The play
+// leaves the menu open for the accessibility check.
+export const BlocksSlashMenu: Story = {
+  render: () => ({
+    components: { PrRichTextEditor },
+    setup() {
+      const value = ref('<p></p>')
+      return { value }
+    },
+    template: '<div class="story-column"><PrRichTextEditor v-model="value" variant="blocks" label="Article" /></div>',
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const editable = canvasElement.querySelector<HTMLElement>('.tiptap')!
+
+    await userEvent.click(editable)
+    await userEvent.keyboard('/tit')
+    const listbox = await canvas.findByRole('listbox', { name: 'Insérer un bloc' })
+    await expect(within(listbox).getAllByRole('option').map(option => option.querySelector('.pr-rich-text-editor__slash-title')?.textContent)).toEqual(['Titre', 'Sous-titre'])
+    await expect(editable).toHaveFocus()
+    await waitFor(() => expect(editable).toHaveAttribute('aria-activedescendant', `${listbox.id}-option-0`))
+
+    await userEvent.keyboard('{ArrowDown}{Enter}')
+    await waitFor(() => expect(editable.querySelector('h3')).not.toBeNull())
+    await waitFor(() => expect(canvas.queryByRole('listbox')).toBeNull())
+
+    await userEvent.keyboard('Programme{Enter}/encadré')
+    const callouts = await canvas.findByRole('listbox', { name: 'Insérer un bloc' })
+    await expect(within(callouts).getAllByRole('option')).toHaveLength(4)
+    const box = callouts.getBoundingClientRect()
+    await expect(box.left).toBeGreaterThanOrEqual(8)
+    await expect(box.right).toBeLessThanOrEqual(document.documentElement.clientWidth - 8)
+  },
+}
+
+// The keyboard alternative to dragging (WCAG 2.5.7): Alt+arrows move the current block, and the
+// "Options du bloc" button opens the block menu. The play leaves the menu open.
+export const BlocksKeyboard: Story = {
+  render: () => ({
+    components: { PrRichTextEditor },
+    setup() {
+      const value = ref('<p>Premier</p><p>Deuxième</p><p>Troisième</p>')
+      return { value }
+    },
+    template: '<div class="story-column"><PrRichTextEditor v-model="value" variant="blocks" label="Article" /></div>',
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const editable = canvasElement.querySelector<HTMLElement>('.tiptap')!
+
+    await userEvent.click(editable.querySelector('p')!)
+    await userEvent.keyboard('{Alt>}{ArrowDown}{/Alt}')
+    await waitFor(() => expect(Array.from(editable.querySelectorAll('p')).map(p => p.textContent)).toEqual(['Deuxième', 'Premier', 'Troisième']))
+    await waitFor(() => expect(canvasElement.textContent).toContain('Bloc descendu'))
+
+    const handle = canvasElement.querySelector<HTMLElement>('.pr-rich-text-editor__block-handle')!
+    await expect(handle).toBeVisible()
+    await expect(handle.getBoundingClientRect().width).toBeGreaterThanOrEqual(24)
+
+    const optionsButton = canvas.getByRole('button', { name: 'Options du bloc' })
+    await userEvent.click(optionsButton)
+    const menu = await canvas.findByRole('menu', { name: 'Options du bloc' })
+    await expect(within(menu).getByRole('menuitem', { name: /Monter/ })).toHaveFocus()
+    await userEvent.keyboard('{Escape}')
+    await expect(menu).not.toBeInTheDocument()
+    await expect(optionsButton).toHaveFocus()
+
+    await userEvent.keyboard('{Enter}')
+    await canvas.findByRole('menu', { name: 'Options du bloc' })
+  },
+}
+
+// "Écrire", "Aperçu", "Code HTML": the code is one block per line, loaded back when going back to
+// "Écrire". The play ends on the preview.
+export const BlocksTabs: Story = {
+  render: () => ({
+    components: { PrRichTextEditor },
+    setup() {
+      const value = ref(blocksContent)
+      return { value }
+    },
+    template: '<div class="story-column"><PrRichTextEditor v-model="value" variant="blocks" label="Article" name="article" /></div>',
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await userEvent.click(canvas.getByRole('tab', { name: 'Code HTML' }))
+    const code = canvas.getByRole('textbox', { name: 'Code HTML : Article' }) as HTMLTextAreaElement
+    await expect(code.value.split('\n')[0]).toBe('<h2>Journée de sensibilisation</h2>')
+
+    await userEvent.clear(code)
+    await userEvent.type(code, '<h2>Nouveau titre</h2>')
+    await userEvent.click(canvas.getByRole('tab', { name: 'Écrire' }))
+    await waitFor(() => expect(canvasElement.querySelector('.tiptap')).toHaveFocus())
+    await waitFor(() => expect(canvasElement.querySelector('.tiptap h2')).toHaveTextContent('Nouveau titre'))
+    await waitFor(() => expect(canvasElement.querySelector<HTMLInputElement>('input[name="article"]')!.value).toContain('Nouveau titre'))
+
+    const preview = canvas.getByRole('tab', { name: 'Aperçu' })
+    preview.focus()
+    await userEvent.keyboard('{ArrowLeft}')
+    await waitFor(() => expect(canvas.getByRole('tab', { name: 'Écrire' })).toHaveFocus())
+    await userEvent.keyboard('{ArrowRight}')
+    await waitFor(() => expect(preview).toHaveAttribute('aria-selected', 'true'))
+    await expect(preview).toHaveFocus()
+    await expect(canvas.getByRole('tabpanel', { name: 'Aperçu' })).toHaveTextContent('Nouveau titre')
+  },
+}
+
+// Selecting text shows a formatting toolbar over it; Alt+F10 reaches it from the keyboard and
+// Escape goes back to the text. The play leaves it shown.
+export const BlocksSelectionToolbar: Story = {
+  render: () => ({
+    components: { PrRichTextEditor },
+    setup() {
+      const value = ref('<p>Un texte à mettre en forme.</p>')
+      return { value }
+    },
+    template: '<div class="story-column" style="padding-top: 4rem"><PrRichTextEditor v-model="value" variant="blocks" label="Article" /></div>',
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const editable = canvasElement.querySelector<HTMLElement>('.tiptap')!
+
+    await userEvent.click(editable)
+    await userEvent.keyboard('{Control>}a{/Control}')
+    const toolbar = await canvas.findByRole('toolbar', { name: 'Mise en forme de la sélection' })
+    await waitFor(() => expect(toolbar).toBeVisible())
+
+    await userEvent.keyboard('{Alt>}{F10}{/Alt}')
+    const bold = within(toolbar).getByRole('button', { name: 'Gras' })
+    await expect(bold).toHaveFocus()
+    await userEvent.keyboard('{Enter}')
+    await waitFor(() => expect(editable.querySelector('strong')).not.toBeNull())
+    await waitFor(() => expect(bold).toHaveAttribute('aria-pressed', 'true'))
+    await waitFor(() => expect(editable).toHaveFocus())
+
+    await userEvent.keyboard('{Alt>}{F10}{/Alt}')
+    await userEvent.keyboard('{ArrowRight}')
+    await expect(within(toolbar).getByRole('button', { name: 'Italique' })).toHaveFocus()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(editable).toHaveFocus())
+    await expect(toolbar).toBeVisible()
+  },
+}
+
+// An app's own block: a tiptap node (`extensions`) and its entry in the "/" menu (`slashItems`),
+// listed after the editor's blocks under its group.
+const Banner = Node.create({
+  name: 'banner',
+  group: 'block',
+  content: 'inline*',
+  parseHTML: () => [{ tag: 'section[data-banner]' }],
+  renderHTML: () => ['section', { 'data-banner': '', 'style': 'padding: 1rem; border-radius: 0.5rem; background: var(--pr-color-surface-subtle); font-weight: 700' }, 0],
+})
+
+export const BlocksCustomBlock: Story = {
+  render: () => ({
+    components: { PrRichTextEditor },
+    setup() {
+      const value = ref('<section data-banner="">Bienvenue sur le site</section><p></p>')
+      const extensions = [Banner]
+      const slashItems: PrRichTextEditorSlashItem[] = [{
+        title: 'Bannière',
+        hint: 'Un grand bandeau d\'accueil',
+        icon: PanelTop,
+        keywords: 'banniere bandeau accueil',
+        group: 'Mise en page',
+        command: editor => editor.chain().focus().setNode('banner').run(),
+      }]
+      return { value, extensions, slashItems }
+    },
+    template: `
+      <div class="story-column">
+        <PrRichTextEditor v-model="value" variant="blocks" label="Page d'accueil" :extensions="extensions" :slash-items="slashItems" />
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const editable = canvasElement.querySelector<HTMLElement>('.tiptap')!
+    await expect(editable.querySelector('section[data-banner]')).toHaveTextContent('Bienvenue sur le site')
+
+    await userEvent.click(editable.querySelector('p')!)
+    await userEvent.keyboard('/bandeau')
+    const listbox = await canvas.findByRole('listbox', { name: 'Insérer un bloc' })
+    await expect(within(listbox).getByRole('group', { name: 'Mise en page' })).toBeInTheDocument()
+    await userEvent.keyboard('{Enter}Nos actions')
+    await waitFor(() => expect(editable.querySelectorAll('section[data-banner]')).toHaveLength(2))
+
+    // Left open, short enough not to scroll, for the accessibility check.
+    await userEvent.keyboard('{Enter}/ban')
+    await canvas.findByRole('listbox', { name: 'Insérer un bloc' })
   },
 }

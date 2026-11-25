@@ -14,7 +14,22 @@ import { PrRichTextEditor } from './components/molecules/RichTextEditor'
  * `@oremis/prisme/styles.css` (see `src/styles/prisme.css`).
  */
 export { PrRichTextEditor }
-export type { PrRichTextEditorProps } from './components/molecules/RichTextEditor'
+export type { PrRichTextEditorProps, PrRichTextEditorSlashItem } from './components/molecules/RichTextEditor'
+export type { PrRichTextEditorBlock } from './i18n/messages'
+
+// The helpers of the blocks variant (`variant="blocks"`), for an app's own slash items and blocks.
+export {
+  BlockKeys,
+  deleteBlock,
+  duplicateBlock,
+  filterSlashItems,
+  htmlToSource,
+  keepSlashMenuOpen,
+  moveBlock,
+  SlashCommand,
+  topBlockPos,
+} from './components/molecules/RichTextEditor/blocks'
+export type { PrBlockMoveResult, PrSlashCommandOptions, PrSlashMenuRenderer } from './components/molecules/RichTextEditor/blocks'
 
 export { Callout } from './tiptap/callout'
 export type { PrCalloutAttributes, PrCalloutOptions, PrCalloutVariant } from './tiptap/callout'
