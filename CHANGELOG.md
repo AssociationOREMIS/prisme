@@ -2,7 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.17 (2026-11-25)
+
+Dix-septieme version candidate, sous le tag npm `next`. L'editeur par blocs garde sa barre de mise en forme. Aucun changement cassant.
 
 ### `PrRichTextEditor`
 
