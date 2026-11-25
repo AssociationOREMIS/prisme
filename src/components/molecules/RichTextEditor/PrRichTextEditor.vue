@@ -36,6 +36,7 @@ import {
   Table2,
   TriangleAlert,
   Undo2,
+  Plus,
 } from '@lucide/vue'
 import type { AnyExtension, Editor } from '@tiptap/core'
 import { CharacterCount } from '@tiptap/extension-character-count'
@@ -101,6 +102,12 @@ export interface PrRichTextEditorProps {
   extensions?: AnyExtension[]
   /** Extra items of the "/" menu (`variant="blocks"`), listed after the editor's own blocks. */
   slashItems?: PrRichTextEditorSlashItem[]
+  /**
+   * `variant="blocks"`: the fixed formatting toolbar too, led by « Insérer un bloc » (the "/" menu,
+   * found without knowing it). On by default: people who never used Notion find their way. `false`
+   * leaves only the "/" menu, the handle and the toolbar over selected text.
+   */
+  formattingToolbar?: boolean
 }
 
 const props = withDefaults(defineProps<PrRichTextEditorProps>(), {
@@ -117,6 +124,7 @@ const props = withDefaults(defineProps<PrRichTextEditorProps>(), {
   variant: 'toolbar',
   extensions: () => [],
   slashItems: () => [],
+  formattingToolbar: true,
 })
 
 const messages = usePrMessages()
@@ -407,6 +415,8 @@ function slashRenderer(): PrSlashMenuRenderer {
       slash.items = []
       slashCommand = null
       syncSlashAria()
+      // After the plugin's own update: a choice has already replaced the "/".
+      void nextTick(removeLoneSlash)
     },
   }
 }
@@ -414,6 +424,38 @@ function slashRenderer(): PrSlashMenuRenderer {
 function selectSlashItem(index: number) {
   const item = slash.items[index]
   if (item) slashCommand?.(item)
+}
+
+/**
+ * « Insérer un bloc » of the toolbar: types the "/" that opens the menu, in the current paragraph
+ * when it is empty, else in a new one after the current block. The "/" left alone when the menu
+ * closes without a choice is removed.
+ */
+let slashFromToolbar = false
+function insertBlockFromToolbar() {
+  const instance = editor.value
+  if (!instance) return
+  const { $from } = instance.state.selection
+  const inEmptyParagraph = $from.parent.type.name === 'paragraph' && $from.parent.content.size === 0
+  const chain = instance.chain().focus()
+
+  if (!inEmptyParagraph) {
+    const after = $from.depth > 0 ? $from.after(1) : instance.state.doc.content.size
+    chain.insertContentAt(after, { type: 'paragraph' }).setTextSelection(after + 1)
+  }
+
+  slashFromToolbar = true
+  chain.insertContent('/').run()
+}
+
+function removeLoneSlash() {
+  if (!slashFromToolbar) return
+  slashFromToolbar = false
+  const instance = editor.value
+  const $from = instance?.state.selection.$from
+  if (instance && $from && $from.parent.type.name === 'paragraph' && $from.parent.textContent === '/') {
+    instance.chain().deleteRange({ from: $from.pos - 1, to: $from.pos }).run()
+  }
 }
 
 /* Toolbar over selected text: shown while writing, over a text selection, in the focused editor. */
@@ -1132,16 +1174,85 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
         Keyboard: one tab stop, arrow keys between controls (see `onToolbarKeydown`). Toggle
         buttons carry `aria-pressed`.
       -->
+      <!--
+        Blocks variant: the tabs, then the formatting toolbar (formattingToolbar, below), or only a
+        small toolbar (the block menu for the keyboard, undo, redo) when it is turned off: the
+        formatting is then in the "/" menu and in the toolbar over selected text.
+      -->
+      <div
+        v-if="isBlocks"
+        class="pr-rich-text-editor__topbar pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:justify-between pr:gap-[var(--pr-space-2)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]"
+        :class="formattingToolbar ? 'pr:rounded-t-[var(--pr-radius-lg)]' : 'pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:rounded-t-[var(--pr-radius-lg)]'"
+      >
+        <div ref="tablistRef" class="pr-rich-text-editor__tabs pr:flex pr:flex-wrap pr:gap-[var(--pr-space-1)]" role="tablist" :aria-label="label ? `${messages.richTextEditor.views} : ${label}` : messages.richTextEditor.views">
+          <button
+            v-for="(view, index) in VIEWS"
+            :id="tabId(view)"
+            :key="view"
+            type="button"
+            role="tab"
+            class="pr-rich-text-editor__tab pr:min-h-9 pr:rounded-[var(--pr-radius-md)] pr:border! pr:border-transparent! pr:bg-[transparent] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:motion-reduce:transition-none"
+            :class="currentView === view ? 'pr:bg-[var(--pr-color-surface-subtle)]! pr:text-[color:var(--pr-color-text)]! pr:border-[var(--pr-color-border-strong)]!' : ''"
+            :aria-selected="currentView === view"
+            :aria-controls="panelId(view)"
+            :tabindex="currentView === view ? 0 : -1"
+            @click="showView(view, view === 'write' ? 'editor' : 'none')"
+            @keydown="onTabKeydown($event, index)"
+          >
+            {{ viewLabels[view] }}
+          </button>
+        </div>
+        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- a toolbar (roving focus): arrow keys move between its controls (WAI-ARIA toolbar pattern) -->
+        <div
+          v-if="!formattingToolbar"
+          ref="toolbarRef"
+          class="pr-rich-text-editor__toolbar pr:flex pr:items-center pr:gap-[var(--pr-space-1)]"
+          role="toolbar"
+          :aria-label="messages.richTextEditor.toolbar"
+          @keydown="onToolbarKeydown"
+          @focusin="onToolbarFocusin"
+        >
+          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor || disabled || currentView !== 'write'"
+                  :title="messages.richTextEditor.blockMenu" :aria-label="messages.richTextEditor.blockMenu"
+                  aria-haspopup="menu" @click="openBlockMenu">
+            <GripVertical :size="16" aria-hidden="true" />
+          </button>
+          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor?.can().undo() || currentView !== 'write'"
+                  :title="messages.richTextEditor.undo" :aria-label="messages.richTextEditor.undo" @click="editor?.chain().focus().undo().run()">
+            <Undo2 :size="16" aria-hidden="true" />
+          </button>
+          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor?.can().redo() || currentView !== 'write'"
+                  :title="messages.richTextEditor.redo" :aria-label="messages.richTextEditor.redo" @click="editor?.chain().focus().redo().run()">
+            <Redo2 :size="16" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
       <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- a toolbar (roving focus): arrow keys move between its controls (WAI-ARIA toolbar pattern) -->
       <div
-        v-if="!isBlocks"
+        v-if="!isBlocks || formattingToolbar"
+        v-show="!isBlocks || currentView === 'write'"
         ref="toolbarRef"
-        class="pr-rich-text-editor__toolbar pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:rounded-t-[var(--pr-radius-lg)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]"
+        class="pr-rich-text-editor__toolbar pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:gap-[var(--pr-space-1)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]"
+        :class="isBlocks ? '' : 'pr:rounded-t-[var(--pr-radius-lg)]'"
         role="toolbar"
         :aria-label="messages.richTextEditor.toolbar"
         @keydown="onToolbarKeydown"
         @focusin="onToolbarFocusin"
       >
+        <template v-if="isBlocks">
+          <button type="button" data-toolbar-item :class="[toolbarButtonClass, 'pr:w-auto! pr:gap-[var(--pr-space-1)] pr:px-[var(--pr-space-2)]! pr:font-semibold']" :disabled="!editor || disabled"
+                  :aria-haspopup="'listbox'" @click="insertBlockFromToolbar">
+            <Plus :size="16" aria-hidden="true" />
+            {{ messages.richTextEditor.insertBlock }}
+          </button>
+          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor || disabled"
+                  :title="messages.richTextEditor.blockMenu" :aria-label="messages.richTextEditor.blockMenu"
+                  aria-haspopup="menu" @click="openBlockMenu">
+            <GripVertical :size="16" aria-hidden="true" />
+          </button>
+          <span class="pr:mx-[var(--pr-space-1)] pr:h-6 pr:w-px pr:bg-[var(--pr-color-border)]" aria-hidden="true" />
+        </template>
         <button type="button" data-toolbar-item :class="[toolbarButtonClass, editor?.isActive('heading', { level: 2 }) ? toolbarButtonActiveClass : '']" :aria-pressed="Boolean(editor?.isActive('heading', { level: 2 }))"
                 :disabled="!editor || disabled" :title="messages.richTextEditor.heading" :aria-label="messages.richTextEditor.heading" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()">
           <Heading2 :size="16" aria-hidden="true" />
@@ -1294,57 +1405,6 @@ const toolbarButtonActiveClass = 'pr:bg-[var(--pr-color-primary)]! pr:text-[colo
                 :title="messages.richTextEditor.redo" :aria-label="messages.richTextEditor.redo" @click="editor?.chain().focus().redo().run()">
           <Redo2 :size="16" aria-hidden="true" />
         </button>
-      </div>
-
-      <!--
-        Blocks variant: the tabs and a small toolbar (the block menu for the keyboard, undo, redo).
-        The formatting is in the "/" menu and in the toolbar over selected text.
-      -->
-      <div
-        v-else
-        class="pr-rich-text-editor__topbar pr:sticky pr:top-[var(--pr-rich-text-editor-sticky-offset,0px)] pr:z-10 pr:flex pr:flex-wrap pr:items-center pr:justify-between pr:gap-[var(--pr-space-2)] pr:rounded-t-[var(--pr-radius-lg)] pr:border-b pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:p-[var(--pr-space-2)]"
-      >
-        <div ref="tablistRef" class="pr-rich-text-editor__tabs pr:flex pr:flex-wrap pr:gap-[var(--pr-space-1)]" role="tablist" :aria-label="label ? `${messages.richTextEditor.views} : ${label}` : messages.richTextEditor.views">
-          <button
-            v-for="(view, index) in VIEWS"
-            :id="tabId(view)"
-            :key="view"
-            type="button"
-            role="tab"
-            class="pr-rich-text-editor__tab pr:min-h-9 pr:rounded-[var(--pr-radius-md)] pr:border! pr:border-transparent! pr:bg-[transparent] pr:px-[var(--pr-space-3)] pr:text-[length:var(--pr-font-size-sm)] pr:font-semibold pr:text-[color:var(--pr-color-text-muted)] pr:transition-colors pr:duration-[var(--pr-duration-fast)] pr:hover:bg-[var(--pr-color-surface-subtle)] pr:focus-visible:outline-2 pr:focus-visible:outline-offset-2 pr:focus-visible:outline-[var(--pr-color-focus)] pr:motion-reduce:transition-none"
-            :class="currentView === view ? 'pr:bg-[var(--pr-color-surface-subtle)]! pr:text-[color:var(--pr-color-text)]! pr:border-[var(--pr-color-border-strong)]!' : ''"
-            :aria-selected="currentView === view"
-            :aria-controls="panelId(view)"
-            :tabindex="currentView === view ? 0 : -1"
-            @click="showView(view, view === 'write' ? 'editor' : 'none')"
-            @keydown="onTabKeydown($event, index)"
-          >
-            {{ viewLabels[view] }}
-          </button>
-        </div>
-        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- a toolbar (roving focus): arrow keys move between its controls (WAI-ARIA toolbar pattern) -->
-        <div
-          ref="toolbarRef"
-          class="pr-rich-text-editor__toolbar pr:flex pr:items-center pr:gap-[var(--pr-space-1)]"
-          role="toolbar"
-          :aria-label="messages.richTextEditor.toolbar"
-          @keydown="onToolbarKeydown"
-          @focusin="onToolbarFocusin"
-        >
-          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor || disabled || currentView !== 'write'"
-                  :title="messages.richTextEditor.blockMenu" :aria-label="messages.richTextEditor.blockMenu"
-                  aria-haspopup="menu" @click="openBlockMenu">
-            <GripVertical :size="16" aria-hidden="true" />
-          </button>
-          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor?.can().undo() || currentView !== 'write'"
-                  :title="messages.richTextEditor.undo" :aria-label="messages.richTextEditor.undo" @click="editor?.chain().focus().undo().run()">
-            <Undo2 :size="16" aria-hidden="true" />
-          </button>
-          <button type="button" data-toolbar-item :class="toolbarButtonClass" :disabled="!editor?.can().redo() || currentView !== 'write'"
-                  :title="messages.richTextEditor.redo" :aria-label="messages.richTextEditor.redo" @click="editor?.chain().focus().redo().run()">
-            <Redo2 :size="16" aria-hidden="true" />
-          </button>
-        </div>
       </div>
 
       <!-- The "Écrire" panel (the whole editing area without tabs, in the toolbar variant). -->

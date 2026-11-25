@@ -62,20 +62,48 @@ function optionTitles(listbox: HTMLElement) {
 }
 
 describe('prRichTextEditor variant="blocks"', () => {
-  it('replaces the big toolbar with tabs and a small toolbar, and says how to insert a block', async () => {
+  it('shows the tabs and the formatting toolbar, led by « Insérer un bloc », and says how to insert a block', async () => {
     const wrapper = mountBlocks({ modelValue: '<p></p>' })
     const editor = await waitForEditor(wrapper)
 
     expect(wrapper.findAll('[role="tab"]').map(tab => tab.text())).toEqual(['Écrire', 'Aperçu', 'Code HTML'])
     expect(wrapper.find('[role="tab"][aria-selected="true"]').text()).toBe('Écrire')
-    expect(wrapper.find('button[aria-label="Gras"]').exists()).toBe(false)
-    expect(wrapper.find('button[aria-label="Options du bloc"]').exists()).toBe(true)
-    expect(wrapper.find('button[aria-label="Annuler"]').exists()).toBe(true)
+    const toolbar = wrapper.get('[role="toolbar"]')
+    expect(toolbar.find('button').text()).toBe('Insérer un bloc')
+    expect(toolbar.find('button[aria-label="Gras"]').exists()).toBe(true)
+    expect(toolbar.find('button[aria-label="Options du bloc"]').exists()).toBe(true)
+    expect(toolbar.find('button[aria-label="Annuler"]').exists()).toBe(true)
     expect(editor.view.dom.querySelector('p')?.getAttribute('data-placeholder')).toBe('Écrivez, ou tapez / pour insérer un bloc')
 
     const help = wrapper.find('.pr-rich-text-editor__help')
     expect(help.text()).toContain('tapez / pour insérer un bloc')
     expect(editor.view.dom.getAttribute('aria-describedby')).toContain(help.attributes('id'))
+  })
+
+  it('leaves only a small toolbar with formattingToolbar off', async () => {
+    const wrapper = mountBlocks({ modelValue: '<p></p>', formattingToolbar: false })
+    await waitForEditor(wrapper)
+
+    expect(wrapper.find('button[aria-label="Gras"]').exists()).toBe(false)
+    expect(wrapper.find('button[aria-label="Options du bloc"]').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('Insérer un bloc')
+  })
+
+  it('opens the "/" menu from « Insérer un bloc », in a new paragraph, and removes the lone "/" when nothing is chosen', async () => {
+    const wrapper = mountBlocks({ modelValue: '<p>Bonjour</p>' })
+    const editor = await waitForEditor(wrapper)
+    editor.commands.setTextSelection(3)
+
+    await wrapper.get('[role="toolbar"] button').trigger('click')
+    await flushPromises()
+    const listbox = await vi.waitFor(() => document.querySelector<HTMLElement>('[role="listbox"]') ?? Promise.reject(new Error('no menu')))
+    expect(listbox.querySelectorAll('[role="option"]').length).toBeGreaterThan(5)
+    expect(withoutTrailingParagraph(editor.getHTML())).toBe('<p>Bonjour</p><p>/</p>')
+
+    press(wrapper, 'Escape')
+    await flushPromises()
+    await vi.waitFor(() => expect(editor.getHTML()).not.toContain('<p>/</p>'))
+    expect(document.querySelector('[role="listbox"]')).toBeNull()
   })
 
   it('keeps the toolbar variant unchanged by default', async () => {
