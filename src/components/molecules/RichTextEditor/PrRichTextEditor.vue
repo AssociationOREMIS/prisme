@@ -610,7 +610,9 @@ const editor = useEditor({
   editable: !props.disabled,
   extensions: [
     StarterKit.configure({ link: false, codeBlock: false }),
-    Link.configure({ openOnClick: false, autolink: true }),
+    // No target="_blank" rel="nofollow" added to every link (tiptap's default): a link of the site opens
+    // in place and search engines follow it. A link that came with its own target keeps it.
+    Link.configure({ openOnClick: false, autolink: true, HTMLAttributes: { target: null, rel: null } }),
     AccessibleImage.configure({ minWidth: 80, maxWidth: PR_IMAGE_WIDTHS.full }),
     AccessibleYoutube.configure({ nocookie: true, width: 640, height: 360, defaultTitle: messages.richTextEditor.youtubeDefaultTitle }),
     TableKit.configure({ table: { resizable: true }, tableHeader: false }),

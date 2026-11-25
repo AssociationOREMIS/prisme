@@ -168,6 +168,19 @@ describe('prRichTextEditor', () => {
     wrapper.unmount()
   })
 
+  it('never adds target="_blank" nor rel="nofollow" to the links', async () => {
+    const wrapper = mount(PrRichTextEditor, {
+      props: { modelValue: '<p><a href="/association/">L’association</a> et <a href="https://example.org" target="_blank">un site</a></p>' },
+      attachTo: document.body,
+    })
+    const editor = await waitForEditor(wrapper)
+
+    expect(editor.getHTML()).toContain('<a href="/association/">L’association</a>')
+    expect(editor.getHTML()).not.toContain('nofollow')
+    expect(editor.getHTML()).toContain('target="_blank"')
+    wrapper.unmount()
+  })
+
   it('keeps an image inside a <figure> (WordPress), its caption as text', async () => {
     const wrapper = mount(PrRichTextEditor, {
       props: { modelValue: '<figure><img src="/storage/ag.jpg" alt="Les adhérents votent"><figcaption>Photo : OREMIS</figcaption></figure>' },
