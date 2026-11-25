@@ -2,6 +2,12 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## Non publie
+
+### Corrections
+
+- **`PrNavbar` `variant="floating"`** : la barre mesure sa vraie hauteur (`ResizeObserver`) et l'ecrit dans `--pr-navbar-floating-height`, sur `<html>`. Une `PrSection` ou un `PrHero` `under-navbar` passe ainsi exactement dessous, quel que soit le contenu de la barre : avec la hauteur fixe de `layout.css` (7,5 rem, 5,25 rem sur telephone), une barre un peu plus haute laissait une bande du fond de la page au-dessus de l'image. Les valeurs fixes restent pour le premier affichage.
+
 ## 1.0.0-rc.15 (2026-11-25)
 
 Quinzieme version candidate, sous le tag npm `next`. La navigation sans rechargement fonctionne sur les sites publics. Aucun changement cassant.

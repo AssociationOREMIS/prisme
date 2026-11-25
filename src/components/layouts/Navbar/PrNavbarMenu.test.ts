@@ -68,3 +68,36 @@ describe('PrNavbar floating', () => {
     wrapper.unmount()
   })
 })
+
+describe('PrNavbar floating height', () => {
+  it('publishes its measured height for the sections passing under it, and keeps it up to date', () => {
+    let resize: () => void = () => {}
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(callback: () => void) { resize = callback }
+      observe() {}
+      disconnect() {}
+    })
+    let height = 124
+    const offsetHeight = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(() => height)
+
+    const wrapper = mount(PrNavbar, { attachTo: document.body, props: { variant: 'floating', title: 'OREMIS' } })
+    expect(document.documentElement.style.getPropertyValue('--pr-navbar-floating-height')).toBe('124px')
+
+    height = 86
+    resize()
+    expect(document.documentElement.style.getPropertyValue('--pr-navbar-floating-height')).toBe('86px')
+
+    wrapper.unmount()
+    expect(document.documentElement.style.getPropertyValue('--pr-navbar-floating-height')).toBe('')
+    offsetHeight.mockRestore()
+  })
+
+  it('leaves the height alone for the bar of an app', () => {
+    vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} })
+
+    const wrapper = mount(PrNavbar, { attachTo: document.body, props: { title: 'SAFIR' } })
+
+    expect(document.documentElement.style.getPropertyValue('--pr-navbar-floating-height')).toBe('')
+    wrapper.unmount()
+  })
+})
