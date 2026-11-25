@@ -2,7 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.14 (2026-11-25)
+
+Quatorzieme version candidate, sous le tag npm `next`. Des coins plus doux (squircles) et un appel a l'action qui bouge sans a-coups. Aucun changement cassant ; les keyframes `pr-pulse-out` deviennent `pr-pulse-glow`.
 
 ### Apparence
 
