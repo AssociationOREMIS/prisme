@@ -2,9 +2,9 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
-## Non publie
+## 1.0.0-rc.16 (2026-11-25)
 
-Un mode blocs facon Notion pour `PrRichTextEditor`. Aucun changement cassant : la variante par defaut ne change pas.
+Seizieme version candidate, sous le tag npm `next`. Un mode blocs facon Notion pour l'editeur, et trois corrections : les images dans un `<figure>`, les liens sans `nofollow`, la hauteur de la barre flottante. Aucun changement cassant : la variante par defaut de l'editeur ne change pas.
 
 ### `PrRichTextEditor`
 
