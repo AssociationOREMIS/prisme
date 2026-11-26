@@ -74,3 +74,17 @@ describe('size', () => {
     expect(className).not.toContain('pr:w-[')
   })
 })
+
+describe.each([['PrDialog', PrDialog], ['PrSheet', PrSheet]] as const)('%s rows', (_name, component) => {
+  it('gives the body the rest of the height, so a long content scrolls', async () => {
+    mount(component, { props: { defaultOpen: true, title: 'Ajouter une convention' }, attachTo: document.body })
+    await nextTick()
+    expect(document.querySelector('[role="dialog"]')?.className).toContain('pr:grid-rows-[auto_minmax(0,1fr)]')
+  })
+
+  it('keeps a row for the footer', async () => {
+    mount(component, { props: { defaultOpen: true, title: 'Ajouter une convention' }, slots: { footer: '<button>Ajouter</button>' }, attachTo: document.body })
+    await nextTick()
+    expect(document.querySelector('[role="dialog"]')?.className).toContain('pr:grid-rows-[auto_minmax(0,1fr)_auto]')
+  })
+})

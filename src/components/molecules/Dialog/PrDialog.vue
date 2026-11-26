@@ -63,9 +63,11 @@ const emit = defineEmits<{
       <DialogOverlay class="pr-dialog__overlay pr:fixed pr:inset-0 pr:z-[80] pr:bg-[var(--pr-color-overlay)] pr:data-[state=open]:animate-[pr-fade-in_150ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-fade-out_150ms_var(--pr-ease-standard)]" />
       <!-- dvh where supported: 100vh is the tallest viewport of mobile browsers, so the bottom of a long dialog went under their toolbar. -->
       <!-- Without a description, no aria-describedby pointing to a missing element (reka-ui warned in the console). -->
+      <!-- Explicit rows, as in PrSheet: with implicit ones the body row grew with its content, the max-height cut the
+           dialog off and the body never scrolled (a long form lost its submit button). The body takes the rest and scrolls. -->
       <DialogContent
         class="pr-dialog pr:fixed pr:left-1/2 pr:top-1/2 pr:z-[90] pr:grid pr:max-h-[calc(100vh-var(--pr-space-8))] pr:supports-[height:100dvh]:max-h-[calc(100dvh-var(--pr-space-8))] pr:-translate-x-1/2 pr:-translate-y-1/2 pr:overflow-hidden pr:rounded-[var(--pr-radius-lg)] pr:border pr:border-[var(--pr-color-border)] pr:bg-[var(--pr-color-surface)] pr:text-[color:var(--pr-color-text)] pr:shadow-[var(--pr-shadow-md)] pr:data-[state=open]:animate-[pr-dialog-in_200ms_var(--pr-ease-standard)] pr:data-[state=closed]:animate-[pr-dialog-out_200ms_var(--pr-ease-standard)]"
-        :class="dialogSizeClass"
+        :class="[dialogSizeClass, $slots.footer ? 'pr:grid-rows-[auto_minmax(0,1fr)_auto]' : 'pr:grid-rows-[auto_minmax(0,1fr)]']"
         v-bind="description ? {} : { 'aria-describedby': undefined }"
       >
         <div class="pr-dialog__header pr:flex pr:items-start pr:justify-between pr:gap-[var(--pr-space-4)] pr:border-b pr:border-[var(--pr-color-border)] pr:p-[var(--pr-space-5)]">
