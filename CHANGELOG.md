@@ -2,6 +2,14 @@
 
 Toutes les evolutions notables de `@oremis/prisme`. Avant la 1.0, un changement cassant incremente la version mineure.
 
+## 1.0.0-rc.18 (2026-11-26)
+
+Dix-huitieme version candidate, sous le tag npm `next`. Un `PrDialog` plus haut que l'ecran defile. Aucun changement cassant.
+
+### Corrections
+
+- **`PrDialog`** : un contenu plus haut que l'ecran etait coupe en bas et ne defilait pas (un formulaire long perdait son bouton d'envoi sur un ordinateur portable). Le dialog donne a ses lignes une taille, comme `PrSheet` : l'en-tete et le pied gardent la leur, le corps prend le reste et defile.
+
 ## 1.0.0-rc.17 (2026-11-25)
 
 Dix-septieme version candidate, sous le tag npm `next`. L'editeur par blocs garde sa barre de mise en forme. Aucun changement cassant.
